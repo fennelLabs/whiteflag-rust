@@ -1,0 +1,7 @@
+services:
+  dev:
+    build: .
+    working_dir: /app
+    volumes:
+      - ./:/app
+    entrypoint: sh docker-entry.sh
