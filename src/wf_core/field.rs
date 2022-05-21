@@ -1,4 +1,4 @@
-use crate::wf_codec::common::extract_bits;
+use crate::wf_buffer::common::extract_bits;
 
 use super::{
     error::{WhiteflagError, WhiteflagResult},

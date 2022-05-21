@@ -1,7 +1,7 @@
 use super::basic_message::BasicMessage;
 use super::segment::MessageSegment;
 use super::types::MessageType;
-use super::wf_codec::common::{crop_bits, decode_from_hexadecimal, to_hex};
+use super::wf_buffer::common::{crop_bits, decode_from_hexadecimal, to_hex};
 
 pub const PREFIX: &str = "WF";
 pub const PROTOCOL_VERSION: &str = "1";

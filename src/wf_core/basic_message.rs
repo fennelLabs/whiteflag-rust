@@ -1,4 +1,4 @@
-use super::wf_codec::common::append_bits;
+use super::wf_buffer::common::append_bits;
 use super::{segment::MessageSegment, types::MessageType};
 
 pub struct BasicMessage {

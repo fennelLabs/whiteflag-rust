@@ -75,7 +75,7 @@ impl MessageSegment {
             } */
             let field_length = field.bit_length();
             //buffer.appendBits(field.encode(), field.bitLength());
-            buffer = super::wf_codec::common::concatinate_bits(
+            buffer = super::wf_buffer::common::concatinate_bits(
                 &buffer,
                 len,
                 &field.encode().expect("field had no value"),
