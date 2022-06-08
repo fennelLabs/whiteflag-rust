@@ -13,17 +13,17 @@ fn serialize() {
     let verification_data = "https://organisation.int/whiteflag";
 
     let json = format!(
-        "{{
-        \"prefix\": \"{}\",
-        \"version\": \"{}\",
-        \"encryptionIndicator\": \"{}\",
-        \"duressIndicator\": \"{}\",
-        \"messageCode\": \"{}\",
-        \"referenceIndicator\": \"{}\",
-        \"referencedMessage\": \"{}\",
-        \"verificationMethod\": \"{}\",
-        \"verificationData\": \"{}\"
-    }}",
+        r#"{{
+        "prefix": "{}",
+        "version": "{}",
+        "encryptionIndicator": "{}",
+        "duressIndicator": "{}",
+        "messageCode": "{}",
+        "referenceIndicator": "{}",
+        "referencedMessage": "{}",
+        "verificationMethod": "{}",
+        "verificationData": "{}"
+    }}"#,
         prefix,
         version,
         encryption_indicator,
