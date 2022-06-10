@@ -6,7 +6,7 @@ fn serialize_authentication_message() {
     let version = "1";
     let encryption_indicator = "0";
     let duress_indicator = "0";
-    let message_code = "A";
+    let message_code = 'A';
     let reference_indicator = "0";
     let referenced_message = "0000000000000000000000000000000000000000000000000000000000000000";
     let verification_method = "1";
@@ -44,7 +44,7 @@ fn serialize_authentication_message() {
         auth_message.header.encryption_indicator
     );
     assert_eq!(duress_indicator, auth_message.header.duress_indicator);
-    assert_eq!(message_code, auth_message.header.message_code.to_string());
+    assert_eq!(message_code, auth_message.header.message_code);
     assert_eq!(reference_indicator, auth_message.header.reference_indicator);
     assert_eq!(referenced_message, auth_message.header.referenced_message);
     assert_eq!(verification_method, auth_message.verification_method);
@@ -57,7 +57,7 @@ fn serialize_message() {
     let version = "1";
     let encryption_indicator = "0";
     let duress_indicator = "0";
-    let message_code = "A";
+    let message_code = 'A';
     let reference_indicator = "0";
     let referenced_message = "0000000000000000000000000000000000000000000000000000000000000000";
     let verification_method = "1";
@@ -92,7 +92,7 @@ fn serialize_message() {
     assert_eq!(version, wf_message.header.version);
     assert_eq!(encryption_indicator, wf_message.header.encryption_indicator);
     assert_eq!(duress_indicator, wf_message.header.duress_indicator);
-    assert_eq!(message_code, wf_message.header.message_code.to_string());
+    assert_eq!(message_code, wf_message.header.message_code);
     assert_eq!(reference_indicator, wf_message.header.reference_indicator);
     assert_eq!(referenced_message, wf_message.header.referenced_message);
     assert_eq!(verification_method, wf_message.verification_method);
