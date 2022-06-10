@@ -1,5 +1,5 @@
 use super::creator::{decode, encode};
-use crate::wf_models::AuthenticationMessage;
+use crate::wf_models::{AuthenticationMessage, MessageHeader};
 
 #[test]
 fn encode_sign_signal_message() {
@@ -142,15 +142,17 @@ fn encode_auth_message() {
     let encoding_result: String = "5746313020800000000000000000000000000000000000000000000000000000000000000000b43a3a38399d1797b7b933b0b734b9b0ba34b7b71734b73a17bbb434ba32b33630b380".to_string();
 
     let auth_message = AuthenticationMessage {
-        prefix: String::from("WF"),
-        version: String::from("1"),
-        encryption_indicator: String::from("0"),
-        duress_indicator: String::from("0"),
-        message_code: String::from("A"),
-        reference_indicator: String::from("0"),
-        referenced_message: String::from(
-            "0000000000000000000000000000000000000000000000000000000000000000",
-        ),
+        header: MessageHeader {
+            prefix: String::from("WF"),
+            version: String::from("1"),
+            encryption_indicator: String::from("0"),
+            duress_indicator: String::from("0"),
+            message_code: 'A',
+            reference_indicator: String::from("0"),
+            referenced_message: String::from(
+                "0000000000000000000000000000000000000000000000000000000000000000",
+            ),
+        },
         verification_method: String::from("1"),
         verification_data: String::from("https://organisation.int/whiteflag"),
     };
