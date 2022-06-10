@@ -1,4 +1,3 @@
-use super::WhiteflagEncodeCompatible;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -13,16 +12,16 @@ pub struct MessageHeader {
     pub referenced_message: String,
 }
 
-impl WhiteflagEncodeCompatible for MessageHeader {
-    fn to_field_values(self) -> Vec<String> {
+impl From<MessageHeader> for Vec<String> {
+    fn from(message: MessageHeader) -> Self {
         vec![
-            self.prefix,
-            self.version,
-            self.encryption_indicator,
-            self.duress_indicator,
-            self.message_code.to_string(),
-            self.reference_indicator,
-            self.referenced_message,
+            message.prefix,
+            message.version,
+            message.encryption_indicator,
+            message.duress_indicator,
+            message.message_code.to_string(),
+            message.reference_indicator,
+            message.referenced_message,
         ]
     }
 }

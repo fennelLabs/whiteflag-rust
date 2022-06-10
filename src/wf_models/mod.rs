@@ -20,27 +20,22 @@ pub struct WhiteflagMessage {
     pub body: HashMap<String, Value>,
 }
 
-pub trait WhiteflagEncodeCompatible {
-    fn to_field_values(self) -> Vec<String>;
-}
-
+// implicit trait syntax dyn T
 impl WhiteflagMessage {
     pub fn from_json<T: AsRef<str>>(json: T) -> WhiteflagMessage {
         let wf_message: WhiteflagMessage = serde_json::from_str(json.as_ref()).unwrap();
         wf_message
     }
-}
 
-impl WhiteflagEncodeCompatible for WhiteflagMessage {
-    fn to_field_values(self) -> Vec<String> {
+    pub fn to_field_values(self) -> Result<Vec<String>, String> {
         match &self.header.message_code {
             'A' => {
-                let auth: AuthenticationMessage = self.into();
-                return auth.to_field_values();
+                let auth: AuthenticationMessage = self.try_into()?;
+                return Ok(auth.into());
             }
             _ => {}
         };
 
-        vec![]
+        Ok(vec![])
     }
 }

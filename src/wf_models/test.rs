@@ -1,4 +1,4 @@
-use super::{AuthenticationMessage, WhiteflagMessage, WhiteflagEncodeCompatible};
+use super::{AuthenticationMessage, WhiteflagMessage};
 
 #[test]
 fn serialize_authentication_message() {
@@ -86,7 +86,7 @@ fn serialize_message() {
         verification_data
     );
 
-    let wf_message: AuthenticationMessage = WhiteflagMessage::from_json(&json).into();
+    let wf_message: AuthenticationMessage = WhiteflagMessage::from_json(&json).try_into().unwrap();
 
     assert_eq!(prefix, wf_message.header.prefix);
     assert_eq!(version, wf_message.header.version);
@@ -134,7 +134,9 @@ fn serialize_message_into_values() {
         verification_data
     );
 
-    let values = WhiteflagMessage::from_json(&json).to_field_values();
+    let values = WhiteflagMessage::from_json(&json)
+        .to_field_values()
+        .unwrap();
 
     assert_eq!(prefix, values[0]);
     assert_eq!(version, values[1]);
