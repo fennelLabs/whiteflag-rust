@@ -1,5 +1,5 @@
 use super::creator::{decode, encode};
-use crate::wf_models::{AuthenticationMessage, MessageHeader};
+use crate::wf_models::{AuthenticationMessage, MessageHeader, WhiteflagEncodeCompatible};
 
 #[test]
 fn encode_sign_signal_message() {

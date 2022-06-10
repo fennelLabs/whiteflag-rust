@@ -86,7 +86,7 @@ fn serialize_message() {
         verification_data
     );
 
-    let wf_message: WhiteflagMessage = serde_json::from_str(&json).unwrap();
+    let wf_message: AuthenticationMessage = WhiteflagMessage::from_json(&json).into();
 
     assert_eq!(prefix, wf_message.header.prefix);
     assert_eq!(version, wf_message.header.version);
@@ -95,12 +95,6 @@ fn serialize_message() {
     assert_eq!(message_code, wf_message.header.message_code.to_string());
     assert_eq!(reference_indicator, wf_message.header.reference_indicator);
     assert_eq!(referenced_message, wf_message.header.referenced_message);
-    assert_eq!(
-        verification_method,
-        wf_message.body.get("verificationMethod").unwrap()
-    );
-    assert_eq!(
-        verification_data,
-        wf_message.body.get("verificationData").unwrap()
-    );
+    assert_eq!(verification_method, wf_message.verification_method);
+    assert_eq!(verification_data, wf_message.verification_data);
 }
