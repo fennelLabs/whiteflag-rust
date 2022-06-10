@@ -7,6 +7,7 @@ mod test;
 
 mod authentication;
 mod header;
+mod serialize;
 
 pub use authentication::AuthenticationMessage;
 pub use header::MessageHeader;

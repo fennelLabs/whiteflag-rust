@@ -1,3 +1,4 @@
+use super::field::Field;
 use super::wf_buffer::common::append_bits;
 use super::{segment::MessageSegment, types::MessageType};
 
@@ -54,5 +55,12 @@ impl BasicMessage {
             .get(fieldname.as_ref())
             .or(self.body.get(fieldname.as_ref()))
             .or(None)
+    }
+
+    pub fn get_fields(&self) -> Vec<&Field> {
+        let mut fields: Vec<&Field> = vec![];
+        fields.extend(&self.header.fields);
+        fields.extend(&self.body.fields);
+        fields
     }
 }

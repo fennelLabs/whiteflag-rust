@@ -14,5 +14,7 @@ pub fn encode_from_json<T: AsRef<str>>(json: T) -> Result<String, String> {
 }
 
 pub fn decode_from_hex<T: AsRef<str>>(hex: T) -> Result<String, String> {
-    Ok(String::from(hex.as_ref()))
+    let message = wf_core::creator::decode(hex);
+    let json = serde_json::to_string(&message).expect("serialization issue");
+    Ok(json)
 }
