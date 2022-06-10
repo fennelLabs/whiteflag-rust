@@ -86,7 +86,8 @@ fn serialize_message() {
         verification_data
     );
 
-    let wf_message: AuthenticationMessage = WhiteflagMessage::from_json(&json).try_into().unwrap();
+    let message: WhiteflagMessage = serde_json::from_str(&json).unwrap();
+    let wf_message: AuthenticationMessage = message.try_into().unwrap();
 
     assert_eq!(prefix, wf_message.header.prefix);
     assert_eq!(version, wf_message.header.version);
@@ -134,9 +135,8 @@ fn serialize_message_into_values() {
         verification_data
     );
 
-    let values = WhiteflagMessage::from_json(&json)
-        .to_field_values()
-        .unwrap();
+    let message: WhiteflagMessage = serde_json::from_str(&json).unwrap();
+    let values: Vec<String> = message.try_into().unwrap();
 
     assert_eq!(prefix, values[0]);
     assert_eq!(version, values[1]);
