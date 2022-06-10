@@ -32,6 +32,28 @@ fn name_map(name: &str) -> &'static str {
         /* authentication */
         "VerificationMethod" => "verificationMethod",
         "VerificationData" => "verificationData",
+        /* crypto */
+        "CryptoDataType" => "cryptoDataType",
+        "CryptoData" => "cryptoData",
+        /* free text */
+        "Text" => "text",
+        /* resource */
+        "ResourceMethod" => "resourceMethod",
+        "ResourceData" => "resourceData",
+        /* test */
+        "PseudoMessageCode" => "pseudoMessageCode",
+        /* sign signal */
+        "SubjectCode" => "subjectCode",
+        "DateTime" => "dateTime",
+        "Duration" => "duration",
+        "ObjectType" => "objectType",
+        "ObjectLatitude" => "objectLatitude",
+        "ObjectLongitude" => "objectLongitude",
+        "ObjectSizeDim1" => "objectSizeDim1",
+        "ObjectSizeDim2" => "objectSizeDim2",
+        "ObjectOrientation" => "objectOrientation",
+        /* request */
+        "ObjectTypeQuant" => "objectTypeQuant",
         _ => "",
     }
 }
