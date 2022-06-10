@@ -36,6 +36,7 @@ impl WhiteflagEncodeCompatible for WhiteflagMessage {
         match &self.header.message_code {
             'A' => {
                 let auth: AuthenticationMessage = self.into();
+                return auth.to_field_values();
             }
             _ => {}
         };
