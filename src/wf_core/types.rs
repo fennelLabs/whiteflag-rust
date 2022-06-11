@@ -3,7 +3,7 @@ use super::field::Field;
 use super::segment::MessageSegment;
 
 pub struct MessageType {
-    message_code: char,
+    pub message_code: char,
     pub headers: MessageSegment,
     pub body: MessageSegment,
 }

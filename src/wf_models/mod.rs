@@ -1,46 +1,38 @@
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use std::collections::HashMap;
 
 #[cfg(test)]
 mod test;
 
-/* #[derive(Serialize, Deserialize)]
-pub struct HeaderSegment {
-    prefix: String,
-    version: String,
-    encryption_indicator: String,
-    duress_indicator: String,
-    message_code: String,
-    reference_indicator: String,
-    referenced_message: String,
-} */
+mod authentication;
+mod header;
+mod serialize;
+
+pub use authentication::AuthenticationMessage;
+pub use header::MessageHeader;
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all(deserialize = "camelCase"))]
-pub struct AuthenticationMessage {
-    pub prefix: String,
-    pub version: String,
-    pub encryption_indicator: String,
-    pub duress_indicator: String,
-    pub message_code: String,
-    pub reference_indicator: String,
-    pub referenced_message: String,
-
-    pub verification_method: String,
-    pub verification_data: String,
+pub struct WhiteflagMessage {
+    #[serde(flatten)]
+    pub header: MessageHeader,
+    #[serde(flatten)]
+    pub body: HashMap<String, Value>,
 }
 
-impl AuthenticationMessage {
-    pub fn to_field_values(self) -> Vec<String> {
-        vec![
-            self.prefix,
-            self.version,
-            self.encryption_indicator,
-            self.duress_indicator,
-            self.message_code,
-            self.reference_indicator,
-            self.referenced_message,
-            self.verification_method,
-            self.verification_data,
-        ]
+impl TryFrom<WhiteflagMessage> for Vec<String> {
+    type Error = String;
+
+    fn try_from(message: WhiteflagMessage) -> Result<Self, Self::Error> {
+        let values: Vec<String> = match &message.header.message_code {
+            'A' => {
+                let auth: AuthenticationMessage = message.try_into()?;
+                auth.into()
+            }
+            _ => vec![],
+        };
+
+        Ok(values)
     }
 }
