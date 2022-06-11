@@ -1,4 +1,5 @@
 use super::{AuthenticationMessage, WhiteflagMessage};
+use serde_json::json;
 
 #[test]
 fn serialize_authentication_message() {
@@ -12,28 +13,18 @@ fn serialize_authentication_message() {
     let verification_method = "1";
     let verification_data = "https://organisation.int/whiteflag";
 
-    let json = format!(
-        r#"{{
-        "prefix": "{}",
-        "version": "{}",
-        "encryptionIndicator": "{}",
-        "duressIndicator": "{}",
-        "messageCode": "{}",
-        "referenceIndicator": "{}",
-        "referencedMessage": "{}",
-        "verificationMethod": "{}",
-        "verificationData": "{}"
-    }}"#,
-        prefix,
-        version,
-        encryption_indicator,
-        duress_indicator,
-        message_code,
-        reference_indicator,
-        referenced_message,
-        verification_method,
-        verification_data
-    );
+    let json = json!({
+        "prefix": prefix,
+        "version": version,
+        "encryptionIndicator": encryption_indicator,
+        "duressIndicator": duress_indicator,
+        "messageCode": message_code,
+        "referenceIndicator": reference_indicator,
+        "referencedMessage": referenced_message,
+        "verificationMethod": verification_method,
+        "verificationData": verification_data
+    })
+    .to_string();
 
     let auth_message: AuthenticationMessage = serde_json::from_str(&json).unwrap();
 
@@ -63,28 +54,18 @@ fn serialize_message() {
     let verification_method = "1";
     let verification_data = "https://organisation.int/whiteflag";
 
-    let json = format!(
-        r#"{{
-        "prefix": "{}",
-        "version": "{}",
-        "encryptionIndicator": "{}",
-        "duressIndicator": "{}",
-        "messageCode": "{}",
-        "referenceIndicator": "{}",
-        "referencedMessage": "{}",
-        "verificationMethod": "{}",
-        "verificationData": "{}"
-    }}"#,
-        prefix,
-        version,
-        encryption_indicator,
-        duress_indicator,
-        message_code,
-        reference_indicator,
-        referenced_message,
-        verification_method,
-        verification_data
-    );
+    let json = json!({
+        "prefix": prefix,
+        "version": version,
+        "encryptionIndicator": encryption_indicator,
+        "duressIndicator": duress_indicator,
+        "messageCode": message_code,
+        "referenceIndicator": reference_indicator,
+        "referencedMessage": referenced_message,
+        "verificationMethod": verification_method,
+        "verificationData": verification_data
+    })
+    .to_string();
 
     let message: WhiteflagMessage = serde_json::from_str(&json).unwrap();
     let wf_message: AuthenticationMessage = message.try_into().unwrap();
@@ -112,28 +93,18 @@ fn serialize_message_into_values() {
     let verification_method = "1";
     let verification_data = "https://organisation.int/whiteflag";
 
-    let json = format!(
-        r#"{{
-        "prefix": "{}",
-        "version": "{}",
-        "encryptionIndicator": "{}",
-        "duressIndicator": "{}",
-        "messageCode": "{}",
-        "referenceIndicator": "{}",
-        "referencedMessage": "{}",
-        "verificationMethod": "{}",
-        "verificationData": "{}"
-    }}"#,
-        prefix,
-        version,
-        encryption_indicator,
-        duress_indicator,
-        message_code,
-        reference_indicator,
-        referenced_message,
-        verification_method,
-        verification_data
-    );
+    let json = json!({
+        "prefix": prefix,
+        "version": version,
+        "encryptionIndicator": encryption_indicator,
+        "duressIndicator": duress_indicator,
+        "messageCode": message_code,
+        "referenceIndicator": reference_indicator,
+        "referencedMessage": referenced_message,
+        "verificationMethod": verification_method,
+        "verificationData": verification_data
+    })
+    .to_string();
 
     let message: WhiteflagMessage = serde_json::from_str(&json).unwrap();
     let values: Vec<String> = message.try_into().unwrap();
