@@ -7,10 +7,9 @@ mod wf_core;
 mod wf_models;
 
 pub fn encode_from_json<T: AsRef<str>>(json: T) -> Result<String, String> {
-    let message: wf_models::WhiteflagMessage =
+    let message: wf_models::WhiteflagFieldValues =
         serde_json::from_str(json.as_ref()).expect("deserialization error");
-    let values: Vec<String> = message.try_into()?;
-    Ok(wf_core::creator::encode(&values))
+    Ok(wf_core::creator::encode(&message.fields))
 }
 
 pub fn decode_from_hex<T: AsRef<str>>(hex: T) -> Result<String, String> {
