@@ -72,13 +72,13 @@ fn name_map(name: &str) -> usize {
         "datetime" => 16,
         "duration" => 17,
         "objecttype" => 18,
-        "objectLatitude" => 19,
-        "objectLongitude" => 20,
-        "objectSizeDim1" => 21,
-        "objectSizeDim2" => 22,
-        "objectOrientation" => 23,
+        "objectlatitude" => 19,
+        "objectlongitude" => 20,
+        "objectsizedim1" => 21,
+        "objectsizedim2" => 22,
+        "objectorientation" => 23,
         /* request */
-        "objectTypeQuant" => 24,
+        "objecttypequant" => 24,
         _ => 100, // eventually going to impplement an error here
     }
 }
