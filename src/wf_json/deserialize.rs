@@ -31,7 +31,7 @@ impl<'de> de::Visitor<'de> for FieldValuesVisitor {
         let mut fields: HashMap<usize, String> = HashMap::new();
 
         while let Some((key, value)) = map.next_entry::<String, String>()? {
-            let index = name_map(&key);
+            let index = name_map(&key).map_err(|e| serde::de::Error::custom(e))?;
             fields.insert(index, value);
         }
 
@@ -44,8 +44,8 @@ impl<'de> de::Visitor<'de> for FieldValuesVisitor {
     }
 }
 
-fn name_map(name: &str) -> usize {
-    match name.to_lowercase().as_str() {
+fn name_map(name: &str) -> Result<usize, String> {
+    let index = match name.to_lowercase().as_str() {
         /* headers */
         "prefix" => 0,
         "version" => 1,
@@ -79,6 +79,8 @@ fn name_map(name: &str) -> usize {
         "objectorientation" => 23,
         /* request */
         "objecttypequant" => 24,
-        _ => 100, // eventually going to impplement an error here
-    }
+        _ => return Err(format!("missing index for field: {}", &name)),
+    };
+
+    Ok(index)
 }

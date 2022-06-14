@@ -12,15 +12,16 @@ impl Serialize for BasicMessage {
         let mut state = serializer.serialize_struct("BasicMessage", length)?;
 
         for f in fields {
-            state.serialize_field(name_map(&f.name), f.get())?;
+            let json_name = name_map(&f.name).map_err(|e| serde::ser::Error::custom(e))?;
+            state.serialize_field(json_name, f.get())?;
         }
 
         state.end()
     }
 }
 
-fn name_map(name: &str) -> &'static str {
-    match name {
+fn name_map(name: &str) -> Result<&'static str, String> {
+    let json_name = match name {
         /* headers */
         "Prefix" => "prefix",
         "Version" => "version",
@@ -54,6 +55,8 @@ fn name_map(name: &str) -> &'static str {
         "ObjectOrientation" => "objectOrientation",
         /* request */
         "ObjectTypeQuant" => "objectTypeQuant",
-        _ => "",
-    }
+        _ => return Err(format!("missing support for field name: {}", name)),
+    };
+
+    Ok(json_name)
 }
