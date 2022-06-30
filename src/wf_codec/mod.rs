@@ -1,6 +1,3 @@
-#[cfg(test)]
-mod tests;
-
 use super::wf_buffer::*;
 
 pub mod binary;
