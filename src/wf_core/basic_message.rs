@@ -1,21 +1,17 @@
 use super::field::Field;
+use super::segment::MessageSegment;
 use super::wf_buffer::common::append_bits;
-use super::{segment::MessageSegment, types::MessageType};
 
 pub struct BasicMessage {
-    message_type: MessageType,
+    message_code: char,
     header: MessageSegment,
     body: MessageSegment,
 }
 
 impl BasicMessage {
-    pub fn new(
-        message_type: MessageType,
-        header: MessageSegment,
-        body: MessageSegment,
-    ) -> BasicMessage {
+    pub fn new(message_code: char, header: MessageSegment, body: MessageSegment) -> BasicMessage {
         BasicMessage {
-            message_type,
+            message_code,
             header,
             body,
         }
