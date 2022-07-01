@@ -1,8 +1,7 @@
-use super::definitions::*;
-use super::field::Field;
 use super::segment::MessageSegment;
+use crate::wf_field::get_body_from_code;
 
-pub struct MessageType {
+struct MessageType {
     pub message_code: char,
     pub body: MessageSegment,
 }
@@ -14,24 +13,14 @@ impl MessageType {
     }
 
     pub fn from_code(code: &char) -> MessageType {
-        let body: Vec<Field> = match code {
-            'A' => authentication_body_fields().to_vec(),
-            'K' => crypto_body_fields().to_vec(),
-            'T' => test_body_fields().to_vec(),
-            'R' => resource_body_fields().to_vec(),
-            'F' => freetext_body_fields().to_vec(),
-            'P' | 'E' | 'D' | 'S' | 'I' | 'M' | 'Q' => sign_signal_body_fields().to_vec(),
-            _ => Vec::<Field>::new(),
-        };
-
         MessageType {
             message_code: *code,
-            body: MessageSegment::from(body),
+            body: get_body_from_code(code),
         }
     }
 }
 
-pub enum MessageTypeEnum {
+enum MessageTypeEnum {
     /**
      * Undefined message type
      */

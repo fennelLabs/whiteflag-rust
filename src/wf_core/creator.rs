@@ -2,7 +2,7 @@ use super::basic_message::BasicMessage;
 use super::segment::MessageSegment;
 use super::wf_buffer::common::{decode_from_hexadecimal, to_hex};
 use crate::wf_convert::FieldValue;
-use crate::wf_field::get_message_type;
+use crate::wf_field::get_message_body;
 
 pub const PREFIX: &str = "WF";
 pub const PROTOCOL_VERSION: &str = "1";
@@ -22,8 +22,6 @@ pub fn encode<T: FieldValue>(fields: &[T]) -> String {
  */
 pub fn decode<T: AsRef<str>>(message: T) -> BasicMessage {
     let (buffer, bit_length) = decode_from_hexadecimal(message);
-    //let buffer = from_hex(message);
-    //let bit_length = buffer.len() * BYTE;
 
     let mut bit_cursor = 0;
     //let mut next_field = 0;
@@ -31,15 +29,13 @@ pub fn decode<T: AsRef<str>>(message: T) -> BasicMessage {
     let mut header: MessageSegment = MessageSegment::generic_header_segment();
     bit_cursor += header.decode(&buffer, bit_length, bit_cursor, 0); // header.bit_length();
 
-    let mut message_type = get_message_type(&header);
-
-    let body = &mut message_type.body;
+    let (mut body, code) = get_message_body(&header);
     body.decode(&buffer, bit_length, bit_cursor, 0);
     //bit_cursor += header.bit_length();
     //next_field = body.fields.len();
     //body.decode(&buffer, bit_length, bit_cursor, next_field);
 
-    BasicMessage::new(message_type.message_code, header, message_type.body)
+    BasicMessage::new(code, header, body)
 }
 
 /* public final WfMessageCreator decode(final WfBinaryBuffer msgBuffer) throws WfCoreException {
