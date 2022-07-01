@@ -1,5 +1,19 @@
-use super::definitions::generic_header_fields;
+use super::definitions::{generic_header_fields, get_body_from_code};
 use super::field::Field;
+use crate::wf_field::FIELD_MESSAGETYPE;
+
+pub fn get_message_code(header: &MessageSegment) -> char {
+    match header.get(&FIELD_MESSAGETYPE) {
+        Some(x) => x.chars().next(),
+        _ => None,
+    }
+    .expect("expected message code but none was found")
+}
+
+pub fn get_message_body(header: &MessageSegment) -> (MessageSegment, char) {
+    let message_code = get_message_code(header);
+    (MessageSegment::from_code(&message_code), message_code)
+}
 
 #[derive(Clone)]
 pub struct MessageSegment {
@@ -7,6 +21,10 @@ pub struct MessageSegment {
 }
 
 impl MessageSegment {
+    pub fn from_code(code: &char) -> MessageSegment {
+        MessageSegment::from(get_body_from_code(code))
+    }
+
     pub fn from(fields: Vec<Field>) -> MessageSegment {
         MessageSegment { fields }
     }

@@ -2,6 +2,18 @@ use super::field::Field;
 use super::wf_codec::encoding::*;
 use regex::Regex;
 
+pub fn get_body_from_code(code: &char) -> Vec<Field> {
+    match code {
+        'A' => authentication_body_fields().to_vec(),
+        'K' => crypto_body_fields().to_vec(),
+        'T' => test_body_fields().to_vec(),
+        'R' => resource_body_fields().to_vec(),
+        'F' => freetext_body_fields().to_vec(),
+        'P' | 'E' | 'D' | 'S' | 'I' | 'M' | 'Q' => sign_signal_body_fields().to_vec(),
+        _ => Vec::<Field>::new(),
+    }
+}
+
 pub enum FieldKind {
     GENERIC,
     AUTHENTICATION,

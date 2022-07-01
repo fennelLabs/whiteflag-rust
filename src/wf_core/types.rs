@@ -1,10 +1,7 @@
-use super::definitions::*;
-use super::field::Field;
-use super::segment::MessageSegment;
+use super::{segment::MessageSegment};
 
-pub struct MessageType {
+struct MessageType {
     pub message_code: char,
-    pub headers: MessageSegment,
     pub body: MessageSegment,
 }
 
@@ -15,25 +12,14 @@ impl MessageType {
     }
 
     pub fn from_code(code: &char) -> MessageType {
-        let body: Vec<Field> = match code {
-            'A' => authentication_body_fields().to_vec(),
-            'K' => crypto_body_fields().to_vec(),
-            'T' => test_body_fields().to_vec(),
-            'R' => resource_body_fields().to_vec(),
-            'F' => freetext_body_fields().to_vec(),
-            'P' | 'E' | 'D' | 'S' | 'I' | 'M' | 'Q' => sign_signal_body_fields().to_vec(),
-            _ => Vec::<Field>::new(),
-        };
-
         MessageType {
             message_code: *code,
-            headers: MessageSegment::generic_header_segment(),
-            body: MessageSegment::from(body),
+            body: MessageSegment::from_code(code),
         }
     }
 }
 
-pub enum MessageTypeEnum {
+enum MessageTypeEnum {
     /**
      * Undefined message type
      */
