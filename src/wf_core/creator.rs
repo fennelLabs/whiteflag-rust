@@ -1,8 +1,7 @@
 use super::basic_message::BasicMessage;
-use super::segment::MessageSegment;
+use super::segment::{MessageSegment, get_message_body};
 use super::wf_buffer::common::{decode_from_hexadecimal, to_hex};
 use crate::wf_convert::FieldValue;
-use crate::wf_field::get_message_body;
 
 pub const PREFIX: &str = "WF";
 pub const PROTOCOL_VERSION: &str = "1";

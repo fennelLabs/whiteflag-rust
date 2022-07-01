@@ -1,5 +1,4 @@
-use super::segment::MessageSegment;
-use crate::wf_field::get_body_from_code;
+use super::{segment::MessageSegment};
 
 struct MessageType {
     pub message_code: char,
@@ -15,7 +14,7 @@ impl MessageType {
     pub fn from_code(code: &char) -> MessageType {
         MessageType {
             message_code: *code,
-            body: get_body_from_code(code),
+            body: MessageSegment::from_code(code),
         }
     }
 }
