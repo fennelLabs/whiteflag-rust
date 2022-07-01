@@ -1,6 +1,6 @@
-use crate::{
-    wf_codec::common::{concatinate_bits, to_hex},
-    wf_codec::*,
+use super::{
+    common::{concatinate_bits, to_hex},
+    *,
 };
 
 fn assert_array_eq<T: PartialEq + std::fmt::Debug>(l: Vec<T>, r: Vec<T>) {
