@@ -16,7 +16,7 @@ pub fn compile<T: AsRef<str> + Into<String>>(data: &[T]) -> BasicMessage {
 
     let mut message_type = get_message_type(&header);
     let body_start_index = header.get_number_of_fields();
-    let mut body = &mut message_type.body;
+    let body = &mut message_type.body;
 
     //need switch statement here
 
@@ -51,7 +51,7 @@ pub fn decode<T: AsRef<str>>(message: T) -> BasicMessage {
 
     let mut message_type = get_message_type(&header);
 
-    let mut body = &mut message_type.body;
+    let body = &mut message_type.body;
     body.decode(&buffer, bit_length, bit_cursor, 0);
     //bit_cursor += header.bit_length();
     //next_field = body.fields.len();
