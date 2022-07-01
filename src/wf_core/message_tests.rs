@@ -1,4 +1,7 @@
-use super::creator::{decode, encode};
+use super::{
+    basic_message::BasicMessage,
+    creator::{decode, encode},
+};
 
 #[test]
 fn encode_sign_signal_message() {
@@ -54,41 +57,8 @@ fn decode_sign_signal_message() {
     let message = decode(encoding_result);
 
     //assert_eq!(message.set("Version", "2"), "Should not be able to change version field");
-    assert_eq!(
-        field_values[0],
-        message.get("Prefix"),
-        "Prefix should be correctly set"
-    );
-    assert_eq!(
-        field_values[1],
-        message.get("Version"),
-        "Version number should be correctly set"
-    );
-    assert_eq!(
-        field_values[2],
-        message.get("EncryptionIndicator"),
-        "Encryption indicator should be correctly set"
-    );
-    assert_eq!(
-        field_values[3],
-        message.get("DuressIndicator"),
-        "Duress indicator should be correctly set"
-    );
-    assert_eq!(
-        field_values[4],
-        message.get("MessageCode"),
-        "Message code should be correctly set"
-    );
-    assert_eq!(
-        field_values[5],
-        message.get("ReferenceIndicator"),
-        "Reference indicator should be correctly set"
-    );
-    assert_eq!(
-        field_values[6],
-        message.get("ReferencedMessage"),
-        "Referenced message should be correctly set"
-    );
+    assert_message_headers_are_valid(&field_values, &message);
+
     assert_eq!(
         field_values[7],
         message.get("SubjectCode"),
@@ -180,50 +150,57 @@ fn decode_auth_message() {
     //assert_eq!("Message type should be correct", A, message.getType());
     //assert_eq!(fieldValues.length, message.getNoFields(), "Number of fields should be equal to number of provided fields");
     //assert_eq!(message.getFieldNames().size(), message.getNoFields(), "Number of fields should be equal to number of field names in set");
-    assert_eq!(
-        field_values[0],
-        message.get("Prefix"),
-        "Prefix should be correctly set"
-    );
-    assert_eq!(
-        field_values[1],
-        message.get("Version"),
-        "Version number should be correctly set"
-    );
-    assert_eq!(
-        field_values[2],
-        message.get("EncryptionIndicator"),
-        "Encryption indicator should be correctly set"
-    );
-    assert_eq!(
-        field_values[3],
-        message.get("DuressIndicator"),
-        "Duress indicator should be correctly set"
-    );
-    assert_eq!(
-        field_values[4],
-        message.get("MessageCode"),
-        "Message code should be correctly set"
-    );
-    assert_eq!(
-        field_values[5],
-        message.get("ReferenceIndicator"),
-        "Reference indicator should be correctly set"
-    );
-    assert_eq!(
-        field_values[6],
-        message.get("ReferencedMessage"),
-        "Referenced message should be correctly set"
-    );
+
+    assert_message_headers_are_valid(&field_values, &message);
+
     assert_eq!(
         field_values[7],
         message.get("VerificationMethod"),
         "Verification method should be correctly set"
     );
+
     assert_eq!(
         field_values[8],
         message.get("VerificationData"),
         "Verification data should be correctly set"
     );
     //assertTrue("Message should be valid", message.isValid());
+}
+
+fn assert_message_headers_are_valid(data: &[&str], message: &BasicMessage) {
+    assert_eq!(
+        data[0],
+        message.get("Prefix"),
+        "Prefix should be correctly set"
+    );
+    assert_eq!(
+        data[1],
+        message.get("Version"),
+        "Version number should be correctly set"
+    );
+    assert_eq!(
+        data[2],
+        message.get("EncryptionIndicator"),
+        "Encryption indicator should be correctly set"
+    );
+    assert_eq!(
+        data[3],
+        message.get("DuressIndicator"),
+        "Duress indicator should be correctly set"
+    );
+    assert_eq!(
+        data[4],
+        message.get("MessageCode"),
+        "Message code should be correctly set"
+    );
+    assert_eq!(
+        data[5],
+        message.get("ReferenceIndicator"),
+        "Reference indicator should be correctly set"
+    );
+    assert_eq!(
+        data[6],
+        message.get("ReferencedMessage"),
+        "Referenced message should be correctly set"
+    );
 }
