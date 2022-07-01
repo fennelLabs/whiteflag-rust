@@ -1,21 +1,16 @@
 use super::basic_message::BasicMessage;
 use super::segment::MessageSegment;
-use super::types::MessageType;
-use super::wf_buffer::common::{crop_bits, decode_from_hexadecimal, to_hex};
+use super::wf_buffer::common::{decode_from_hexadecimal, to_hex};
 use crate::wf_convert::FieldValue;
+use crate::wf_field::get_message_type;
 
 pub const PREFIX: &str = "WF";
 pub const PROTOCOL_VERSION: &str = "1";
-pub const FIELD_PREFIX: &str = "Prefix";
-pub const FIELD_VERSION: &str = "Version";
-pub const FIELD_MESSAGETYPE: &str = "MessageCode";
-pub const FIELD_TESTMESSAGETYPE: &str = "PseudoMessageCode";
 
 pub fn encode<T: FieldValue>(fields: &[T]) -> String {
     let basic_message: BasicMessage = fields.into();
-    let (message_encoded, len) = basic_message.encode();
-
-    to_hex(&crop_bits(message_encoded, len as isize))
+    let message_encoded = basic_message.encode();
+    to_hex(&message_encoded)
 }
 
 /**
@@ -80,12 +75,3 @@ pub fn decode<T: AsRef<str>>(message: T) -> BasicMessage {
     body.decode(msgBuffer, bitCursor, nextField);
     return this;
 } */
-
-fn get_message_type(header: &MessageSegment) -> MessageType {
-    let message_code = match header.get(&FIELD_MESSAGETYPE) {
-        Some(x) => x.chars().next(),
-        _ => None,
-    };
-
-    MessageType::from_code_option(message_code.as_ref())
-}

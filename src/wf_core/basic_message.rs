@@ -1,6 +1,6 @@
 use super::field::Field;
 use super::segment::MessageSegment;
-use super::wf_buffer::common::append_bits;
+use super::wf_buffer::common::{append_bits, crop_bits};
 
 pub struct BasicMessage {
     message_code: char,
@@ -17,7 +17,7 @@ impl BasicMessage {
         }
     }
 
-    pub fn encode(&self) -> (Vec<u8>, usize) {
+    pub fn encode(&self) -> Vec<u8> {
         let mut buffer: Vec<u8> = vec![];
         let mut len = 0;
 
@@ -27,7 +27,7 @@ impl BasicMessage {
         (buffer, len) = append_bits(&buffer, len, &header_buffer, header_len);
         (buffer, len) = append_bits(&buffer, len, &body_buffer, body_len);
 
-        (buffer, len)
+        crop_bits(buffer, len as isize)
     }
 
     /**
