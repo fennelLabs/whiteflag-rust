@@ -167,6 +167,30 @@ fn decode_auth_message() {
     //assertTrue("Message should be valid", message.isValid());
 }
 
+#[test]
+#[should_panic(expected = "InvalidPattern")]
+fn encode_auth_message_incorrect_length() {
+    let encoding_result: String = "5746313020800000000000000000000000000000000000000000000000000000000000000000b43a3a38399d1797b7b933b0b734b9b0ba34b7b71734b73a17bbb434ba32b33630b380".to_string();
+
+    let auth_message = vec![
+        "WF",
+        "1",
+        "0",
+        "0",
+        "A",
+        "0",
+        "000000000000000000000000000000000000000000000000000000000000000",
+        "1",
+        "https://organisation.int/whiteflag",
+    ];
+
+    assert_eq!(
+        encoding_result,
+        encode(&auth_message),
+        "Encoding should be correct"
+    );
+}
+
 fn assert_message_headers_are_valid(data: &[&str], message: &BasicMessage) {
     assert_eq!(
         data[0],

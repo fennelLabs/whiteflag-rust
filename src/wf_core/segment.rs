@@ -34,7 +34,10 @@ impl MessageSegment {
                 throw new WfCoreException("Field " + field.debugInfo() + " already set or array item " + index + " contains invalid data: " + data[index], null);
             } */
             let value = &data[index];
-            field.set(value.as_ref()).unwrap();
+            match field.set(value.as_ref()) {
+                Ok(_) => println!("Message field set successfully."),
+                Err(e) => panic!("{:?}", e)
+            }
             index += 1;
         }
 
