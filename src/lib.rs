@@ -6,6 +6,7 @@ mod tests;
 mod error;
 mod wf_buffer;
 mod wf_codec;
+mod wf_convert;
 mod wf_core;
 mod wf_json;
 
