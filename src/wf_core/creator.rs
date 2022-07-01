@@ -14,14 +14,14 @@ pub fn compile<T: AsRef<str> + Into<String>>(data: &[T]) -> BasicMessage {
     let mut header: MessageSegment = MessageSegment::generic_header_segment();
     header.set_all(data.as_ref(), 0);
 
-    let message_type = get_message_type(&header);
+    let mut message_type = get_message_type(&header);
     let body_start_index = header.get_number_of_fields();
-    let mut body = message_type.body.clone();
+    let mut body = &mut message_type.body;
 
     //need switch statement here
 
     body.set_all(data.as_ref(), body_start_index);
-    BasicMessage::new(message_type, header, body)
+    BasicMessage::new(message_type.message_code, header, message_type.body)
 }
 
 pub fn encode<T: AsRef<str> + Into<String>>(fields: &[T]) -> String {
@@ -49,16 +49,15 @@ pub fn decode<T: AsRef<str>>(message: T) -> BasicMessage {
     let mut header: MessageSegment = MessageSegment::generic_header_segment();
     bit_cursor += header.decode(&buffer, bit_length, bit_cursor, 0); // header.bit_length();
 
-    let message_type = get_message_type(&header);
+    let mut message_type = get_message_type(&header);
 
-    let mut body = message_type.body.clone();
+    let mut body = &mut message_type.body;
     body.decode(&buffer, bit_length, bit_cursor, 0);
     //bit_cursor += header.bit_length();
     //next_field = body.fields.len();
-
     //body.decode(&buffer, bit_length, bit_cursor, next_field);
 
-    BasicMessage::new(message_type, header, body)
+    BasicMessage::new(message_type.message_code, header, message_type.body)
 }
 
 /* public final WfMessageCreator decode(final WfBinaryBuffer msgBuffer) throws WfCoreException {
