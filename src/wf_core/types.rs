@@ -4,7 +4,6 @@ use super::segment::MessageSegment;
 
 pub struct MessageType {
     pub message_code: char,
-    pub headers: MessageSegment,
     pub body: MessageSegment,
 }
 
@@ -27,7 +26,6 @@ impl MessageType {
 
         MessageType {
             message_code: *code,
-            headers: MessageSegment::generic_header_segment(),
             body: MessageSegment::from(body),
         }
     }
