@@ -264,7 +264,7 @@ impl WhiteflagMessage {
         todo!()
     }
 
-    pub fn encode(&self) -> Vec<u8> {
+    pub fn encode(&self) -> WfBinaryBuffer {
         todo!()
     }
 
@@ -281,7 +281,7 @@ impl WhiteflagMessage {
     }
 
     pub fn decrypt(
-        encrypted_msg: WhiteflagMessage,
+        encrypted_msg: WfBinaryBuffer,
         originator: WfAccountImpl,
         recipient: WfAccountImpl,
         init_vector: Vec<u8>,
