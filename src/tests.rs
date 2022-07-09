@@ -49,7 +49,7 @@ fn test_compile_auth_message() {
     assert_eq!("A", message.message_type());
     assert_eq!(field_values[0], message.prefix());
     assert_eq!(field_values[1], message.version());
-    assert_eq!(field_values[2], message.get_encryption_indicator());
+    assert_eq!(field_values[2], message.encryption_indicator());
     assert_eq!(field_values[3], message.duress_indictor());
     assert_eq!(field_values[4], message.message_code());
     assert_eq!(field_values[5], message.reference_indicator());

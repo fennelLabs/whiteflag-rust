@@ -75,8 +75,8 @@ impl WhiteflagMessage {
         }
     }
 
-    pub fn get_encryption_indicator(&self) -> String {
-        self.encryption_indicator.clone()
+    pub fn encryption_indicator(&self) -> &str {
+        self.encryption_indicator.as_ref()
     }
     pub fn set_encryption_indicator(&mut self, arg: String) -> bool {
         if self.encryption_indicator == "" {
@@ -108,8 +108,8 @@ impl WhiteflagMessage {
         return false;
     }
 
-    pub fn get_transaction_hash(&self) -> String {
-        self.transaction_hash.clone()
+    pub fn get_transaction_hash(&self) -> Option<String> {
+        Some(self.transaction_hash.clone())
     }
     pub fn set_transaction_hash(&mut self, arg: String) -> Option<String> {
         if self.transaction_hash == "" {
@@ -238,5 +238,138 @@ impl WhiteflagMessage {
     /// Get a reference to the whiteflag message's verification data.
     pub fn verification_data(&self) -> &str {
         self.verification_data.as_ref()
+    }
+
+    pub fn compile(field_values: Vec<&str>) -> Option<WhiteflagMessage> {
+        todo!()
+    }
+
+    pub fn decode(arg: &str) -> Option<WhiteflagMessage> {
+        todo!()
+    }
+
+    pub fn deserialize(message_serialized: &str) -> Option<WhiteflagMessage> {
+        todo!()
+    }
+
+    pub fn to_json(&self) -> String {
+        todo!()
+    }
+
+    pub fn deserializeJson(json_message_str: String) -> Option<WhiteflagMessage> {
+        todo!()
+    }
+
+    pub fn is_encryption_indicator_valid(&self) -> bool {
+        todo!()
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        todo!()
+    }
+
+    pub fn serialize(&self) -> &str {
+        todo!()
+    }
+
+    pub fn datetime(&self) -> &str {
+        todo!()
+    }
+
+    pub fn to_string(&self) -> &str {
+        todo!()
+    }
+
+    pub fn decrypt(
+        encrypted_msg: WhiteflagMessage,
+        originator: WfAccountImpl,
+        recipient: WfAccountImpl,
+        init_vector: Vec<u8>,
+    ) -> WhiteflagMessage {
+        todo!()
+    }
+
+    pub fn encrypt(&self) -> WhiteflagMessage {
+        todo!()
+    }
+
+    pub fn get_init_vector(&self) -> Vec<u8> {
+        todo!()
+    }
+
+    pub fn set_init_vector(&self, vector: &str) {
+        todo!()
+    }
+
+    pub fn set_duress_indicator(&self, indicator: &str) -> bool {
+        todo!()
+    }
+
+    pub fn set_message_code(&self, code: &str) -> bool {
+        todo!()
+    }
+
+    pub fn set_originator(&self, originator: WfAccountImpl) {
+        todo!()
+    }
+
+    pub fn set_recipient(&self, recipient: WfAccountImpl) {
+        todo!()
+    }
+
+    pub fn set_reference_indicator(&self, indicator: &str) -> bool {
+        todo!()
+    }
+
+    pub fn text(&self) -> &str {
+        todo!()
+    }
+
+    pub fn set_text(&self, text: &str) -> bool {
+        todo!()
+    }
+
+    pub fn duration(&self) -> &str {
+        todo!()
+    }
+
+    pub fn object_latitude(&self) -> &str {
+        todo!()
+    }
+
+    pub fn object_longitude(&self) -> &str {
+        todo!()
+    }
+
+    pub fn object_size_dim_one(&self) -> &str {
+        todo!()
+    }
+
+    pub fn object_size_dim_two(&self) -> &str {
+        todo!()
+    }
+
+    pub fn object_orientation(&self) -> &str {
+        todo!()
+    }
+
+    pub fn pseudo_message_code(&self) -> &str {
+        todo!()
+    }
+
+    pub fn object_type_one(&self) -> &str {
+        todo!()
+    }
+
+    pub fn object_type_one_quantity(&self) -> &str {
+        todo!()
+    }
+
+    pub fn object_type_two(&self) -> &str {
+        todo!()
+    }
+
+    pub fn object_type_two_quantity(&self) -> &str {
+        todo!()
     }
 }
