@@ -1,6 +1,6 @@
 use super::{
-    constants::{BYTE},
-    common::{concatinate_bits, to_hex},
+    common::{concatinate_bits, extract_bits, to_hex},
+    constants::BYTE,
     *,
 };
 
@@ -122,37 +122,56 @@ fn test_append_bits_1() {
 
 #[test]
 fn test_append_bits_2() {
-
     let byte_array_1: Vec<u8> = vec![0xE6, 0x38, 0x87]; // 1110 0110 | 0011 1000 | 1000 0111
     let byte_array_2: Vec<u8> = vec![0x6E, 0x6f]; // 0110 1110 | 0111 1111
     let mut begin: Vec<u8> = vec![];
 
     begin = concatinate_bits(&begin, 0, &byte_array_1, 24);
 
-    assert_eq!(begin.len() * BYTE, 24, "Binary buffer length should be 24 bits");
-    assert_eq!(&byte_array_2.len() * BYTE, 16, "Binary buffer length should be 16 bits");
-    assert_eq!(to_hex(&begin), "e63887", "Byte array 1 should have been correctly added to the binary buffer");
+    assert_eq!(
+        begin.len() * BYTE,
+        24,
+        "Binary buffer length should be 24 bits"
+    );
+    assert_eq!(
+        &byte_array_2.len() * BYTE,
+        16,
+        "Binary buffer length should be 16 bits"
+    );
+    assert_eq!(
+        to_hex(&begin),
+        "e63887",
+        "Byte array 1 should have been correctly added to the binary buffer"
+    );
 
     let end = concatinate_bits(&begin, 24, &byte_array_2, 12);
-    
-    assert_eq!(end.len() * BYTE, 36, "Binary buffer length should be 36 bits");
+
+    assert_eq!(
+        end.len() * BYTE,
+        36,
+        "Binary buffer length should be 36 bits"
+    );
 }
 
 #[test]
 fn test_append_bits_3() {
-
     let byte_array_1: Vec<u8> = vec![0xDD, 0xFF]; // 1101 1101 | 1111 1111
     let byte_array_2: Vec<u8> = vec![0xBF]; // 1011 1111
     let mut begin: Vec<u8> = vec![];
 
-    assert_eq!(begin.len() * BYTE, 0, "Binary buffer length should be 0 bits");
-    assert_eq!(byte_array_1.len() * BYTE, 16, "byte_array_2 length should be 16 bits");
-    
+    assert_eq!(
+        begin.len() * BYTE,
+        0,
+        "Binary buffer length should be 0 bits"
+    );
+    assert_eq!(
+        byte_array_1.len() * BYTE,
+        16,
+        "byte_array_2 length should be 16 bits"
+    );
     let end = concatinate_bits(&begin, 0, &byte_array_1, 4);
     assert_eq!(end.len() * BYTE, 4, "Binary buffer length should be 4 bits");
-
-
-/*
+    /*
         TO IMPLEMENT:
         assertEquals("Binary buffer length should be 0 bits", 0, buffer.bitLength());
         buffer.appendBits(byteArray1, 4);         // 1101 0000
@@ -161,8 +180,24 @@ fn test_append_bits_3() {
         buffer.appendBits(byteArray2, 3);         // 1101 1010
         assertEquals("Binary buffer length should be 7 bits", 7, buffer.bitLength());
         assertTrue("Byte array 2 should have been correctly added to the binary buffer", buffer.toHexString().equalsIgnoreCase("da"));
-*/
+    */
+}
 
+#[test]
+fn test_extract_bits_1() {
+    let byte_array_1: Vec<u8> = vec![0xDD, 0xFF]; // 110|1110111|111111
+    let result: Vec<u8> = vec![0xEE]; //    |1110111|0
+
+    assert_eq!(
+        byte_array_1.len() * BYTE,
+        16,
+        "Binary buffer length should be 16 bits"
+    );
+    assert_eq!(
+        result,
+        extract_bits(&byte_array_1, 16, 3, 7),
+        "Should have correctly extracted 7 bits from binary buffer"
+    );
 }
 
 #[test]
