@@ -139,6 +139,33 @@ fn test_append_bits_2() {
 }
 
 #[test]
+fn test_append_bits_3() {
+
+    let byte_array_1: Vec<u8> = vec![0xDD, 0xFF]; // 1101 1101 | 1111 1111
+    let byte_array_2: Vec<u8> = vec![0xBF]; // 1011 1111
+    let mut begin: Vec<u8> = vec![];
+
+    assert_eq!(begin.len() * BYTE, 0, "Binary buffer length should be 0 bits");
+    assert_eq!(byte_array_1.len() * BYTE, 16, "byte_array_2 length should be 16 bits");
+    
+    let end = concatinate_bits(&begin, 0, &byte_array_1, 4);
+    assert_eq!(end.len() * BYTE, 4, "Binary buffer length should be 4 bits");
+
+
+/*
+        TO IMPLEMENT:
+        assertEquals("Binary buffer length should be 0 bits", 0, buffer.bitLength());
+        buffer.appendBits(byteArray1, 4);         // 1101 0000
+        assertEquals("Binary buffer length should be 4 bits", 4, buffer.bitLength());
+        assertTrue("Byte array 1 should have been correctly added to the binary buffer", buffer.toHexString().equalsIgnoreCase("d0"));
+        buffer.appendBits(byteArray2, 3);         // 1101 1010
+        assertEquals("Binary buffer length should be 7 bits", 7, buffer.bitLength());
+        assertTrue("Byte array 2 should have been correctly added to the binary buffer", buffer.toHexString().equalsIgnoreCase("da"));
+*/
+
+}
+
+#[test]
 fn removes_invalid_hex_characters() {
     let input = common::remove_all_invalid_hex_characters("-i-... HELLO::am::WORLD +val+:.id");
     assert_eq!(input, "i am valid");
