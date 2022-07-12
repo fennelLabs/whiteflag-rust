@@ -1,4 +1,5 @@
 use super::{
+    constants::{BYTE},
     common::{concatinate_bits, to_hex},
     *,
 };
@@ -117,6 +118,24 @@ fn test_append_bits_1() {
         to_hex(&begin),
         "Byte array 2 should have been correctly added to the binary buffer"
     );
+}
+
+#[test]
+fn test_append_bits_2() {
+
+    let byte_array_1: Vec<u8> = vec![0xE6, 0x38, 0x87]; // 1110 0110 | 0011 1000 | 1000 0111
+    let byte_array_2: Vec<u8> = vec![0x6E, 0x6f]; // 0110 1110 | 0111 1111
+    let mut begin: Vec<u8> = vec![];
+
+    begin = concatinate_bits(&begin, 0, &byte_array_1, 24);
+
+    assert_eq!(begin.len() * BYTE, 24, "Binary buffer length should be 24 bits");
+    assert_eq!(&byte_array_2.len() * BYTE, 16, "Binary buffer length should be 16 bits");
+    assert_eq!(to_hex(&begin), "e63887", "Byte array 1 should have been correctly added to the binary buffer");
+
+    let end = concatinate_bits(&begin, 24, &byte_array_2, 12);
+    
+    assert_eq!(end.len() * BYTE, 36, "Binary buffer length should be 36 bits");
 }
 
 #[test]
