@@ -199,6 +199,25 @@ fn test_extract_bits_1() {
         "Should have correctly extracted 7 bits from binary buffer"
     );
 }
+  
+#[test]
+fn test_extract_bits_2() {
+
+    let byte_array_1: Vec<u8> = vec![0xDD, 0xE7, 0xD0]; // 1101110111100|111|11010000
+    let result: Vec<u8> = vec![0xE0]; // |111|00000
+
+    assert_eq!(
+        byte_array_1.len() * BYTE,
+        24,
+        "Binary buffer length should be 24 bits"
+    );
+
+    assert_eq!(
+        result,
+        extract_bits(&byte_array_1, 24, 13, 3),
+        "Should have correctly extracted 3 bits from binary buffer"
+    );
+}
 
 #[test]
 fn removes_invalid_hex_characters() {
