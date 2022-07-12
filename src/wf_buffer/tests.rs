@@ -220,6 +220,25 @@ fn test_extract_bits_2() {
 }
 
 #[test]
+fn test_extract_bits_3() {
+    
+    let byte_array_1: Vec<u8> = vec![0x95, 0xDD, 0xFF, 0xE7]; // 1001010111|0111011111|111111100111
+    let result: Vec<u8> = vec![0x77, 0xC0]; //           |0111011111|000000
+
+    assert_eq!(
+        byte_array_1.len() * BYTE,
+        32,
+        "Binary buffer length should be 10 bits"
+    );
+
+    assert_eq!(
+        result,
+        extract_bits(&byte_array_1, 32, 10, 10),
+        "Should have correctly extracted 10 bits from binary buffer"
+    );
+}
+
+#[test]
 fn removes_invalid_hex_characters() {
     let input = common::remove_all_invalid_hex_characters("-i-... HELLO::am::WORLD +val+:.id");
     assert_eq!(input, "i am valid");
