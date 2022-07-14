@@ -3,8 +3,8 @@ mod codec_tests;
 
 mod field;
 
+use crate::wf_buffer::WhiteflagBuffer;
 pub use field::Field;
-use crate::{wf_buffer::WhiteflagBuffer};
 
 pub const FIELD_PREFIX: &'static str = "Prefix";
 pub const FIELD_VERSION: &'static str = "Version";
@@ -29,4 +29,3 @@ impl WhiteflagBuffer {
         self.append(field.into());
     }
 }
-
