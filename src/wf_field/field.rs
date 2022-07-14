@@ -6,13 +6,17 @@ use crate::{
 };
 use regex::Regex;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Field {
     pub definition: FieldDefinition,
     value: Option<String>,
 }
 
 impl Field {
+    pub fn from_definition(definition: FieldDefinition, value: Option<String>) -> Field {
+        Field { definition, value }
+    }
+
     pub fn new(
         name: &str,
         pattern: Option<Regex>,
@@ -20,10 +24,10 @@ impl Field {
         start_byte: usize,
         end_byte: isize,
     ) -> Field {
-        Field {
-            definition: FieldDefinition::new(name, pattern, encoding, start_byte, end_byte),
-            value: None,
-        }
+        Field::from_definition(
+            FieldDefinition::new(name, pattern, encoding, start_byte, end_byte),
+            None,
+        )
     }
 
     /* pub fn get(&self, data: Vec<String>) -> WhiteflagResult<String> {
