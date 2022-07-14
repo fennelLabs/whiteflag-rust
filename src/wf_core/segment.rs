@@ -1,5 +1,5 @@
 use super::definitions::{generic_header_fields, get_body_from_code};
-use super::field::Field;
+use crate::wf_field::Field;
 use crate::wf_buffer::WhiteflagBuffer;
 use crate::wf_field::FIELD_MESSAGETYPE;
 

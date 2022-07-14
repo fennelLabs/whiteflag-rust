@@ -1,4 +1,10 @@
-use crate::{wf_buffer::WhiteflagBuffer, wf_core::field::Field};
+#[cfg(test)]
+mod codec_tests;
+
+mod field;
+
+pub use field::Field;
+use crate::{wf_buffer::WhiteflagBuffer};
 
 pub const FIELD_PREFIX: &'static str = "Prefix";
 pub const FIELD_VERSION: &'static str = "Version";
@@ -24,9 +30,3 @@ impl WhiteflagBuffer {
     }
 }
 
-#[cfg(test)]
-mod codec_tests;
-
-mod field;
-
-pub use field::Field;
