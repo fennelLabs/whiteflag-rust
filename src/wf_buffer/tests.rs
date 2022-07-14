@@ -1,13 +1,8 @@
-use crate::wf_core::field::Field;
-use crate::wf_codec::encoding::UTF8;
-
 use super::{
     common::{concatinate_bits, extract_bits, to_hex},
     constants::BYTE,
     *,
 };
-
-const FIELDNAME: &str = "TESTFIELD";
 
 fn assert_array_eq<T: PartialEq + std::fmt::Debug>(l: Vec<T>, r: Vec<T>) {
     let success = l.iter().eq(r.iter());
@@ -270,36 +265,6 @@ fn test_extract_bits_4() {
         extract_bits(&byte_array_1, 32, 12, 16),
         "Should have correctly extracted 10 bits from binary buffer"
     );
-}
-
-#[test]
-fn test_add_field_utf() {
-
-    let mut buffer: Vec<Field> = vec![];
-    let mut field = Field::new(FIELDNAME, None, UTF8, 0, -1);
-    
-    let success = field.set("text");
-    assert!(success.is_ok());
-
-    let result = field.clone();
-
-    buffer.push(field);
-
-    //This really isn't the right test here
-    assert_eq!(
-        buffer.len(), //This will be 1 because it is just 1 item in Vec
-        result.bit_length(), //this will be 32 because that's how big a Field is
-        "Buffer bit length should be equal to field bit length"
-    );
-
-
-
-
-    /*
-    buffer.addMessageField(field);
-    assertEquals("Binary buffer length should be equal to field length", field.bitLength(), buffer.bitLength());
-    assertTrue("Message field (UTF) should be correctly encoded and added", buffer.toHexString().equalsIgnoreCase("74657874"));
-    */
 }
 
 #[test]
