@@ -285,9 +285,10 @@ fn test_add_field_utf() {
 
     buffer.push(field);
 
+    //This really isn't the right test here
     assert_eq!(
-        buffer.len(),
-        result.bit_length(),
+        buffer.len(), //This will be 1 because it is just 1 item in Vec
+        result.bit_length(), //this will be 32 because that's how big a Field is
         "Buffer bit length should be equal to field bit length"
     );
 
