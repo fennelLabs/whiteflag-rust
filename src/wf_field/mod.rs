@@ -23,3 +23,10 @@ impl WhiteflagBuffer {
         self.append(field.into());
     }
 }
+
+#[cfg(test)]
+mod codec_tests;
+
+mod field;
+
+pub use field::Field;
