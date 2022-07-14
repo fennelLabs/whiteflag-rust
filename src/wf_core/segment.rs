@@ -1,5 +1,6 @@
 use super::definitions::{generic_header_fields, get_body_from_code};
-use crate::wf_field::Field;
+use super::field::Field;
+use crate::wf_buffer::WhiteflagBuffer;
 use crate::wf_field::FIELD_MESSAGETYPE;
 
 pub fn get_message_code(header: &MessageSegment) -> char {
@@ -87,27 +88,20 @@ impl MessageSegment {
      * @throws WfCoreException if the message cannot be encoded
      */
     pub fn encode(&self) -> (Vec<u8>, usize) {
-        let mut buffer: Vec<u8> = vec![];
-        let mut len = buffer.len();
+        let mut buffer: WhiteflagBuffer = Default::default();
+
         //let cursor = self.fields[0].start_byte;
         for field in &self.fields {
             /* if (field.startByte != byteCursor) {
                 throw new WfCoreException("Invalid field order while encoding: did not expect field " + field.debugInfo() + " at byte " + byteCursor, null);
             } */
-            let field_length = field.bit_length();
-            //buffer.appendBits(field.encode(), field.bitLength());
-            buffer = super::wf_buffer::common::concatinate_bits(
-                &buffer,
-                len,
-                &field.encode().expect("field had no value"),
-                field_length,
-            );
 
-            len += field_length;
+            buffer.append_field(field);
+
             //byteCursor = field.endByte;
         }
 
-        (buffer, len)
+        buffer.into()
     }
 
     /**
