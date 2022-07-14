@@ -1,7 +1,9 @@
 use crate::wf_codec::encoding::*;
 use regex::Regex;
 
-#[derive(Clone)]
+use super::Field;
+
+#[derive(Clone, Debug)]
 pub struct FieldDefinition {
     pub name: String,
     pattern: Option<Regex>,
@@ -75,5 +77,30 @@ impl FieldDefinition {
             Some(re) => re.is_match(value.as_ref()),
             None => true,
         }
+    }
+
+    pub fn decode(self, data: Vec<u8>) -> Field {
+        let s = self.encoding.decode(data, self.bit_length());
+        Field::from_definition(self, Some(s))
+    }
+
+    /**
+     * Gets the byte length of the unencoded field value
+     * @return the byte length of the unencoded field value
+     */
+    pub fn byte_length(&self) -> usize {
+        if self.end_byte < 0 {
+            return 0;
+        }
+
+        return self.end_byte as usize - self.start_byte;
+    }
+
+    /**
+     * Gets the bit length of the encoded field
+     * @return the bit length of the compressed encoded field value
+     */
+    pub fn bit_length(&self) -> usize {
+        return self.encoding.bit_length(self.byte_length());
     }
 }
