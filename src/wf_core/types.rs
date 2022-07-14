@@ -1,8 +1,8 @@
-use super::{segment::MessageSegment};
+use crate::wf_field::{FieldDefinition, get_body_from_code};
 
 struct MessageType {
     pub message_code: char,
-    pub body: MessageSegment,
+    pub definitions: Vec<FieldDefinition>,
 }
 
 impl MessageType {
@@ -14,10 +14,11 @@ impl MessageType {
     pub fn from_code(code: &char) -> MessageType {
         MessageType {
             message_code: *code,
-            body: MessageSegment::from_code(code),
+            definitions: get_body_from_code(code),
         }
     }
 }
+
 
 enum MessageTypeEnum {
     /**

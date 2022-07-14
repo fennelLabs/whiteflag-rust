@@ -1,6 +1,4 @@
-use crate::wf_field::Field;
-use crate::wf_field::FIELD_MESSAGETYPE;
-use crate::wf_field::{generic_header_fields, get_body_from_code};
+use crate::wf_field::{FIELD_MESSAGETYPE, Field, FieldDefinition, generic_header_fields, get_body_from_code};
 
 pub fn get_message_code(header: &MessageSegment) -> char {
     match header.get(&FIELD_MESSAGETYPE) {
@@ -21,10 +19,6 @@ pub struct MessageSegment {
 }
 
 impl MessageSegment {
-    pub fn from_code(code: &char) -> MessageSegment {
-        MessageSegment::from(get_body_from_code(code))
-    }
-
     pub fn from(fields: Vec<Field>) -> MessageSegment {
         MessageSegment { fields }
     }

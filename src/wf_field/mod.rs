@@ -10,5 +10,6 @@ mod definitions;
 mod field;
 mod field_definition;
 
+pub use field_definition::FieldDefinition;
 pub use definitions::{generic_header_fields, get_body_from_code};
 pub use field::Field;

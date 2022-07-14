@@ -1,8 +1,8 @@
-use super::Field;
+use super::{field_definition::FieldDefinition};
 use crate::wf_codec::encoding::*;
 use regex::Regex;
 
-pub fn get_body_from_code(code: &char) -> Vec<Field> {
+pub fn get_body_from_code(code: &char) -> Vec<FieldDefinition> {
     match code {
         'A' => authentication_body_fields().to_vec(),
         'K' => crypto_body_fields().to_vec(),
@@ -10,7 +10,7 @@ pub fn get_body_from_code(code: &char) -> Vec<Field> {
         'R' => resource_body_fields().to_vec(),
         'F' => freetext_body_fields().to_vec(),
         'P' | 'E' | 'D' | 'S' | 'I' | 'M' | 'Q' => sign_signal_body_fields().to_vec(),
-        _ => Vec::<Field>::new(),
+        _ => Vec::<FieldDefinition>::new(),
     }
 }
 
@@ -25,8 +25,8 @@ pub enum FieldKind {
     REQUEST,
 }
 
-fn message_code() -> Field {
-    Field::new(
+fn message_code() -> FieldDefinition {
+    FieldDefinition::new(
         "MessageCode",
         Regex::new("^[A-Z]{1}$").ok(), //"(?=A|K|T|P|E|S|D|I|M|Q|R|F)^[A-Z]{1}$"
         UTF8,
@@ -35,20 +35,20 @@ fn message_code() -> Field {
     )
 }
 
-pub fn generic_header_fields() -> [Field; 7] {
+pub fn generic_header_fields() -> [FieldDefinition; 7] {
     [
-        Field::new("Prefix", Regex::new("^WF$").ok(), UTF8, 0, 2),
-        Field::new("Version", Regex::new("^[A-Z0-9]{1}$").ok(), UTF8, 2, 3), //"(?=1)^[A-Z0-9]{1}$"
-        Field::new(
+        FieldDefinition::new("Prefix", Regex::new("^WF$").ok(), UTF8, 0, 2),
+        FieldDefinition::new("Version", Regex::new("^[A-Z0-9]{1}$").ok(), UTF8, 2, 3), //"(?=1)^[A-Z0-9]{1}$"
+        FieldDefinition::new(
             "EncryptionIndicator",
             Regex::new("^[A-Z0-9]{1}$").ok(), //"(?=0|1|2)^[A-Z0-9]{1}$"
             UTF8,
             3,
             4,
         ),
-        Field::new("DuressIndicator", Regex::new("^[0-1]{1}$").ok(), BIN, 4, 5),
+        FieldDefinition::new("DuressIndicator", Regex::new("^[0-1]{1}$").ok(), BIN, 4, 5),
         message_code(),
-        Field::new(
+        FieldDefinition::new(
             "ReferenceIndicator",
             Regex::new(
                 ["^", HEX.charset, "{1}$"] //"(?=0|1|2|3|4|5|6|7|8|9)^", HEX.charset, "{1}$"
@@ -60,7 +60,7 @@ pub fn generic_header_fields() -> [Field; 7] {
             6,
             7,
         ),
-        Field::new(
+        FieldDefinition::new(
             "ReferencedMessage",
             Regex::new(["^", HEX.charset, "{64}$"].concat().as_str()).ok(),
             HEX,
@@ -70,16 +70,16 @@ pub fn generic_header_fields() -> [Field; 7] {
     ]
 }
 
-fn authentication_body_fields() -> [Field; 2] {
+fn authentication_body_fields() -> [FieldDefinition; 2] {
     [
-        Field::new(
+        FieldDefinition::new(
             "VerificationMethod",
             Regex::new(["(?=1|2)^", HEX.charset, "{1}$"].concat().as_str()).ok(),
             HEX,
             71,
             72,
         ),
-        Field::new(
+        FieldDefinition::new(
             "VerificationData",
             Regex::new(["^", UTF8.charset, "*$"].concat().as_str()).ok(),
             UTF8,
@@ -89,16 +89,16 @@ fn authentication_body_fields() -> [Field; 2] {
     ]
 }
 
-fn crypto_body_fields() -> [Field; 2] {
+fn crypto_body_fields() -> [FieldDefinition; 2] {
     [
-        Field::new(
+        FieldDefinition::new(
             "CryptoDataType",
             Regex::new(["^", HEX.charset, "{2}$"].concat().as_str()).ok(),
             HEX,
             71,
             73,
         ),
-        Field::new(
+        FieldDefinition::new(
             "CryptoData",
             Regex::new(["^", HEX.charset, "*$"].concat().as_str()).ok(),
             HEX,
@@ -108,8 +108,8 @@ fn crypto_body_fields() -> [Field; 2] {
     ]
 }
 
-fn freetext_body_fields() -> [Field; 1] {
-    [Field::new(
+fn freetext_body_fields() -> [FieldDefinition; 1] {
+    [FieldDefinition::new(
         "Text",
         Regex::new(["^", UTF8.charset, "*$"].concat().as_str()).ok(),
         UTF8,
@@ -118,16 +118,16 @@ fn freetext_body_fields() -> [Field; 1] {
     )]
 }
 
-fn resource_body_fields() -> [Field; 2] {
+fn resource_body_fields() -> [FieldDefinition; 2] {
     [
-        Field::new(
+        FieldDefinition::new(
             "ResourceMethod",
             Regex::new(["(?=1)^", HEX.charset, "{1}$"].concat().as_str()).ok(),
             HEX,
             71,
             72,
         ),
-        Field::new(
+        FieldDefinition::new(
             "ResourceData",
             Regex::new(["^", UTF8.charset, "*$"].concat().as_str()).ok(),
             UTF8,
@@ -137,8 +137,8 @@ fn resource_body_fields() -> [Field; 2] {
     ]
 }
 
-fn test_body_fields() -> [Field; 1] {
-    [Field::new(
+fn test_body_fields() -> [FieldDefinition; 1] {
+    [FieldDefinition::new(
         "PseudoMessageCode",
         Regex::new("^[A-Z]{1}$").ok(),
         UTF8,
@@ -147,65 +147,65 @@ fn test_body_fields() -> [Field; 1] {
     )]
 }
 
-fn sign_signal_body_fields() -> [Field; 9] {
+fn sign_signal_body_fields() -> [FieldDefinition; 9] {
     [
-        Field::new(
+        FieldDefinition::new(
             "SubjectCode",
             Regex::new(["^", HEX.charset, "{2}$"].concat().as_str()).ok(),
             HEX,
             71,
             73,
         ),
-        Field::new(
+        FieldDefinition::new(
             "DateTime",
             Regex::new(["^", DATETIME.charset, "$"].concat().as_str()).ok(),
             DATETIME,
             73,
             93,
         ),
-        Field::new(
+        FieldDefinition::new(
             "Duration",
             Regex::new(["^", DURATION.charset, "$"].concat().as_str()).ok(),
             DURATION,
             93,
             103,
         ),
-        Field::new(
+        FieldDefinition::new(
             "ObjectType",
             Regex::new(["^", HEX.charset, "{2}$"].concat().as_str()).ok(),
             HEX,
             103,
             105,
         ),
-        Field::new(
+        FieldDefinition::new(
             "ObjectLatitude",
             Regex::new(["^", LAT.charset, "$"].concat().as_str()).ok(),
             LAT,
             105,
             114,
         ),
-        Field::new(
+        FieldDefinition::new(
             "ObjectLongitude",
             Regex::new(["^", LONG.charset, "$"].concat().as_str()).ok(),
             LONG,
             114,
             124,
         ),
-        Field::new(
+        FieldDefinition::new(
             "ObjectSizeDim1",
             Regex::new(["^", DEC.charset, "{4}$"].concat().as_str()).ok(),
             DEC,
             124,
             128,
         ),
-        Field::new(
+        FieldDefinition::new(
             "ObjectSizeDim2",
             Regex::new(["^", DEC.charset, "{4}$"].concat().as_str()).ok(),
             DEC,
             128,
             132,
         ),
-        Field::new(
+        FieldDefinition::new(
             "ObjectOrientation",
             Regex::new(["^", DEC.charset, "{3}$"].concat().as_str()).ok(),
             DEC,
@@ -215,16 +215,16 @@ fn sign_signal_body_fields() -> [Field; 9] {
     ]
 }
 
-fn request_fields() -> [Field; 2] {
+fn request_fields() -> [FieldDefinition; 2] {
     [
-        Field::new(
+        FieldDefinition::new(
             "ObjectType",
             Regex::new(["^", HEX.charset, "{2}$"].concat().as_str()).ok(),
             HEX,
             135,
             137,
         ),
-        Field::new(
+        FieldDefinition::new(
             "ObjectTypeQuant",
             Regex::new(["^", DEC.charset, "{2}$"].concat().as_str()).ok(),
             DEC,
