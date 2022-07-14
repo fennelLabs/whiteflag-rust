@@ -4,7 +4,6 @@ use crate::{
     wf_codec::encoding::*,
 };
 
-
 const FIELDNAME: &str = "TESTFIELD";
 
 #[test]
