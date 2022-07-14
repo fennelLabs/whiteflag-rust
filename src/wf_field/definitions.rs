@@ -1,4 +1,4 @@
-use super::{field_definition::FieldDefinition};
+use super::field_definition::FieldDefinition;
 use crate::wf_codec::encoding::*;
 use regex::Regex;
 
@@ -10,7 +10,7 @@ pub fn get_body_from_code(code: &char) -> Vec<FieldDefinition> {
         'R' => resource_body_fields().to_vec(),
         'F' => freetext_body_fields().to_vec(),
         'P' | 'E' | 'D' | 'S' | 'I' | 'M' | 'Q' => sign_signal_body_fields().to_vec(),
-        _ => Vec::<FieldDefinition>::new(),
+        _ => panic!("'{}' is not a valid message code", code),
     }
 }
 
