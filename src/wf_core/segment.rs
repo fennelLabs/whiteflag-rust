@@ -1,6 +1,6 @@
-use super::definitions::{generic_header_fields, get_body_from_code};
 use crate::wf_field::Field;
 use crate::wf_field::FIELD_MESSAGETYPE;
+use crate::wf_field::{generic_header_fields, get_body_from_code};
 
 pub fn get_message_code(header: &MessageSegment) -> char {
     match header.get(&FIELD_MESSAGETYPE) {

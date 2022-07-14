@@ -1,5 +1,5 @@
-use super::wf_codec::encoding::*;
-use crate::wf_field::Field;
+use super::Field;
+use crate::wf_codec::encoding::*;
 use regex::Regex;
 
 pub fn get_body_from_code(code: &char) -> Vec<Field> {
@@ -25,7 +25,7 @@ pub enum FieldKind {
     REQUEST,
 }
 
-pub fn message_code() -> Field {
+fn message_code() -> Field {
     Field::new(
         "MessageCode",
         Regex::new("^[A-Z]{1}$").ok(), //"(?=A|K|T|P|E|S|D|I|M|Q|R|F)^[A-Z]{1}$"
@@ -70,7 +70,7 @@ pub fn generic_header_fields() -> [Field; 7] {
     ]
 }
 
-pub fn authentication_body_fields() -> [Field; 2] {
+fn authentication_body_fields() -> [Field; 2] {
     [
         Field::new(
             "VerificationMethod",
@@ -89,7 +89,7 @@ pub fn authentication_body_fields() -> [Field; 2] {
     ]
 }
 
-pub fn crypto_body_fields() -> [Field; 2] {
+fn crypto_body_fields() -> [Field; 2] {
     [
         Field::new(
             "CryptoDataType",
@@ -108,7 +108,7 @@ pub fn crypto_body_fields() -> [Field; 2] {
     ]
 }
 
-pub fn freetext_body_fields() -> [Field; 1] {
+fn freetext_body_fields() -> [Field; 1] {
     [Field::new(
         "Text",
         Regex::new(["^", UTF8.charset, "*$"].concat().as_str()).ok(),
@@ -118,7 +118,7 @@ pub fn freetext_body_fields() -> [Field; 1] {
     )]
 }
 
-pub fn resource_body_fields() -> [Field; 2] {
+fn resource_body_fields() -> [Field; 2] {
     [
         Field::new(
             "ResourceMethod",
@@ -137,7 +137,7 @@ pub fn resource_body_fields() -> [Field; 2] {
     ]
 }
 
-pub fn test_body_fields() -> [Field; 1] {
+fn test_body_fields() -> [Field; 1] {
     [Field::new(
         "PseudoMessageCode",
         Regex::new("^[A-Z]{1}$").ok(),
@@ -147,7 +147,7 @@ pub fn test_body_fields() -> [Field; 1] {
     )]
 }
 
-pub fn sign_signal_body_fields() -> [Field; 9] {
+fn sign_signal_body_fields() -> [Field; 9] {
     [
         Field::new(
             "SubjectCode",
@@ -215,7 +215,7 @@ pub fn sign_signal_body_fields() -> [Field; 9] {
     ]
 }
 
-pub fn request_fields() -> [Field; 2] {
+fn request_fields() -> [Field; 2] {
     [
         Field::new(
             "ObjectType",
