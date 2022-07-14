@@ -1,4 +1,4 @@
-use crate::wf_field::{FieldDefinition, get_body_from_code};
+use crate::wf_field::{get_body_from_code, FieldDefinition};
 
 struct MessageType {
     pub message_code: char,
@@ -18,7 +18,6 @@ impl MessageType {
         }
     }
 }
-
 
 enum MessageTypeEnum {
     /**
