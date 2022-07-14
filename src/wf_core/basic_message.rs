@@ -1,6 +1,6 @@
-use super::field::Field;
 use super::segment::MessageSegment;
 use super::wf_buffer::common::{append_bits, crop_bits};
+use crate::wf_field::Field;
 
 pub struct BasicMessage {
     message_code: char,

@@ -1,5 +1,5 @@
-use super::field::Field;
 use super::wf_codec::encoding::*;
+use crate::wf_field::Field;
 use regex::Regex;
 
 pub fn get_body_from_code(code: &char) -> Vec<Field> {
