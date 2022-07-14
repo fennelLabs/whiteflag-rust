@@ -1,4 +1,4 @@
-use super::field::Field;
+use crate::wf_field::Field;
 use super::wf_codec::encoding::*;
 use regex::Regex;
 

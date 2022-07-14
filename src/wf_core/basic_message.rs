@@ -1,4 +1,4 @@
-use super::field::Field;
+use crate::wf_field::Field;
 use super::segment::MessageSegment;
 use super::wf_buffer::common::{append_bits, crop_bits};
 

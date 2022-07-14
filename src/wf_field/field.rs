@@ -1,9 +1,5 @@
 use crate::wf_buffer::common::extract_bits;
-
-use super::{
-    error::{WhiteflagError, WhiteflagResult},
-    wf_codec::encoding::*,
-};
+use crate::{wf_codec::encoding::*, wf_core::error::{WhiteflagError, WhiteflagResult}};
 use regex::Regex;
 
 #[derive(Clone)]

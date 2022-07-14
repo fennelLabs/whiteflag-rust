@@ -1,8 +1,9 @@
-use super::{
-    field::Field,
+use super::field::Field;
+use crate::{
     wf_buffer::common::{decode_from_hexadecimal, to_hex},
     wf_codec::encoding::*,
 };
+
 
 const FIELDNAME: &str = "TESTFIELD";
 
