@@ -1,3 +1,4 @@
+use super::field_definition::FieldDefinition;
 use crate::wf_buffer::common::extract_bits;
 use crate::{
     wf_codec::encoding::*,
@@ -7,11 +8,7 @@ use regex::Regex;
 
 #[derive(Clone)]
 pub struct Field {
-    pub name: String,
-    pattern: Option<Regex>,
-    encoding: Encoding,
-    pub start_byte: usize,
-    pub end_byte: isize,
+    pub definition: FieldDefinition,
     value: Option<String>,
 }
 
@@ -24,38 +21,9 @@ impl Field {
         end_byte: isize,
     ) -> Field {
         Field {
-            name: String::from(name),
-            pattern, //: pattern.expect(&format!("invalid regular expression pattern: {}", name)),
-            encoding,
-            start_byte,
-            end_byte,
+            definition: FieldDefinition::new(name, pattern, encoding, start_byte, end_byte),
             value: None,
         }
-    }
-
-    pub fn new2(
-        name: &str,
-        pattern: Result<Regex, regex::Error>,
-        encoding: Encoding,
-        start_byte: usize,
-        end_byte: isize,
-    ) -> Field {
-        Field {
-            name: String::from(name),
-            pattern: pattern.ok(), //: pattern.expect(&format!("invalid regular expression pattern: {}", name)),
-            encoding,
-            start_byte,
-            end_byte,
-            value: None,
-        }
-    }
-
-    pub fn get_minimum_starting_position(&self) -> usize {
-        if self.end_byte < 0 {
-            return self.start_byte;
-        }
-
-        self.end_byte as usize
     }
 
     /* pub fn get(&self, data: Vec<String>) -> WhiteflagResult<String> {
@@ -74,7 +42,7 @@ impl Field {
      * @return TRUE if field value is set, FALSE if field already set or data is invalid
      */
     pub fn set<T: AsRef<str> + Into<String>>(&mut self, data: T) -> WhiteflagResult<()> {
-        if !self.is_valid(&Some(data.as_ref())) {
+        if !self.definition.is_valid(&Some(data.as_ref())) {
             return Err(WhiteflagError::InvalidPattern);
         }
 
@@ -91,34 +59,18 @@ impl Field {
      * @return TRUE if the field has been set, else FALSE
      */
     pub fn is_set(&self) -> bool {
-        self.is_valid(&self.value)
-    }
-
-    /**
-     * Checks if the message field contains a valid value
-     * @return TRUE if the field contains a valid value, else FALSE
-     */
-    pub fn is_valid<T: AsRef<str>>(&self, data: &Option<T>) -> bool {
-        let value = match data {
-            Some(x) => x,
-            None => return false,
-        };
-
-        match self.pattern.as_ref() {
-            Some(re) => re.is_match(value.as_ref()),
-            None => true,
-        }
+        self.definition.is_valid(&self.value)
     }
 
     pub fn encode(&self) -> Option<Vec<u8>> {
         match &self.value {
-            Some(x) => Some(self.encoding.encode(x)),
+            Some(x) => Some(self.definition.encoding.encode(x)),
             None => None,
         }
     }
 
     pub fn decode(&mut self, data: Vec<u8>) -> String {
-        let s = self.encoding.decode(data, self.bit_length());
+        let s = self.definition.encoding.decode(data, self.bit_length());
         self.value = Some(s.clone());
         s
     }
@@ -128,7 +80,7 @@ impl Field {
      * @return the byte length of the unencoded field value
      */
     pub fn byte_length(&self) -> usize {
-        if self.end_byte < 0 {
+        if self.definition.end_byte < 0 {
             if let Some(v) = &self.value {
                 return v.len();
             } else {
@@ -136,7 +88,7 @@ impl Field {
             }
         }
 
-        return self.end_byte as usize - self.start_byte;
+        return self.definition.end_byte as usize - self.definition.start_byte;
     }
 
     /**
@@ -144,7 +96,7 @@ impl Field {
      * @return the bit length of the compressed encoded field value
      */
     pub fn bit_length(&self) -> usize {
-        return self.encoding.bit_length(self.byte_length());
+        return self.definition.encoding.bit_length(self.byte_length());
     }
 
     /**
@@ -164,7 +116,7 @@ impl Field {
             self.bit_length()
         } else {
             let mut bit_length = message_buffer_bit_length - start_bit;
-            bit_length -= bit_length % &self.encoding.bit_length;
+            bit_length -= bit_length % &self.definition.encoding.bit_length;
             bit_length
         };
 
@@ -177,5 +129,11 @@ impl Field {
         self.decode(field_buffer);
 
         bit_length
+    }
+}
+
+impl AsRef<FieldDefinition> for Field {
+    fn as_ref(&self) -> &FieldDefinition {
+        &self.definition
     }
 }

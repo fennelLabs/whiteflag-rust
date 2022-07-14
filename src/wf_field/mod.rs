@@ -7,5 +7,6 @@ pub const FIELD_TESTMESSAGETYPE: &'static str = "PseudoMessageCode";
 mod codec_tests;
 
 mod field;
+mod field_definition;
 
 pub use field::Field;

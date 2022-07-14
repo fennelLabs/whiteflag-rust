@@ -54,7 +54,7 @@ impl MessageSegment {
             let value = &data[index];
             match field.set(value.as_ref()) {
                 Ok(_) => println!("Message field set successfully."),
-                Err(e) => panic!("{:?}", e)
+                Err(e) => panic!("{:?}", e),
             }
             index += 1;
         }
@@ -71,7 +71,7 @@ impl MessageSegment {
         let value = self
             .fields
             .iter()
-            .find(|f| f.name == field_name.as_ref())?
+            .find(|f| f.definition.name == field_name.as_ref())?
             .get();
 
         value.as_ref()
@@ -131,9 +131,9 @@ impl MessageSegment {
         }
 
         let mut bit_cursor = start_bit;
-        let mut byte_cursor = self.fields[field_index].start_byte;
+        let mut byte_cursor = self.fields[field_index].definition.start_byte;
         for field in &mut self.fields[field_index..] {
-            if field.start_byte != byte_cursor {
+            if field.definition.start_byte != byte_cursor {
                 panic!("start byte should match byte cursor");
                 //throw new WfCoreException("Invalid field order while decoding: did not expect field " + fields[index].debugInfo() + " at byte " + byteCursor, null);
             }
@@ -148,7 +148,7 @@ impl MessageSegment {
                 field.extract_message_field(message_buffer, message_buffer_bit_length, bit_cursor);
 
             bit_cursor += bit_length; //field.bit_length();
-            byte_cursor = field.end_byte as usize;
+            byte_cursor = field.definition.end_byte as usize;
         }
 
         bit_cursor - start_bit
