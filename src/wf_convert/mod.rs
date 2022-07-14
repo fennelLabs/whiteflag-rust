@@ -1,5 +1,5 @@
 use crate::wf_core::basic_message::BasicMessage;
-use crate::wf_core::segment::{MessageSegment, get_message_body};
+use crate::wf_core::segment::{get_message_body, MessageSegment};
 
 pub trait FieldValue: AsRef<str> + Into<String> {}
 impl<T> FieldValue for T where T: AsRef<str> + Into<String> {}
