@@ -1,4 +1,4 @@
-use super::{segment::MessageSegment};
+use super::segment::MessageSegment;
 
 struct MessageType {
     pub message_code: char,

@@ -1,5 +1,5 @@
 use super::basic_message::BasicMessage;
-use super::segment::{MessageSegment, get_message_body};
+use super::segment::{get_message_body, MessageSegment};
 use super::wf_buffer::common::{decode_from_hexadecimal, to_hex};
 use crate::wf_convert::FieldValue;
 

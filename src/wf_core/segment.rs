@@ -54,7 +54,7 @@ impl MessageSegment {
             let value = &data[index];
             match field.set(value.as_ref()) {
                 Ok(_) => println!("Message field set successfully."),
-                Err(e) => panic!("{:?}", e)
+                Err(e) => panic!("{:?}", e),
             }
             index += 1;
         }
