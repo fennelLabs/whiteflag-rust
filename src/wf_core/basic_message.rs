@@ -1,6 +1,6 @@
 use super::segment::MessageSegment;
 use super::wf_buffer::common::{append_bits, crop_bits};
-use crate::wf_field::Field;
+use crate::wf_field::{get_field_value_from_array, Field};
 
 pub struct BasicMessage {
     message_code: char,
@@ -47,9 +47,11 @@ impl BasicMessage {
      * @return the field value, or NULL if field does not exist
      */
     pub fn get_option<T: AsRef<str>>(&self, fieldname: T) -> Option<&String> {
-        self.header
-            .get(fieldname.as_ref())
-            .or(self.body.get(fieldname.as_ref()))
+        get_field_value_from_array(&self.header.fields, fieldname.as_ref())
+            .or(get_field_value_from_array(
+                &self.body.fields,
+                fieldname.as_ref(),
+            ))
             .or(None)
     }
 

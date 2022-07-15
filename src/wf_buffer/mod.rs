@@ -1,10 +1,12 @@
-use self::common::append_bits;
+use self::common::{append_bits, extract_bits};
+use crate::wf_field::{Field, FieldDefinition};
 
 #[cfg(test)]
 mod tests;
 
 pub mod common;
 pub mod constants;
+mod decode;
 
 pub struct WhiteflagBuffer {
     data: Vec<u8>,
@@ -25,6 +27,26 @@ impl WhiteflagBuffer {
 
         self.data = buffer;
         self.bit_length = length;
+    }
+
+    pub fn extract_message_field(
+        &self,
+        field: FieldDefinition,
+        start_bit: usize,
+    ) -> (usize, Field) {
+        let field_bit_length = field.bit_length();
+        let bit_length = if field_bit_length >= 1 {
+            field_bit_length
+        } else {
+            let mut bit_length = self.bit_length - start_bit;
+            bit_length -= bit_length % &field.encoding.bit_length;
+            bit_length
+        };
+
+        let field_buffer: Vec<u8> =
+            extract_bits(&self.data, self.bit_length, start_bit, bit_length);
+
+        (bit_length, field.decode(field_buffer))
     }
 }
 
