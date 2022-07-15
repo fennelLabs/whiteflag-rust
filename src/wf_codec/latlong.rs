@@ -25,5 +25,5 @@ pub fn encode_latlong<T: AsRef<str>>(data: T) -> Vec<u8> {
     }
 
     let bit_length = 1 + length * QUADBIT;
-    crop_bits(buffer, bit_length as isize)
+    crop_bits(&buffer, bit_length as isize)
 }

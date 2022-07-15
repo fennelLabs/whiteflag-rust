@@ -9,7 +9,7 @@ pub const PREFIX: &str = "WF";
 pub const PROTOCOL_VERSION: &str = "1";
 
 pub fn encode<T: FieldValue>(fields: &[T]) -> String {
-    let basic_message: BasicMessage = fields.into();
+    let mut basic_message: BasicMessage = fields.into();
     let message_encoded = basic_message.encode();
     to_hex(&message_encoded)
 }

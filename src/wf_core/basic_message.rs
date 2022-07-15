@@ -1,5 +1,6 @@
 use super::segment::MessageSegment;
 use super::wf_buffer::common::{append_bits, crop_bits};
+use crate::wf_buffer::WhiteflagBuffer;
 use crate::wf_field::{get_field_value_from_array, Field};
 
 pub struct BasicMessage {
@@ -17,17 +18,13 @@ impl BasicMessage {
         }
     }
 
-    pub fn encode(&self) -> Vec<u8> {
-        let mut buffer: Vec<u8> = vec![];
-        let mut len = 0;
+    pub fn encode(&mut self) -> Vec<u8> {
+        let mut buffer = WhiteflagBuffer::default();
 
-        let (header_buffer, header_len) = self.header.encode();
-        let (body_buffer, body_len) = self.body.encode();
+        buffer.encode(&mut self.header.fields);
+        buffer.encode(&mut self.body.fields);
 
-        (buffer, len) = append_bits(&buffer, len, &header_buffer, header_len);
-        (buffer, len) = append_bits(&buffer, len, &body_buffer, body_len);
-
-        crop_bits(buffer, len as isize)
+        buffer.crop()
     }
 
     /**

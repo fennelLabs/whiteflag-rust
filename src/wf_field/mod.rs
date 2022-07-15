@@ -29,12 +29,6 @@ impl From<&Field> for WhiteflagBuffer {
     }
 }
 
-impl WhiteflagBuffer {
-    pub fn append_field(&mut self, field: &Field) {
-        self.append(field.into());
-    }
-}
-
 /**
  * Gets the value of the field specified by name
  * @param fieldname the name of the requested field
@@ -46,7 +40,8 @@ pub fn get_field_value_from_array<T: AsRef<str>>(
 ) -> Option<&String> {
     fields
         .iter()
-        .find(|f| f.definition.name == field_name.as_ref()).map(|s| {s.get()})
+        .find(|f| f.definition.name == field_name.as_ref())
+        .map(|s| s.get())
 }
 
 pub fn get_message_code(fields: &[Field]) -> char {

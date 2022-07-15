@@ -57,7 +57,7 @@ fn set_all<T: FieldValue>(
                 Ok(field) => {
                     println!("Message field set successfully.");
                     field
-                },
+                }
                 Err(e) => panic!("{:?}", e),
             };
             index += 1;
