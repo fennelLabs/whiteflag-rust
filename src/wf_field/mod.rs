@@ -18,7 +18,7 @@ pub const FIELD_TESTMESSAGETYPE: &'static str = "PseudoMessageCode";
 
 impl From<&Field> for Vec<u8> {
     fn from(field: &Field) -> Self {
-        field.encode().expect("field has no value")
+        field.encode()
     }
 }
 
@@ -44,12 +44,9 @@ pub fn get_field_value_from_array<T: AsRef<str>>(
     fields: &[Field],
     field_name: T,
 ) -> Option<&String> {
-    let value = fields
+    fields
         .iter()
-        .find(|f| f.definition.name == field_name.as_ref())?
-        .get();
-
-    value.as_ref()
+        .find(|f| f.definition.name == field_name.as_ref()).map(|s| {s.get()})
 }
 
 pub fn get_message_code(fields: &[Field]) -> char {
