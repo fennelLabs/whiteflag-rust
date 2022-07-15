@@ -1,4 +1,4 @@
-use self::common::{append_bits, extract_bits};
+use self::common::{append_bits, crop_bits, extract_bits};
 use crate::wf_field::{Field, FieldDefinition};
 
 #[cfg(test)]
@@ -7,6 +7,7 @@ mod tests;
 pub mod common;
 pub mod constants;
 mod decode;
+mod encode;
 
 pub struct WhiteflagBuffer {
     data: Vec<u8>,
@@ -19,6 +20,10 @@ impl WhiteflagBuffer {
             data: buffer,
             bit_length,
         }
+    }
+
+    pub fn append_field(&mut self, field: &Field) {
+        self.append(field.into());
     }
 
     pub fn append(&mut self, buffer: WhiteflagBuffer) {
@@ -47,6 +52,10 @@ impl WhiteflagBuffer {
             extract_bits(&self.data, self.bit_length, start_bit, bit_length);
 
         (bit_length, field.decode(field_buffer))
+    }
+
+    pub fn crop(&self) -> Vec<u8> {
+        crop_bits(&self.data, self.bit_length as isize)
     }
 }
 
