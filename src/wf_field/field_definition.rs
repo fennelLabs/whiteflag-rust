@@ -1,4 +1,7 @@
-use crate::{wf_codec::encoding::*, wf_core::{error::{WhiteflagResult, WhiteflagError}, creator::encode}};
+use crate::{
+    wf_codec::encoding::*,
+    wf_core::error::{WhiteflagError, WhiteflagResult},
+};
 use regex::Regex;
 
 use super::Field;

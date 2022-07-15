@@ -36,11 +36,7 @@ fn utf_decoding() {
 
     let actual: String = def.decode(buffer).into();
 
-    assert_eq!(
-        result,
-        actual,
-        "UTF-8 field should be correctly decoded"
-    );
+    assert_eq!(result, actual, "UTF-8 field should be correctly decoded");
 }
 
 #[test]
@@ -73,11 +69,7 @@ fn bin_decoding_1() {
 
     let actual: String = def.decode(buffer).into();
 
-    assert_eq!(
-        result,
-        actual,
-        "Binary field should be correctly decoded"
-    );
+    assert_eq!(result, actual, "Binary field should be correctly decoded");
 }
 
 #[test]
@@ -110,11 +102,7 @@ fn bin_decoding_2_a() {
 
     let actual: String = def.decode(buffer).into();
 
-    assert_eq!(
-        result,
-        actual,
-        "Binary field should be correctly decoded"
-    );
+    assert_eq!(result, actual, "Binary field should be correctly decoded");
 }
 
 #[test]
@@ -125,11 +113,7 @@ fn bin_decoding_2_b() {
 
     let actual: String = def.decode(buffer).into();
 
-    assert_eq!(
-        result,
-        actual,
-        "Binary field should be correctly decoded"
-    );
+    assert_eq!(result, actual, "Binary field should be correctly decoded");
 }
 
 #[test]
@@ -162,11 +146,7 @@ fn dec_decoding() {
 
     let actual: String = def.decode(buffer).into();
 
-    assert_eq!(
-        result,
-        actual,
-        "Decimal field should be correctly decoded"
-    );
+    assert_eq!(result, actual, "Decimal field should be correctly decoded");
 }
 
 #[test]
@@ -200,8 +180,7 @@ fn hex_decoding() {
     let actual: String = def.decode(buffer).into();
 
     assert_eq!(
-        result,
-        actual,
+        result, actual,
         "Hexadecimal field should be correctly decoded"
     );
 }
@@ -236,11 +215,7 @@ fn datetime_decoding() {
 
     let actual: String = def.decode(buffer).into();
 
-    assert_eq!(
-        result,
-        actual,
-        "DateTime field should be correctly decoded"
-    );
+    assert_eq!(result, actual, "DateTime field should be correctly decoded");
 }
 
 #[test]
@@ -273,11 +248,7 @@ fn duration_decoding() {
 
     let actual: String = def.decode(buffer).into();
 
-    assert_eq!(
-        result,
-        actual,
-        "Duration field should be correctly decoded"
-    );
+    assert_eq!(result, actual, "Duration field should be correctly decoded");
 }
 
 #[test]
@@ -310,11 +281,7 @@ fn latitude_decoding() {
 
     let actual: String = def.decode(buffer).into();
 
-    assert_eq!(
-        result,
-        actual,
-        "Latitude field should be correctly decoded"
-    );
+    assert_eq!(result, actual, "Latitude field should be correctly decoded");
 }
 
 #[test]
@@ -348,8 +315,7 @@ fn longitude_decoding_1() {
     let actual: String = def.decode(buffer).into();
 
     assert_eq!(
-        result,
-        actual,
+        result, actual,
         "Longitude field should be correctly decoded"
     );
 }
@@ -363,8 +329,7 @@ fn longitude_decoding_2() {
     let actual: String = def.decode(buffer).into();
 
     assert_eq!(
-        result,
-        actual,
+        result, actual,
         "Longitude field should be correctly decoded"
     );
 }
