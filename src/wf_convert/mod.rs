@@ -53,12 +53,13 @@ fn set_all<T: FieldValue>(
                 throw new WfCoreException("Field " + field.debugInfo() + " already set or array item " + index + " contains invalid data: " + data[index], null);
             } */
             let value = &data[index];
-            let mut field = Field::from_definition(f, None);
-            match field.set(value.as_ref()) {
-                Ok(_) => println!("Message field set successfully."),
+            let field = match f.set(value.as_ref()) {
+                Ok(field) => {
+                    println!("Message field set successfully.");
+                    field
+                },
                 Err(e) => panic!("{:?}", e),
-            }
-
+            };
             index += 1;
             field
         })
