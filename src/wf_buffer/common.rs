@@ -100,9 +100,9 @@ pub fn byte_length(bit_length: isize) -> isize {
  * Shortens the byte array to fit the length of the used bits
  * java equivalent: WfBinaryBuffer.cropBits
  */
-pub fn crop_bits(buffer: Vec<u8>, bit_length: isize) -> Vec<u8> {
+pub fn crop_bits(buffer: &[u8], bit_length: isize) -> Vec<u8> {
     if bit_length == 0 {
-        return buffer;
+        return buffer.to_vec();
     }
 
     let is_positive = bit_length > 0;
@@ -189,7 +189,7 @@ pub fn shift_left(buffer: &[u8], shift: isize) -> Vec<u8> {
         }
     }
 
-    crop_bits(new_buffer, -(shift % BYTE as isize))
+    crop_bits(&new_buffer, -(shift % BYTE as isize))
 }
 
 /**
@@ -238,7 +238,7 @@ pub fn extract_bits(
         }
     }
 
-    crop_bits(new_byte_array, bit_length as isize)
+    crop_bits(&new_byte_array, bit_length as isize)
 }
 
 /**
@@ -327,5 +327,5 @@ pub fn concatinate_bits(
         byte_cursor += 1;
     }
 
-    return crop_bits(new_byte_array, bit_length as isize);
+    return crop_bits(&new_byte_array, bit_length as isize);
 }
