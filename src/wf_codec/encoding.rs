@@ -4,7 +4,7 @@ use super::constants::*;
 use super::hexadecimal::{decode_bdx, encode_bdx};
 use super::latlong::encode_latlong;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Encoding {
     pub charset: &'static str,
     pub bit_length: usize,
@@ -12,7 +12,7 @@ pub struct Encoding {
     pub kind: EncodingKind,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum EncodingKind {
     BIN,
     DEC,

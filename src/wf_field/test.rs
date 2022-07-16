@@ -1,33 +1,33 @@
-use crate::wf_core::field::Field;
 use crate::wf_codec::encoding::UTF8;
+use crate::{wf_buffer::WhiteflagBuffer, wf_field::Field, wf_field::FieldDefinition};
+use crate::wf_buffer::common::{to_hex};
 
 const FIELDNAME: &str = "TESTFIELD";
-
-// all "add field" tests should be placed here
 
 #[test]
 fn test_add_field_utf() {
 
-    let mut buffer: Vec<Field> = vec![];
+    let buffer: Vec<u8> = vec![];
+    let mut wf_buffer: WhiteflagBuffer = WhiteflagBuffer::new(buffer, 0); 
+
     let mut field = Field::new(FIELDNAME, None, UTF8, 0, -1);
-    
     let success = field.set("text");
+    
     assert!(success.is_ok());
 
-    let result = field.clone();
+    wf_buffer.append_field(&field);
 
-    buffer.push(field);
+    let (size, extracted_field) = wf_buffer.extract_message_field(FieldDefinition::new(FIELDNAME, None, UTF8, 0, -1), 0);
 
-    //This really isn't the right test here
     assert_eq!(
-        buffer.len(), //This will be 1 because it is just 1 item in Vec
-        result.bit_length(), //this will be 32 because that's how big a Field is
+        field.bit_length(), 
+        size,
         "Buffer bit length should be equal to field bit length"
     );
 
-    /*
-    buffer.addMessageField(field);
-    assertEquals("Binary buffer length should be equal to field length", field.bitLength(), buffer.bitLength());
-    assertTrue("Message field (UTF) should be correctly encoded and added", buffer.toHexString().equalsIgnoreCase("74657874"));
-    */
+    assert_eq!(
+        "74657874",
+        to_hex(&extracted_field.encode().expect("correct string")),
+        "Message field (UTF) should be correctly encoded and added"
+    );
 }
