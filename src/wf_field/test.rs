@@ -117,7 +117,9 @@ fn test_add_field_dec() {
     let success = field.set("1478");
     assert!(success.is_ok());
 
-    let (size, _) = buffer.extract_message_field(FieldDefinition::new(FIELDNAME, None, BIN, 0, -1), 0);
+    buffer.append_field(&field);
+
+    let (size, _) = buffer.extract_message_field(FieldDefinition::new(FIELDNAME, None, DEC, 0, -1), 0);
 
     assert_eq!(
         field.bit_length(), 
@@ -125,23 +127,12 @@ fn test_add_field_dec() {
         "Buffer bit length should be equal to field bit length"
     );
 
+    let (result, _) = From::from(buffer);
+
     assert_eq!(
         "1478", 
         to_hex(&result),
         "Message field (bin) should be correctly encoded and added"
     );
 
-}
-
-@Test
-public void testAddFieldDec() throws WfCoreException {
-    /* Setup */
-    WfBinaryBuffer buffer = WfBinaryBuffer.create();
-    WfMessageField field = WfMessageField.define(FIELDNAME, null, DEC, 0, 4);
-
-    /* Verify */
-    assertTrue("Should be able to set field value", field.set("1478"));
-    buffer.addMessageField(field);
-    assertEquals("Binary buffer length should be equal to field length", field.bitLength(), buffer.bitLength());
-    assertTrue("Message field (dec) should be correctly encoded and added", buffer.toHexString().equalsIgnoreCase("1478"));
 }
