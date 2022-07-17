@@ -1,4 +1,4 @@
-use crate::wf_codec::encoding::{UTF8, BIN};
+use crate::wf_codec::encoding::{UTF8, BIN, DEC};
 use crate::{wf_buffer::WhiteflagBuffer, wf_field::Field, wf_field::FieldDefinition};
 use crate::wf_buffer::common::{to_hex};
 
@@ -108,15 +108,40 @@ fn test_add_field_bin_2() {
     );
 }
 
-/*@Test
-public void testAddFieldBin2() throws WfCoreException {
+#[test]
+fn test_add_field_dec() {
+    let buffer: Vec<u8> = vec![];
+    let mut buffer: WhiteflagBuffer = WhiteflagBuffer::new(buffer, 0); 
+    let mut field = Field::new(FIELDNAME, None, DEC, 0, 4);
 
+    let success = field.set("1478");
+    assert!(success.is_ok());
+
+    let (size, _) = buffer.extract_message_field(FieldDefinition::new(FIELDNAME, None, BIN, 0, -1), 0);
+
+    assert_eq!(
+        field.bit_length(), 
+        size,
+        "Buffer bit length should be equal to field bit length"
+    );
+
+    assert_eq!(
+        "1478", 
+        to_hex(&result),
+        "Message field (bin) should be correctly encoded and added"
+    );
+
+}
+
+@Test
+public void testAddFieldDec() throws WfCoreException {
+    /* Setup */
     WfBinaryBuffer buffer = WfBinaryBuffer.create();
-    WfMessageField field = WfMessageField.define(FIELDNAME, null, BIN, 0, 3);
+    WfMessageField field = WfMessageField.define(FIELDNAME, null, DEC, 0, 4);
 
-
-    assertTrue("Should be able to set field value", field.set("101"));
+    /* Verify */
+    assertTrue("Should be able to set field value", field.set("1478"));
     buffer.addMessageField(field);
     assertEquals("Binary buffer length should be equal to field length", field.bitLength(), buffer.bitLength());
-    assertTrue("Message field (bin) should be correctly encoded and added", buffer.toHexString().equalsIgnoreCase("a0"));
-}*/
+    assertTrue("Message field (dec) should be correctly encoded and added", buffer.toHexString().equalsIgnoreCase("1478"));
+}
