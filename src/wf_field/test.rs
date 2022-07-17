@@ -29,17 +29,13 @@ fn test_add_field_utf() {
 
 #[test]
 fn test_extract_field_utf() {
-    let byte_array_1: Vec<u8> = vec![0x95, 0x74, 0x78, 0x74];
-
-    let buffer: WhiteflagBuffer = WhiteflagBuffer::new(byte_array_1, 32);
-    let field = FieldDefinition::new(FIELDNAME, None, UTF8, 0, -1);
-
-    let field_definition: FieldDefinition = FieldDefinition::new(FIELDNAME, None, UTF8, 0, -1);
-    let (_, extracted_field) = buffer.extract_message_field(field_definition, 8);
+    let buffer: WhiteflagBuffer = vec![0x95, 0x74, 0x78, 0x74].into();
+    let def = FieldDefinition::new(FIELDNAME, None, UTF8, 0, -1);
+    let (_, field) = buffer.extract_message_field(def, 8);
 
     assert_eq!(
         "txt",
-        extracted_field.get(),
+        field.get(),
         "Extracted message field (UTF) should contain the correct value"
     );
 }
@@ -69,7 +65,7 @@ fn test_add_field_bin_1() {
 #[test]
 fn test_add_field_bin_2() {
     let mut buffer: WhiteflagBuffer = WhiteflagBuffer::default();
-    let mut field = FieldDefinition::new(FIELDNAME, None, BIN, 0, 3)
+    let field = FieldDefinition::new(FIELDNAME, None, BIN, 0, 3)
         .set("101")
         .expect("invalid");
 
@@ -112,12 +108,11 @@ fn test_add_field_dec() {
 
 #[test]
 fn test_extract_field_dec() {
-    let buffer: Vec<u8> = vec![0x95, 0x91, 0xFF, 0xE7];
-    let mut buffer: WhiteflagBuffer = WhiteflagBuffer::new(buffer, 0);
-    let mut field = FieldDefinition::new(FIELDNAME, None, DEC, 0, 2);
+    let buffer: WhiteflagBuffer = vec![0x95, 0x91, 0xFF, 0xE7].into();
+    let def = FieldDefinition::new(FIELDNAME, None, DEC, 0, 2);
 
-    let (size, field) =
-        buffer.extract_message_field(FieldDefinition::new(FIELDNAME, None, DEC, 0, -1), 0);
+    let (_, field) =
+        buffer.extract_message_field(def, 0);
 
     assert_eq!(
         "47",

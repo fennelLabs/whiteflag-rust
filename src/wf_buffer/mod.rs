@@ -1,4 +1,7 @@
-use self::common::{append_bits, crop_bits, extract_bits};
+use self::{
+    common::{append_bits, crop_bits, extract_bits},
+    constants::BYTE,
+};
 use crate::wf_field::{Field, FieldDefinition};
 
 #[cfg(test)]
@@ -78,6 +81,16 @@ impl From<WhiteflagBuffer> for (Vec<u8>, usize) {
 impl AsRef<Vec<u8>> for WhiteflagBuffer {
     fn as_ref(&self) -> &Vec<u8> {
         &self.data
+    }
+}
+
+impl From<Vec<u8>> for WhiteflagBuffer {
+    fn from(buffer: Vec<u8>) -> Self {
+        let bit_length = buffer.len() * BYTE;
+        WhiteflagBuffer {
+            data: buffer,
+            bit_length,
+        }
     }
 }
 
