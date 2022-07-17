@@ -1,5 +1,5 @@
 use crate::wf_buffer::common::to_hex;
-use crate::wf_codec::encoding::{BIN, DEC, UTF8};
+use crate::wf_codec::encoding::{BIN, DEC, HEX, UTF8};
 use crate::{wf_buffer::WhiteflagBuffer, wf_field::Field, wf_field::FieldDefinition};
 
 const FIELDNAME: &str = "TESTFIELD";
@@ -117,5 +117,26 @@ fn test_extract_field_dec() {
         "47",
         field.get(),
         "Extracted message field (dec) should contain the correct value"
+    );
+}
+
+#[test]
+fn test_add_field_hex() {
+    let buffer = WhiteflagBuffer::default();
+
+    let field = FieldDefinition::new(FIELDNAME, None, HEX, 0, 4)
+        .set("3f8C")
+        .expect("invalid");
+
+    assert_eq!(
+        field.bit_length(),
+        buffer.bit_length(),
+        "Buffer bit length should be equal to field bit length"
+    );
+
+    assert_eq!(
+        "3f8C",
+        to_hex(buffer.as_ref()),
+        "Message field (hex) should be correctly encoded and added"
     );
 }
