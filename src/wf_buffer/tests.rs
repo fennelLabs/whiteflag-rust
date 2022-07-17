@@ -150,27 +150,34 @@ fn test_append_bits_2() {
 fn test_append_bits_3() {
     let byte_array_1: Vec<u8> = vec![0xDD, 0xFF]; // 1101 1101 | 1111 1111
     let byte_array_2: Vec<u8> = vec![0xBF]; // 1011 1111
-    let mut buffer: Vec<u8> = vec![];
-
-    assert_eq!(buffer.len(), 0, "Binary buffer length should be 0");
-    assert_eq!(byte_array_1.len(), 2, "byte_array_2 length should be 2");
-
-    buffer = concatinate_bits(&buffer, 0, &byte_array_1, 4);
-    assert_eq!(buffer.len(), 1, "Binary buffer length should be 1");
+    let mut buffer = WhiteflagBuffer::default();
 
     assert_eq!(
-        to_hex(&buffer),
+        buffer.bit_length(),
+        0,
+        "Binary buffer length should be 0 bits"
+    );
+
+    buffer.append(byte_array_1.into(), Some(4));
+    assert_eq!(
+        buffer.bit_length(),
+        4,
+        "Binary buffer length should be 4 bits"
+    );
+    assert_eq!(
+        to_hex(buffer.as_ref()),
         "d0",
         "Byte array 1 should have been correctly added to the buffer"
     );
 
-    buffer = concatinate_bits(&buffer, 0, &byte_array_2, 3);
-
-    assert_eq!(buffer.len(), 1, "Binary buffer length should be 1");
-
-    //TODO: Figure out why this isn't working.
+    buffer.append(byte_array_2.into(), Some(3));
     assert_eq!(
-        to_hex(&buffer),
+        buffer.bit_length(),
+        7,
+        "Binary buffer length should be 7 bits"
+    );
+    assert_eq!(
+        to_hex(buffer.as_ref()),
         "da",
         "Byte array 2 should have been correctly added to the buffer"
     );

@@ -26,12 +26,17 @@ impl WhiteflagBuffer {
     }
 
     pub fn append_field(&mut self, field: &Field) {
-        self.append(field.into());
+        self.append(field.into(), None);
     }
 
-    pub fn append(&mut self, buffer: WhiteflagBuffer) {
-        let (buffer, length) =
-            append_bits(&self.data, self.bit_length, &buffer.data, buffer.bit_length);
+    pub fn append(&mut self, buffer: WhiteflagBuffer, bits: Option<usize>) {
+        let bit_length_to_extract = bits.unwrap_or_else(|| buffer.bit_length);
+        let (buffer, length) = append_bits(
+            &self.data,
+            self.bit_length,
+            &buffer.data,
+            bit_length_to_extract,
+        );
 
         self.data = buffer;
         self.bit_length = length;
