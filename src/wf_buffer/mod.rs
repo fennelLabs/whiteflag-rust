@@ -57,6 +57,10 @@ impl WhiteflagBuffer {
     pub fn crop(&self) -> Vec<u8> {
         crop_bits(&self.data, self.bit_length as isize)
     }
+
+    pub fn bit_length(&self) -> usize {
+        self.bit_length
+    }
 }
 
 impl From<(Vec<u8>, usize)> for WhiteflagBuffer {
@@ -68,6 +72,12 @@ impl From<(Vec<u8>, usize)> for WhiteflagBuffer {
 impl From<WhiteflagBuffer> for (Vec<u8>, usize) {
     fn from(buffer: WhiteflagBuffer) -> Self {
         (buffer.data, buffer.bit_length)
+    }
+}
+
+impl AsRef<Vec<u8>> for WhiteflagBuffer {
+    fn as_ref(&self) -> &Vec<u8> {
+        &self.data
     }
 }
 
