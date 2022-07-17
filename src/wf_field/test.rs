@@ -56,7 +56,6 @@ fn test_extract_field_utf() {
 fn test_add_field_bin_1() {
     let buffer: Vec<u8> = vec![];
     let mut buffer: WhiteflagBuffer = WhiteflagBuffer::new(buffer, 0); 
-
     let mut field = Field::new(FIELDNAME, None, BIN, 0, -1);
 
     let success = field.set("01");
@@ -64,7 +63,7 @@ fn test_add_field_bin_1() {
 
     buffer.append_field(&field);
 
-    let (size, extracted_field) = buffer.extract_message_field(FieldDefinition::new(FIELDNAME, None, BIN, 0, -1), 0);
+    let (size, _) = buffer.extract_message_field(FieldDefinition::new(FIELDNAME, None, BIN, 0, -1), 0);
 
     assert_eq!(
         field.bit_length(), 
@@ -72,9 +71,11 @@ fn test_add_field_bin_1() {
         "Buffer bit length should be equal to field bit length"
     );
 
+    let (result, _) = From::from(buffer);
+
     assert_eq!(
         "40", 
-        to_hex(&extracted_field.encode().expect("correct string")),
+        to_hex(&result),
         "Message field (bin) should be correctly encoded and added"
     );
 
