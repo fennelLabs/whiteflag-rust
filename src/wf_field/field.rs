@@ -115,7 +115,7 @@ impl Field {
         message_buffer: &[u8],
         message_buffer_bit_length: usize,
         start_bit: usize,
-    ) -> usize {
+    ) -> String {
         let bit_length = if self.bit_length() >= 1 {
             self.bit_length()
         } else {
@@ -130,9 +130,8 @@ impl Field {
             start_bit,
             bit_length,
         );
-        self.decode(field_buffer);
 
-        bit_length
+        self.decode(field_buffer)
     }
 }
 
