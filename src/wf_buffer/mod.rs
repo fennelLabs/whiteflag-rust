@@ -42,24 +42,20 @@ impl WhiteflagBuffer {
         self.bit_length = length;
     }
 
-    pub fn extract_message_field(
-        &self,
-        field: FieldDefinition,
-        start_bit: usize,
-    ) -> (usize, Field) {
-        let field_bit_length = field.bit_length();
+    pub fn extract_message_field(&self, definition: FieldDefinition, start_bit: usize) -> Field {
+        let field_bit_length = definition.bit_length();
         let bit_length = if field_bit_length >= 1 {
             field_bit_length
         } else {
             let mut bit_length = self.bit_length - start_bit;
-            bit_length -= bit_length % &field.encoding.bit_length;
+            bit_length -= bit_length % &definition.encoding.bit_length;
             bit_length
         };
 
         let field_buffer: Vec<u8> =
             extract_bits(&self.data, self.bit_length, start_bit, bit_length);
 
-        (bit_length, field.decode(field_buffer))
+        definition.decode(field_buffer)
     }
 
     pub fn crop(&self) -> Vec<u8> {
