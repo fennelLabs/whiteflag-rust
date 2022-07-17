@@ -111,7 +111,7 @@ fn test_extract_field_dec() {
     let buffer: WhiteflagBuffer = vec![0x95, 0x91, 0xFF, 0xE7].into();
     let def = FieldDefinition::new(FIELDNAME, None, DEC, 0, 2);
 
-    let (_, field) = buffer.extract_message_field(def, 0);
+    let (_, field) = buffer.extract_message_field(def, 10);
 
     assert_eq!(
         "47",
