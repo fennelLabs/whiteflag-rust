@@ -78,16 +78,45 @@ fn test_add_field_bin_1() {
         to_hex(&result),
         "Message field (bin) should be correctly encoded and added"
     );
-
 }
 
-//@Test
-//public void testAddFieldBin1() throws WfCoreException {
+#[test]
+fn test_add_field_bin_2() {
+    let buffer: Vec<u8> = vec![];
+    let mut buffer: WhiteflagBuffer = WhiteflagBuffer::new(buffer, 0); 
+    let mut field = Field::new(FIELDNAME, None, BIN, 0, 3);
+
+    let success = field.set("101");
+    assert!(success.is_ok());
+
+    buffer.append_field(&field);
+
+    let (size, _) = buffer.extract_message_field(FieldDefinition::new(FIELDNAME, None, BIN, 0, -1), 0);
+
+    assert_eq!(
+        field.bit_length(), 
+        size,
+        "Buffer bit length should be equal to field bit length"
+    );
+
+    let (result, _) = From::from(buffer);
+
+    assert_eq!(
+        "a0", 
+        to_hex(&result),
+        "Message field (bin) should be correctly encoded and added"
+    );
+}
+
+/*@Test
+public void testAddFieldBin2() throws WfCoreException {
+
+    WfBinaryBuffer buffer = WfBinaryBuffer.create();
+    WfMessageField field = WfMessageField.define(FIELDNAME, null, BIN, 0, 3);
 
 
-    /* Verify */
-    //assertTrue("Should be able to set field value", field.set("01"));
-    //buffer.addMessageField(field);
-    //assertEquals("Binary buffer length should be equal to field length", field.bitLength(), buffer.bitLength());
-    //assertTrue("Message field (bin) should be correctly encoded and added", buffer.toHexString().equalsIgnoreCase("40"));
-//}
+    assertTrue("Should be able to set field value", field.set("101"));
+    buffer.addMessageField(field);
+    assertEquals("Binary buffer length should be equal to field length", field.bitLength(), buffer.bitLength());
+    assertTrue("Message field (bin) should be correctly encoded and added", buffer.toHexString().equalsIgnoreCase("a0"));
+}*/
