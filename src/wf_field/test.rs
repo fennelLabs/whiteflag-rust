@@ -134,5 +134,20 @@ fn test_add_field_dec() {
         to_hex(&result),
         "Message field (bin) should be correctly encoded and added"
     );
+}
 
+#[test]
+fn test_extract_field_dec() {
+    let buffer: Vec<u8> = vec![0x95, 0x91, 0xFF, 0xE7];
+    let mut buffer: WhiteflagBuffer = WhiteflagBuffer::new(buffer, 0); 
+    let mut field = Field::new(FIELDNAME, None, DEC, 0, 2);
+
+    let (size, _) = buffer.extract_message_field(FieldDefinition::new(FIELDNAME, None, DEC, 0, -1), 0);
+    let (result, _) = From::from(buffer);
+
+    assert_eq!(
+        "47", 
+        result,
+        "Extracted message field (dec) should contain the correct value"
+    );
 }
