@@ -122,11 +122,13 @@ fn test_extract_field_dec() {
 
 #[test]
 fn test_add_field_hex() {
-    let buffer = WhiteflagBuffer::default();
+    let mut buffer = WhiteflagBuffer::default();
 
     let field = FieldDefinition::new(FIELDNAME, None, HEX, 0, 4)
         .set("3f8C")
         .expect("invalid");
+
+    buffer.append_field(&field);
 
     assert_eq!(
         field.bit_length(),
@@ -135,7 +137,7 @@ fn test_add_field_hex() {
     );
 
     assert_eq!(
-        "3f8C",
+        "3f8c",
         to_hex(buffer.as_ref()),
         "Message field (hex) should be correctly encoded and added"
     );
