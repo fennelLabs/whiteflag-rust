@@ -128,11 +128,7 @@ fn test_append_bits_2() {
 
     buffer = concatinate_bits(&buffer, 0, &byte_array_1, 24);
 
-    assert_eq!(
-        buffer.len(),
-        3,
-        "Binary buffer length should be 3"
-    );
+    assert_eq!(buffer.len(), 3, "Binary buffer length should be 3");
     assert_eq!(
         to_hex(&buffer),
         "e63887",
@@ -141,18 +137,13 @@ fn test_append_bits_2() {
 
     buffer = concatinate_bits(&buffer, 24, &byte_array_2, 12);
 
-    assert_eq!(
-        buffer.len(),
-        5,
-        "Binary buffer length should be 5"
-    );
+    assert_eq!(buffer.len(), 5, "Binary buffer length should be 5");
 
     assert_eq!(
         to_hex(&buffer),
         "e638876e60",
         "Byte array 2 should have been correctly added to the binary buffer"
     );
-
 }
 
 #[test]
@@ -161,16 +152,8 @@ fn test_append_bits_3() {
     let byte_array_2: Vec<u8> = vec![0xBF]; // 1011 1111
     let mut buffer: Vec<u8> = vec![];
 
-    assert_eq!(
-        buffer.len(),
-        0,
-        "Binary buffer length should be 0"
-    );
-    assert_eq!(
-        byte_array_1.len(),
-        2,
-        "byte_array_2 length should be 2"
-    );
+    assert_eq!(buffer.len(), 0, "Binary buffer length should be 0");
+    assert_eq!(byte_array_1.len(), 2, "byte_array_2 length should be 2");
 
     buffer = concatinate_bits(&buffer, 0, &byte_array_1, 4);
     assert_eq!(buffer.len(), 1, "Binary buffer length should be 1");
@@ -179,9 +162,9 @@ fn test_append_bits_3() {
         to_hex(&buffer),
         "d0",
         "Byte array 1 should have been correctly added to the buffer"
-    ); 
+    );
 
-    buffer = concatinate_bits(&buffer, 0, &byte_array_2, 3); 
+    buffer = concatinate_bits(&buffer, 0, &byte_array_2, 3);
 
     assert_eq!(buffer.len(), 1, "Binary buffer length should be 1");
 
@@ -190,7 +173,7 @@ fn test_append_bits_3() {
         to_hex(&buffer),
         "da",
         "Byte array 2 should have been correctly added to the buffer"
-    );  
+    );
 }
 
 #[test]
@@ -198,29 +181,20 @@ fn test_extract_bits_1() {
     let byte_array_1: Vec<u8> = vec![0xDD, 0xFF]; // 110|1110111|111111
     let result: Vec<u8> = vec![0xEE]; //    |1110111|0
 
-    assert_eq!(
-        byte_array_1.len(),
-        2,
-        "Binary buffer length should be 2"
-    );
+    assert_eq!(byte_array_1.len(), 2, "Binary buffer length should be 2");
     assert_eq!(
         result,
         extract_bits(&byte_array_1, 16, 3, 7),
         "Should have correctly extracted 7 bits from binary buffer"
     );
 }
-  
+
 #[test]
 fn test_extract_bits_2() {
-
     let byte_array_1: Vec<u8> = vec![0xDD, 0xE7, 0xD0]; // 1101110111100|111|11010000
     let result: Vec<u8> = vec![0xE0]; // |111|00000
 
-    assert_eq!(
-        byte_array_1.len(),
-        3,
-        "Binary buffer length should be 3"
-    );
+    assert_eq!(byte_array_1.len(), 3, "Binary buffer length should be 3");
 
     assert_eq!(
         result,
@@ -231,7 +205,6 @@ fn test_extract_bits_2() {
 
 #[test]
 fn test_extract_bits_3() {
-
     let byte_array_1: Vec<u8> = vec![0x95, 0xDD, 0xFF, 0xE7]; // 1001010111|0111011111|111111100111
     let result: Vec<u8> = vec![0x77, 0xC0]; //           |0111011111|000000
 
@@ -250,7 +223,6 @@ fn test_extract_bits_3() {
 
 #[test]
 fn test_extract_bits_4() {
-
     let byte_array_1: Vec<u8> = vec![0x95, 0xDD, 0xFF, 0xE7]; // 1001010111|0111011111|111111100111
     let result: Vec<u8> = vec![0xDF, 0xFE]; //           |0111011111|000000
 
