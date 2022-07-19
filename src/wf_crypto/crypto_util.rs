@@ -1,3 +1,4 @@
+use math::round;
 use regex::Regex;
 
 /// The hash algorithm for the HKDF function
@@ -76,8 +77,7 @@ fn hkdf_expand(prk: Vec<u8>, info: Vec<u8>, keyLength: usize) -> Vec<u8> {
 
     let hmac: Mac = get_hmac(prk); // Mac isn't a real type yet.
     let t: u8 = 0;
-    // TODO Replace this with real function calls.
-    let N = Math.ceil((keyLength as f32) / (hmac.getMacLength() as f32)) as usize;
+    let N = round::ceil((keyLength as f32) / (hmac.getMacLength() as f32)) as usize;
 
     for i in 1..N {
         hmac.update(t);
@@ -85,8 +85,13 @@ fn hkdf_expand(prk: Vec<u8>, info: Vec<u8>, keyLength: usize) -> Vec<u8> {
         hmac.update(i as u8);
         t = hmac.doFinal();
 
-        // TODO De-Java this.
-        let length = Math.min(remainder, t.length);
+        // Home-baked min(x,y) function, just like ma used to make.
+        let length = if remainder < t.length {
+            remainder
+        } else {
+            t.length
+        };
+
         okm.put(t, 0, length);
         remainder -= length;
     }
