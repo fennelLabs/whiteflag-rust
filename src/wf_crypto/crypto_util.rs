@@ -102,7 +102,7 @@ fn hkdf_expand(prk: Vec<u8>, info: Vec<u8>, keyLength: usize) -> Vec<u8> {
 fn get_hmac(key: Vec<u8>) -> WhiteflagCryptoResult<Mac> {
     // Mac isn't a real type here yet.
     let hmac: Mac;
-    hmac = Mac.getInstance(HKDF_HASHALG);
-    hmac.init(SecretKeySpec::new(key, HKDF_HASHALG)); // For now, pretending this is a real type. We'll need to change this to our secret key.
+    hmac = Mac.get_instance(HKDF_HASHALG);
+    hmac.init(SecretKey::new(key, HKDF_HASHALG)); // For now, pretending this is a real type. We'll need to change this to our secret key.
     return hmac;
 }
