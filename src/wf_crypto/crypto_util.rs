@@ -38,7 +38,7 @@ pub fn zeroise(byteArray: Vec<u8>) {
 /// HKDF expand and extract.
 ///
 /// Whiteflag Specification 5.2.3 Key and Token Derivation
-pub fn hkdf(ikm: Vec<u8>, salt: Vec<u8>, info: Vec<u8>, key_length: usize) {
+fn hkdf(ikm: Vec<u8>, salt: Vec<u8>, info: Vec<u8>, key_length: usize) -> Vec<u8> {
     /// Step 1. HKDF-Extract(salt, IKM) -> PRK
     /// Step 2. HKDF-Expand(PRK, info, L) -> OKM
     return hkdf_expand(hkdf_extract(ikm, salt), info, key_length);
@@ -48,7 +48,10 @@ pub fn hkdf(ikm: Vec<u8>, salt: Vec<u8>, info: Vec<u8>, key_length: usize) {
 ///
 /// This is a wrapper for the HKDF function allowing to provide
 /// the input as hexadecimal strings.
-pub fn hkdf(ikm: &str, salt: &str, info: &str, key_length: usize) {
+/// Note from Fennel Labs:
+/// In whiteflag-java, this is an overload of hkdf. We've kept it for completeness,
+/// but really it'd be preferable for this to be the public-facing interface.
+pub fn hkdf_strings(ikm: &str, salt: &str, info: &str, key_length: usize) -> &str {
     /// Step 1. HKDF-Extract(salt, IKM) -> PRK
     /// Step 2. HKDF-Expand(PRK, info, L) -> OKM
     return hex::encode(hkdf(
@@ -83,7 +86,7 @@ fn hkdf_expand(prk: Vec<u8>, info: Vec<u8>, keyLength: usize) -> Vec<u8> {
         t = hmac.doFinal();
 
         // TODO De-Java this.
-        let length = Math.min(remainder, t.length); 
+        let length = Math.min(remainder, t.length);
         okm.put(t, 0, length);
         remainder -= length;
     }
