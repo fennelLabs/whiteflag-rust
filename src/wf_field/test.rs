@@ -1,5 +1,5 @@
 use crate::wf_buffer::common::to_hex;
-use crate::wf_codec::encoding::{BIN, DEC, HEX, UTF8, DATETIME};
+use crate::wf_codec::encoding::{BIN, DATETIME, DEC, HEX, UTF8};
 use crate::{wf_buffer::WhiteflagBuffer, wf_field::Field, wf_field::FieldDefinition};
 
 const FIELDNAME: &str = "TESTFIELD";
@@ -164,7 +164,7 @@ fn test_add_field_date_time() {
     let field = FieldDefinition::new(FIELDNAME, None, DATETIME, 0, -1)
         .set("2020-07-01T21:42:23Z")
         .expect("invalid");
-    
+
     buffer.append_field(&field);
 
     assert_eq!(
