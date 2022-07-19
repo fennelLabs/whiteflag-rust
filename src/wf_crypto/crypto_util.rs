@@ -30,10 +30,10 @@ use regex::Regex;
     /// HKDF expand and extract.
     /// 
     /// Whiteflag Specification 5.2.3 Key and Token Derivation
-    pub fn hkdf(byte[] ikm, byte[] salt, byte[] info, int keyLength) {
+    pub fn hkdf(ikm: Vec<u8>, salt: Vec<u8>, info: Vec<u8>, key_length: usize) {
         /// Step 1. HKDF-Extract(salt, IKM) -> PRK
         /// Step 2. HKDF-Expand(PRK, info, L) -> OKM
-        return hkdfExpand(hkdfExtract(ikm, salt), info, keyLength);
+        return hkdfExpand(hkdfExtract(ikm, salt), info, key_length);
     }
 
     
@@ -41,29 +41,29 @@ use regex::Regex;
     /// 
     /// This is a wrapper for the HKDF function allowing to provide
     /// the input as hexadecimal strings.
-    pub fn hkdf(String ikm, String salt, String info, int keyLength) {
+    pub fn hkdf(ikm: &str, salt: &str, info: &str, key_length: usize) {
         /// Step 1. HKDF-Extract(salt, IKM) -> PRK
         /// Step 2. HKDF-Expand(PRK, info, L) -> OKM
-        return convertToHexString(hkdf(
-            convertToByteArray(ikm),
-            convertToByteArray(salt),
-            convertToByteArray(info),
-            keyLength
-        ));
+        return hex::encode(hkdf(
+            hex::decode(ikm).unwrap(),
+            hex::decode(salt).unwrap(),
+            hex::decode(info).unwrap(),
+            key_length
+        )).unwrap();
     }
     
     /// Performs RFC 5869 HKDF Step 1: extract
-    fn hkdfExtract(byte[] ikm, byte[] salt) {
+    fn hkdfExtract(ikm: Vec<u8>, salt: Vec<u8>) {
         return getHMAC(salt).doFinal(ikm);
     }
     
     /// Performs RFC 5869 HKDF Step 2: expand
-    fn hkdfExpand(byte[] prk, byte[] info, int keyLength) {
+    fn hkdfExpand(prk: Vec<u8>, info: Vec<u8>, keyLength: usize) -> Vec<u8> {
         ByteBuffer okm = ByteBuffer.allocate(keyLength);
-        int remainder = keyLength;
+        let remainder = keyLength;
 
         Mac hmac = getHMAC(prk);
-        byte[] t = new byte[0];
+        let t: u8 = 0;
         int N = (int) Math.ceil((double) keyLength / (double) hmac.getMacLength());
 
         for (int i = 1; i <= N; i++) {
@@ -80,7 +80,7 @@ use regex::Regex;
     }
 
     /// Creates a HMAC object initialised with the provide key
-    private fn getHMAC(byte[] key) {
+    fn getHMAC(key: Vec<u8>) {
         Mac hmac;
         try {
             hmac = Mac.getInstance(HKDF_HASHALG);
@@ -92,11 +92,3 @@ use regex::Regex;
         }
         return hmac;
     }
-
-    
-    /// Checks for and removes prefix from string
-    private fn removeStringPrefix(String str, String prefix) {
-        if (str.startsWith(prefix)) return str.substring(prefix.length());
-        return str;
-    }
-}
