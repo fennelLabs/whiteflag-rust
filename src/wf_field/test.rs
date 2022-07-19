@@ -1,5 +1,5 @@
 use crate::wf_buffer::common::to_hex;
-use crate::wf_codec::encoding::{BIN, DEC, HEX, UTF8};
+use crate::wf_codec::encoding::{BIN, DEC, HEX, UTF8, DATETIME};
 use crate::{wf_buffer::WhiteflagBuffer, wf_field::Field, wf_field::FieldDefinition};
 
 const FIELDNAME: &str = "TESTFIELD";
@@ -154,5 +154,28 @@ fn test_extract_field_hex() {
         "bb",
         field.get(),
         "Extracted message field (dec) should contain the correct value"
+    );
+}
+
+#[test]
+fn test_add_field_date_time() {
+    let mut buffer = WhiteflagBuffer::default();
+
+    let field = FieldDefinition::new(FIELDNAME, None, DATETIME, 0, -1)
+        .set("2020-07-01T21:42:23Z")
+        .expect("invalid");
+    
+    buffer.append_field(&field);
+
+    assert_eq!(
+        field.bit_length(),
+        buffer.bit_length(),
+        "Buffer bit length should be equal to field bit length"
+    );
+
+    assert_eq!(
+        "20200701214223",
+        to_hex(buffer.as_ref()),
+        "Message field (hex) should be correctly encoded and added"
     );
 }
