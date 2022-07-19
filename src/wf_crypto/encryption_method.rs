@@ -7,32 +7,32 @@
 enum WhiteflagEncryptionMethod {
     /// Encryption Method 0: no encryption
     NO_ENCRYPTION {
-        fieldValue: &str,
-        algorithmName: &str,
-        operationMode: &str,
-        paddingScheme: &str,
+        field_value: &str,
+        algorithm_name: &str,
+        operation_mode: &str,
+        padding_scheme: &str,
         key_length: usize,
-        hkdfSalt: &str,
+        hkdf_salt: &str,
     },
 
     /// Encryption Method 1: AES-256-CTR with negotiated key
     AES_256_CTR_ECDH {
-        fieldValue: &str,
-        algorithmName: &str,
-        operationMode: &str,
-        paddingScheme: &str,
+        field_value: &str,
+        algorithm_name: &str,
+        operation_mode: &str,
+        padding_scheme: &str,
         key_length: usize,
-        hkdfSalt: &str,
+        hkdf_salt: &str,
     },
 
     /// Encryption Method : AES-256-CTR with pre-shared key
     AES_256_CTR_PSK {
-        fieldValue: &str,
-        algorithmName: &str,
-        operationMode: &str,
-        paddingScheme: &str,
+        field_value: &str,
+        algorithm_name: &str,
+        operation_mode: &str,
+        padding_scheme: &str,
         key_length: usize,
-        hkdfSalt: &str,
+        hkdf_salt: &str,
     },
 }
 
