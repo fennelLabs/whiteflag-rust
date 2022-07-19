@@ -1,17 +1,3 @@
-/*
- * Whiteflag Java Library
- */
-package org.whiteflagprotocol.java.crypto;
-
-import java.nio.ByteBuffer;
-import java.security.NoSuchAlgorithmException;
-import java.security.InvalidKeyException;
-import java.util.Arrays;
-import java.util.regex.Pattern;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
 /**
  * Whiteflag cryptographic utility class
  *
@@ -21,7 +7,7 @@ import javax.crypto.spec.SecretKeySpec;
  * 
  * @since 1.1
  */
-public final class WfCryptoUtil {
+struct CryptoUtil {
 
     /* PROPERTIES */
 
@@ -29,7 +15,7 @@ public final class WfCryptoUtil {
     /**
      * The hash algorithm for the HKDF function
      */
-    public static final String HKDF_HASHALG ="HMACSHA256";
+    pub HKDF_HASHALG: String,
     /**
      * The regex pattern describing a valid hexadecimnal string
      */
@@ -37,18 +23,18 @@ public final class WfCryptoUtil {
     /**
      * The "0x" prefix of a hexadecimal string
      */
-    public static final String HEXPREFIX = "0x";
+    pub HEXPREFIX: &str,
     /**
      * The radix of a hexadecimal digit
      */
-    public static final int HEXRADIX = 16;
+    pub HEXRADIX: usize,
     /**
      * The bit size of a quadbit
      */
-    public static final int QUADBIT = 4;
+    pub QUADBITL: usize,
+}
 
-    /* CONSTRUCTOR */
-
+impl WfCryptoUtil for CryptoUtil {
     /** 
      * Prevents the utility class to be instantiated
      */
