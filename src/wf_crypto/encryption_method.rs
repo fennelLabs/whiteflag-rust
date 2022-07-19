@@ -1,11 +1,3 @@
-/*
- * Whiteflag Java Library
- */
-package org.whiteflagprotocol.java.crypto;
-
-/* Static import of cryptographic utility functions */
-import static org.whiteflagprotocol.java.crypto.WfCryptoUtil.convertToByteArray;
-
 /**
  * Whiteflag encryption parameters enum class
  *
@@ -17,13 +9,9 @@ import static org.whiteflagprotocol.java.crypto.WfCryptoUtil.convertToByteArray;
  * are in accordance with the
  * <a href="https://docs.oracle.com/en/java/javase/17/docs/specs/security/standard-names.html">Java Security Standard Algorithm Names</a>.
  * 
- * @wfver v1-draft.6
- * @wfref 5.2.3 Key and Token Derivation
- * 
- * @since 1.1
+ * Whiteflag Specification 5.2.3 Key and Token Derivation
  */
-@SuppressWarnings("java:S1192")
-public enum WfEncryptionMethod {
+enum WhiteflagEncryptionMethod {
     /**
      * Encryption Method 0: no encryption
      */
@@ -38,8 +26,6 @@ public enum WfEncryptionMethod {
      * Encryption Method : AES-256-CTR with pre-shared key
      */
     AES_256_CTR_PSK("2", "AES", "CTR", "NoPadding", 32, "c4d028bd45c876135e80ef7889835822a6f19a31835557d5854d1334e8497b56");
-
-    /* PROPERTIES */
 
     /* The valid regex charset of an unencoded field value */
     /**
