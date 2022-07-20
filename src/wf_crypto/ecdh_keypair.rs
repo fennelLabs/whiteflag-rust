@@ -5,7 +5,7 @@ use x25519_dalek::{PublicKey, SharedSecret, StaticSecret};
 /// This class represents an Elleptic Curve Diffie-Hellmann key pair
 /// used by Whiteflag for cryptographic key negotiation.
 ///
-/// The current Fennel implemenation uses curve-x25519.
+/// The current Fennel implemenation uses curve-x25519 to verify feature completenesss.
 ///
 /// Whiteflag Specification 5.2.2 Key Agreement
 
