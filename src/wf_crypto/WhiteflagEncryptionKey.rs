@@ -68,8 +68,11 @@ impl WfEncryptionKey for WhiteflagEncryptionKey {
     }
 
     ///Returns the encryption method
-    public final WfEncryptionMethod getEncryptionMethod() {
-        return method;
+    //public final WfEncryptionMethod getEncryptionMethod() {
+    //    return method;
+    //}
+    fn get_encryption_method() -> WfEncryptionMethod {
+        self.method
     }
 
     ///Derive the secret cryptographic key from this Whiteflag encryption key
