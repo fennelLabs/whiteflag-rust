@@ -20,7 +20,55 @@ struct WhiteflagEncryptionKey {
     prk: Vec<u8>,
 }
 
+//rust builder pattern is recommended for situations where one needs multiple constructors
+
+//https://rust-unofficial.github.io/patterns/patterns/creational/builder.html
+//https://doc.rust-lang.org/1.0.0/style/ownership/builders.html
+//https://www.ameyalokare.com/rust/2017/11/02/rust-builder-pattern.html
+
+
+#[derive(Default)]
+struct WhiteflagEncryptionKeyBuilder {
+    rawkey: Vec<u8> //This may be different types. how to handle that?
+    method: WfEncryptionMethod,
+    prk: Vec<u8>,  
+    destroyed: bool
+    //not sure how to handle the this() lines in Java
+}
+
+impl WhiteflagEncryptionKeyBuilder {
+    pub fn new(rawkey: Vec<u8>, method: WfEncryptionMethod, prk: Vec<u8>) -> WhiteflagEncryptionKeyBuilder {
+        WhiteflagEncryptionKeyBuilder {
+            rawkey,
+            method,
+            prk,
+            destroyed,
+            //additional
+        }
+    }
+    //fn with_additional_optional_argument_name(mut self, additional_optional_argument_name: type) -> Self {
+    //self.additional_optional_argument_name = Some(additional_optional_argument_name);
+    //self
+    //}
+
+    fn build(self) -> WhiteflagEncryptionKey {
+        WhiteflagEncryptionKey {
+            rawkey: self.rawkey,
+            method: self.method,
+            prk: self.prk,
+            destroyed: self.destroyed
+            //additional_optional_argument_name: self.additional_optional_argument_name
+        }
+    }
+}
+
 impl WfEncryptionKey for WhiteflagEncryptionKey {
+
+    pub fn builder() -> WhiteflagEncryptionKeyBuilder {
+        WhiteflagEncryptionKeyBuilder::default()
+    }
+
+
     /**
     ///Constructs a new Whiteflag encryption key from a raw pre-shared key
     ///@param rawPreSharedKey a hexadecimal string with the raw pre-shared encryption key
