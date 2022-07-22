@@ -18,7 +18,7 @@ pub trait WfECDHKeyPair {
     fn get_raw_public_key(&self) -> [u8; 32];
 
     /// Calculates the negotiated shared key with an originator
-    fn negotiate_key(&mut self, public_key: [u8; 32]) -> Vec<u8>;
+    fn negotiate_key(&mut self, public_key: [u8; 32]);
 
     /// Creates a new random ECDH key with the curve specified for Whiteflag key negotiation
     fn create_keypair() -> WhiteflagECDHKeyPair;
@@ -69,10 +69,9 @@ impl WfECDHKeyPair for WhiteflagECDHKeyPair {
     }
 
     /// Calculates the negotiated shared key with an originator
-    fn negotiate_key(&mut self, public_key: [u8; 32]) -> Vec<u8> {
+    fn negotiate_key(&mut self, public_key: [u8; 32]) {
         let secret = get_shared_secret(self.session_secret.clone(), &PublicKey::from(public_key));
         self.shared_secret = Some(secret);
-        self.shared_secret.as_ref().unwrap().as_bytes().to_vec()
     }
 
     /// Creates a new random ECDH key with the curve specified for Whiteflag key negotiation
