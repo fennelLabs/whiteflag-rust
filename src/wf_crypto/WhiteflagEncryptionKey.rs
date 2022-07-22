@@ -67,7 +67,7 @@ impl WfEncryptionKey for WhiteflagEncryptionKey {
         Self {
             rawkey: , //ecdhKeyPair.negotiateKey(rawPublicKey);
             method:  WhiteflagEncryptionMethod.AES_256_CTR_ECDH, //Arrays.copyOf(rawPreSharedKey, rawPreSharedKey.length);
-            prk: WhiteflagEncryptionMethod.AES_256_CTR_PSK //AES_256_CTR_PSK;
+            prk: //WfCryptoUtil.hkdfExtract(rawkey, method.hkdfSalt);
         }
     }
 
