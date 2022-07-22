@@ -7,8 +7,6 @@ use fennel_lib::aes_tools::AesCipher;
 ///Whiteflag Specification 5.2.3 Key and Token Derivation
 ///Whiteflag Specification 5.2.4 Message Encryption
 struct WhiteflagEncryptionKey {
-    /* Status of the instance */
-    destroyed: bool,
     /* The encryption method and keys */
     /**
     ///The encryption method for which this key is valid
@@ -20,6 +18,7 @@ struct WhiteflagEncryptionKey {
 }
 
 trait WfEncryptionKey {
+
     fn get_encryption_method() -> WhiteflagEncryptionMethod;
 
     fn get_secret_key(context: &str) -> WhiteflagEncryptionMethod;
@@ -63,32 +62,26 @@ impl WfEncryptionKey for WhiteflagEncryptionKey {
     //    this.method = AES_256_CTR_ECDH;
     //    this.prk = WfCryptoUtil.hkdfExtract(rawkey, method.hkdfSalt);
     //}
-    pub fn new_key_from_ecdh(raw_public_key: Vec<u8>, WfECDHKeyPair ecdh_key_pair) -> {
+    pub fn new_key_from_ecdh_vec(raw_public_key: Vec<u8>, WfECDHKeyPair ecdh_key_pair /* not sure what this would be */) -> Self {
         Self {
             rawkey: , //ecdhKeyPair.negotiateKey(rawPublicKey);
-            method:  WhiteflagEncryptionMethod.AES_256_CTR_ECDH, //Arrays.copyOf(rawPreSharedKey, rawPreSharedKey.length);
+            method:  WhiteflagEncryptionMethod.AES_256_CTR_ECDH, 
             prk: //WfCryptoUtil.hkdfExtract(rawkey, method.hkdfSalt);
         }
     }
 
     ///Constructs a new Whiteflag encryption key through ECDH key negotiation
-    public WfEncryptionKey(final ECPublicKey ecPublicKey, final WfECDHKeyPair ecdhKeyPair) throws WfCryptoException {
-        this.rawkey = ecdhKeyPair.negotiateKey(ecPublicKey);
-        this.method = AES_256_CTR_ECDH;
-        this.prk = WfCryptoUtil.hkdfExtract(rawkey, method.hkdfSalt);
-    }
-    ///Destroys this Whiteflag cipher by clearing the encryption key
-    public final void destroy() {
-        WfCryptoUtil.zeroise(rawkey);
-        WfCryptoUtil.zeroise(prk);
-        this.destroyed = true;
-    }
-    ///Determine if this Whiteflag cipher has been destroyed.
-    //public final boolean isDestroyed() {
-    //    return destroyed;
+    //public WfEncryptionKey(final ECPublicKey ecPublicKey, final WfECDHKeyPair ecdhKeyPair) throws WfCryptoException {
+    //    this.rawkey = ecdhKeyPair.negotiateKey(ecPublicKey);
+    //    this.method = AES_256_CTR_ECDH;
+    //    this.prk = WfCryptoUtil.hkdfExtract(rawkey, method.hkdfSalt);
     //}
-    pub fn isDestroyed(&self) -> boolean {
-        self.destroyed
+
+    pub fn new_key_from_ecdh_key() -> Self {
+        Self {
+            rawkey: ecdhKeyPair.negotiateKey(ecPublicKey),
+            method: WhiteflagEncryptionMethod.AES_256_CTR_ECDH,
+        }
     }
 
     ///Returns the encryption method
@@ -106,8 +99,5 @@ impl WfEncryptionKey for WhiteflagEncryptionKey {
             WfCryptoUtil.hkdfExpand(prk, hex::decode(context).unwrap(), method.keyLength)
         )
     }
-    ///Checks and throws exception if this encryption key has been destroyed
-    private final void checkDestroyed() {
-        if (destroyed) throw new IllegalStateException("Encryption key has been destroyed");
-    }
+
 }
