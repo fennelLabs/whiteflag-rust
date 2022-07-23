@@ -1,4 +1,5 @@
-use fennel_lib::aes_tools::AesCipher;
+use fennel_lib::aes_tools::AESCipher;
+use encryption_method::{WhiteflagEncryptionMethod}
 
 ///This class represents a Whiteflag encryption key. Instances of this
 ///class represent the raw key, either pre-shared or negotiated, from which
@@ -6,7 +7,7 @@ use fennel_lib::aes_tools::AesCipher;
 ///
 ///Whiteflag Specification 5.2.3 Key and Token Derivation
 ///Whiteflag Specification 5.2.4 Message Encryption
-struct WhiteflagEncryptionKey {
+pub struct WhiteflagEncryptionKey {
     /* The encryption method and keys */
     /**
     ///The encryption method for which this key is valid
@@ -17,11 +18,18 @@ struct WhiteflagEncryptionKey {
     prk: Vec<u8>,
 }
 
-trait WfEncryptionKey {
+pub trait WfEncryptionKey {
+
+    fn new_key_from_raw_pre_shared_key_str(raw_pre_shared_key: String) -> WfEncryptionKey;
+
+    fn new_key_from_raw_pre_shared_key_vec(raw_pre_shared_key: Vec<u8>) -> WfEncryptionKey;
+
+    fn new_key_from_ecdh_vec(raw_public_key: Vec<u8>, WfECDHKeyPair ecdh_key_pair) -> WhiteflagEncryptionKey;
 
     fn get_encryption_method() -> WhiteflagEncryptionMethod;
 
     fn get_secret_key(context: &str) -> WhiteflagEncryptionMethod;
+
 }
 
 impl WfEncryptionKey for WhiteflagEncryptionKey {
@@ -33,7 +41,7 @@ impl WfEncryptionKey for WhiteflagEncryptionKey {
         //this(convertToByteArray(rawPreSharedKey));
     //}
 
-    pub fn new_key_from_raw_pre_shared_key_str(raw_pre_sharedKey: String) -> Self {
+    fn new_key_from_raw_pre_shared_key_str(raw_pre_sharedKey: String) -> Self {
        //how to rustify? -> this(convertToByteArray(rawPreSharedKey)); 
     }
 
@@ -43,7 +51,7 @@ impl WfEncryptionKey for WhiteflagEncryptionKey {
         //this.method = AES_256_CTR_PSK;
         //this.prk = WfCryptoUtil.hkdfExtract(rawkey, method.hkdfSalt);
     //}
-    pub fn new_key_from_raw_pre_shared_key_vec(raw_pre_sharedKey: Vec<u8>) -> Self {
+    fn new_key_from_raw_pre_shared_key_vec(raw_pre_sharedKey: Vec<u8>) -> Self {
         Self {
             rawkey: , //Arrays.copyOf(rawPreSharedKey, rawPreSharedKey.length);
             method: WhiteflagEncryptionMethod.AES_256_CTR_PSK, 
@@ -52,8 +60,11 @@ impl WfEncryptionKey for WhiteflagEncryptionKey {
     }
 
     ///Constructs a new Whiteflag encryption key through ECDH key negotiation
-    public WfEncryptionKey(final String rawPublicKey, final WfECDHKeyPair ecdhKeyPair) throws WfCryptoException {
-        this(convertToByteArray(rawPublicKey), ecdhKeyPair);
+    /*public WfEncryptionKey(final String rawPublicKey, final WfECDHKeyPair ecdhKeyPair) throws WfCryptoException {
+        this(convertToByteArray(rawPublicKey), ecdhKeyPair); //<- how to rustify?
+    }*/
+    pub fn new_key_from_ecdh_str(raw_public_key: Vec<u8>, WfECDHKeyPair ecdh_key_pair /* not sure what this would be */) -> Self {
+        this(convertToByteArray(rawPublicKey), ecdhKeyPair); //<- how to rustify?
     }
 
     ///Constructs a new Whiteflag encryption key through ECDH key negotiation
@@ -79,8 +90,9 @@ impl WfEncryptionKey for WhiteflagEncryptionKey {
 
     pub fn new_key_from_ecdh_key() -> Self {
         Self {
-            rawkey: ecdhKeyPair.negotiateKey(ecPublicKey),
+            rawkey: ,// need to rustify -> ecdhKeyPair.negotiateKey(ecPublicKey),
             method: WhiteflagEncryptionMethod.AES_256_CTR_ECDH,
+            prk = // need to rustify -> WfCryptoUtil.hkdfExtract(rawkey, method.hkdfSalt);
         }
     }
 
@@ -93,9 +105,8 @@ impl WfEncryptionKey for WhiteflagEncryptionKey {
     }
 
     ///Derive the secret cryptographic key from this Whiteflag encryption key
-    fn get_secret_key(context: &str) -> AesCipher  {
-        checkDestroyed();
-        AesCipher::create(
+    fn get_secret_key(context: &str) -> AESCipher  {
+        AESCipher::create(
             WfCryptoUtil.hkdfExpand(prk, hex::decode(context).unwrap(), method.keyLength)
         )
     }
