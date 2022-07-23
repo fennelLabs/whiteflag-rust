@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod codec_tests;
+mod test;
 
 mod definitions;
 mod field;

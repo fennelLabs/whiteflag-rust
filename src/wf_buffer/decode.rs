@@ -36,9 +36,9 @@ impl WhiteflagBuffer {
                     throw new WfCoreException("Could not decode field at bit " + bitCursor + " of buffer: " + buffer.toHexString(), e);
                 } */
 
-                let (bit_length, field) = self.extract_message_field(f, bit_cursor);
+                let field = self.extract_message_field(f, bit_cursor);
 
-                bit_cursor += bit_length; //field.bit_length();
+                bit_cursor += field.bit_length();
                 byte_cursor = field.definition.end_byte as usize;
 
                 field
