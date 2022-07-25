@@ -1,5 +1,5 @@
 use fennel_lib::aes_tools::AESCipher;
-use super::encryption_method::{WhiteflagEncryptionMethod};
+use super::encryption_method::{WhiteflagEncryptionMethod::*};
 use super::ecdh_keypair::{
     generate_wfkeypair, generate_wfkeypair_from_key, WfECDHKeyPair, WhiteflagECDHKeyPair,
 };
@@ -17,7 +17,8 @@ pub struct WhiteflagEncryptionKey {
      */
     method: WhiteflagEncryptionMethod,
     /* The raw key materials */
-    rawkey: <T>, //this may be String or Vec<u8>,
+    rawkey_str: String, //this may be String or Vec<u8>,
+    rawkey_vec: Vec<u8>,
     prk: Vec<u8>,
 }
 
@@ -59,7 +60,7 @@ impl WfEncryptionKey for WhiteflagEncryptionKey {
     fn new_key_from_raw_pre_shared_key_vec(raw_pre_shared_key: Vec<u8>) -> Self {
         Self {
             rawkey: , //Arrays.copyOf(rawPreSharedKey, rawPreSharedKey.length);
-            method: WhiteflagEncryptionMethod.AES_256_CTR_PSK, 
+            method: AES_256_CTR_PSK, 
             prk: WfCryptoUtil.hkdfExtract(rawkey, method.hkdfSalt)//AES_256_CTR_PSK;
         }
     }
@@ -81,7 +82,7 @@ impl WfEncryptionKey for WhiteflagEncryptionKey {
     fn new_key_from_ecdh_vec(raw_public_key: Vec<u8>, ecdh_key_pair: WfECDHKeyPair) -> Self {
         Self {
             rawkey: , //ecdhKeyPair.negotiateKey(rawPublicKey);
-            method:  WhiteflagEncryptionMethod.AES_256_CTR_ECDH, 
+            method:  AES_256_CTR_ECDH, 
             prk: //WfCryptoUtil.hkdfExtract(rawkey, method.hkdfSalt);
         }
     }
