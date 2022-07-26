@@ -25,14 +25,20 @@ fn test_negotiate_key() {
     let shared_secret = get_shared_secret(static_secret.clone(), &public_key_two.clone());
     let mut pair = generate_wfkeypair_from_key(static_secret);
     pair.negotiate_key(public_key_two.to_bytes());
-    assert_eq!(shared_secret.to_bytes(), pair.get_shared_secret().unwrap().to_bytes())
+    assert_eq!(
+        shared_secret.to_bytes(),
+        pair.get_shared_secret().unwrap().to_bytes()
+    )
 }
 
 #[test]
 fn test_get_keypair_with_secret() {
     let static_secret = get_session_secret();
     let pair = WhiteflagECDHKeyPair::_get_keypair_with_secret(static_secret.clone());
-    assert_eq!(get_session_public_key(&static_secret).to_bytes(), pair.get_public_key().to_bytes())
+    assert_eq!(
+        get_session_public_key(&static_secret).to_bytes(),
+        pair.get_public_key().to_bytes()
+    )
 }
 
 #[test]

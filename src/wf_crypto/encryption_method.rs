@@ -4,7 +4,7 @@
 /// No implementation specific properties and methods are defined by this class.
 ///
 /// Whiteflag Specification 5.2.3 Key and Token Derivation
-pub enum WhiteflagEncryptionMethod {
+enum WhiteflagEncryptionMethod {
     /// Encryption Method 0: no encryption
     NO_ENCRYPTION {
         field_value: &str,
