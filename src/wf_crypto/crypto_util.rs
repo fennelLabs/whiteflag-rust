@@ -1,4 +1,4 @@
-use hkdf::hmac::{Hmac, HmacCore};
+use hkdf::hmac::Hmac;
 
 /// Zeroises a byte array
 pub fn zeroise(byte_array: &mut [u8]) {
