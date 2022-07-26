@@ -1,4 +1,4 @@
-use super::common::{remove_hexadecimal_prefix_mut};
+use super::common::remove_hexadecimal_prefix_mut;
 use hex::FromHexError;
 
 pub struct HexadecimalString {
@@ -6,6 +6,10 @@ pub struct HexadecimalString {
 }
 
 impl HexadecimalString {
+    pub fn new(buffer: &[u8]) -> HexadecimalString {
+        buffer.into()
+    }
+
     pub fn remove_prefix(&mut self) {
         remove_hexadecimal_prefix_mut(&self.hex);
     }

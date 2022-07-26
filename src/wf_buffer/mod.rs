@@ -113,6 +113,6 @@ impl Default for WhiteflagBuffer {
 
 impl From<&WhiteflagBuffer> for HexadecimalString {
     fn from(buffer: &WhiteflagBuffer) -> Self {
-        (buffer.as_ref() as &[u8]).into()
+        HexadecimalString::new(buffer.as_ref())
     }
 }
