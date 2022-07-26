@@ -1,73 +1,6 @@
 use super::constants::*;
 
 /**
- * converts buffer into hexadecimal string
- * java equivalent: WfBinaryBuffer.convertToHexString
- */
-pub fn to_hex(data: &Vec<u8>) -> String {
-    data.iter().flat_map(|b| convert_byte_to_hex(*b)).collect()
-}
-
-fn convert_byte_to_hex(byte: u8) -> [char; 2] {
-    let byte_u32 = byte as u32;
-    let c1 = std::char::from_digit((byte_u32 >> QUADBIT) & 0xF, HEXRADIX as u32)
-        .expect("encoding failed");
-    let c2 = std::char::from_digit(byte_u32 & 0xF, HEXRADIX as u32).expect("encoding failed");
-    [c1, c2]
-}
-
-/**
- * decodes a hexadecimal string into a buffer and includes bit_length
- * java equivalent: WfBinaryBuffer.convertToByteArray
- */
-pub fn decode_from_hexadecimal<T: AsRef<str>>(data: T) -> (Vec<u8>, usize) {
-    let buffer = hex::decode(remove_hexadecimal_prefix(data.as_ref())).unwrap();
-    let bit_length = buffer.len() * BYTE;
-    (buffer, bit_length)
-}
-
-/**
- * Converts a hexadecimal string to a byte array
- * @param hexstr the hexadecimal string
- * @return a byte array
- * @throws IllegalArgumentException if argument is not a hexadecimal string
- * java equivalent: WfBinaryBuffer.convertToByteArray
- */
-pub fn from_hex<T: AsRef<str>>(hex: T) -> Vec<u8> {
-    let mut cleaned_hex = remove_hexadecimal_prefix(hex.as_ref()).to_string();
-
-    if cleaned_hex.len() % 2 == 1 {
-        cleaned_hex += "0";
-    }
-
-    /*
-
-    TODO: check for invalid hex strings?
-
-    if (!HEXPATTERN.matcher(str).matches()) {
-        throw new IllegalArgumentException("Invalid hexadecimal string");
-    }
-
-    */
-
-    /* Loop through hexadecimal string and take two chars at a time*/
-    let data: Vec<char> = cleaned_hex.chars().into_iter().collect();
-    //let data = cleaned_hex.as_bytes();
-    let str_length = data.len();
-    let mut buffer = vec![0; str_length / 2];
-
-    for i in (0..str_length).step_by(2) {
-        buffer[i / 2] = (u8::from_str_radix(&data[i].to_string(), HEXRADIX as u32)
-            .expect("conversion error")
-            << QUADBIT)
-            + u8::from_str_radix(&data[i + 1].to_string(), HEXRADIX as u32)
-                .expect("conversion error");
-    }
-
-    buffer
-}
-
-/**
  * removes characters from string that are invalid in hexadecimal format
  * java equivalent: N/A
  */
@@ -76,15 +9,16 @@ pub fn remove_all_invalid_hex_characters<T: AsRef<str>>(data: T) -> String {
     re.replace_all(data.as_ref(), "").to_string()
 }
 
-/**
- * java equivalent: N/A
- */
 pub fn remove_hexadecimal_prefix(data: &str) -> &str {
     if data.starts_with("0x") {
         return &data[2..];
     }
 
     data
+}
+
+pub fn remove_hexadecimal_prefix_mut(mut data: &str) {
+    data = remove_hexadecimal_prefix(data);
 }
 
 /**
