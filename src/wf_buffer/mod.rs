@@ -11,6 +11,9 @@ pub mod common;
 pub mod constants;
 mod decode;
 mod encode;
+mod hexadecimal_string;
+
+pub use hexadecimal_string::HexadecimalString;
 
 pub struct WhiteflagBuffer {
     data: Vec<u8>,
@@ -65,6 +68,10 @@ impl WhiteflagBuffer {
     pub fn bit_length(&self) -> usize {
         self.bit_length
     }
+
+    pub fn as_hex(&self) -> HexadecimalString {
+        self.into()
+    }
 }
 
 impl From<(Vec<u8>, usize)> for WhiteflagBuffer {
@@ -101,5 +108,11 @@ impl Default for WhiteflagBuffer {
             data: Default::default(),
             bit_length: Default::default(),
         }
+    }
+}
+
+impl From<&WhiteflagBuffer> for HexadecimalString {
+    fn from(buffer: &WhiteflagBuffer) -> Self {
+        (buffer.as_ref() as &[u8]).into()
     }
 }

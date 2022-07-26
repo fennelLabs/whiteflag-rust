@@ -4,8 +4,9 @@ use super::constants::*;
  * converts buffer into hexadecimal string
  * java equivalent: WfBinaryBuffer.convertToHexString
  */
-pub fn to_hex(data: &Vec<u8>) -> String {
-    data.iter().flat_map(|b| convert_byte_to_hex(*b)).collect()
+pub fn to_hex(data: &[u8]) -> String {
+    //data.iter().flat_map(|b| convert_byte_to_hex(*b)).collect()
+    hex::encode(data)
 }
 
 fn convert_byte_to_hex(byte: u8) -> [char; 2] {
