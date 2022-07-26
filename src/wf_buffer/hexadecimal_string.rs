@@ -1,4 +1,4 @@
-use super::common::remove_hexadecimal_prefix_mut;
+use super::common::{remove_hexadecimal_prefix, remove_hexadecimal_prefix_mut};
 use hex::FromHexError;
 
 pub struct HexadecimalString {
@@ -8,6 +8,14 @@ pub struct HexadecimalString {
 impl HexadecimalString {
     pub fn new(buffer: &[u8]) -> HexadecimalString {
         buffer.into()
+    }
+
+    pub fn from_string<T: Into<String>>(hex: T) -> HexadecimalString {
+        HexadecimalString { hex: hex.into() }
+    }
+
+    pub fn decode<T: AsRef<str>>(value: T) -> Result<Vec<u8>, FromHexError> {
+        hex::decode(remove_hexadecimal_prefix(value.as_ref()))
     }
 
     pub fn remove_prefix(&mut self) {
@@ -38,8 +46,7 @@ impl From<&[u8]> for HexadecimalString {
 impl TryFrom<HexadecimalString> for Vec<u8> {
     type Error = FromHexError;
 
-    fn try_from(mut value: HexadecimalString) -> Result<Self, Self::Error> {
-        value.remove_prefix();
-        hex::decode(value.as_ref())
+    fn try_from(value: HexadecimalString) -> Result<Self, Self::Error> {
+        HexadecimalString::decode(value.as_ref())
     }
 }

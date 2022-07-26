@@ -1,16 +1,6 @@
 use super::constants::*;
 
 /**
- * decodes a hexadecimal string into a buffer and includes bit_length
- * java equivalent: WfBinaryBuffer.convertToByteArray
- */
-pub fn decode_from_hexadecimal<T: AsRef<str>>(data: T) -> (Vec<u8>, usize) {
-    let buffer = hex::decode(remove_hexadecimal_prefix(data.as_ref())).unwrap();
-    let bit_length = buffer.len() * BYTE;
-    (buffer, bit_length)
-}
-
-/**
  * removes characters from string that are invalid in hexadecimal format
  * java equivalent: N/A
  */

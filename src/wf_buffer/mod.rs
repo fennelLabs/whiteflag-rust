@@ -13,6 +13,7 @@ mod decode;
 mod encode;
 mod hexadecimal_string;
 
+use hex::FromHexError;
 pub use hexadecimal_string::HexadecimalString;
 
 pub struct WhiteflagBuffer {
@@ -71,6 +72,15 @@ impl WhiteflagBuffer {
 
     pub fn as_hex(&self) -> HexadecimalString {
         self.into()
+    }
+
+    /**
+     * decodes a hexadecimal string into a buffer and includes bit_length
+     * java equivalent: WfBinaryBuffer.convertToByteArray
+     */
+    pub fn decode_from_hexadecimal<T: AsRef<str>>(hex: T) -> Result<WhiteflagBuffer, FromHexError> {
+        let buffer = HexadecimalString::decode(hex)?;
+        Ok(buffer.into())
     }
 }
 
