@@ -22,7 +22,7 @@ pub fn encode<T: FieldValue>(fields: &[T]) -> String {
  * @throws WfCoreException if the encoded message is invalid
  */
 pub fn decode<T: AsRef<str>>(message: T) -> BasicMessage {
-    let buffer: WhiteflagBuffer = match WhiteflagBuffer::decode_from_hexadecimal(message) {
+    let buffer = match WhiteflagBuffer::decode_from_hexadecimal(message) {
         Ok(buffer) => buffer,
         Err(e) => panic!("{}", e),
     };
