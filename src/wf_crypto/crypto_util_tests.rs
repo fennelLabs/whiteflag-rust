@@ -1,4 +1,4 @@
-use super::crypto_util::{hkdf_expand, hkdf_extract, zeroise};
+use super::crypto_util::{zeroise, SimpleWhiteflagHkdf};
 use crate::wf_buffer::common::decode_from_hexadecimal;
 
 fn assert_array_eq<T: PartialEq + std::fmt::Debug>(l: &[T], r: &[T], msg: Option<&str>) {
@@ -36,15 +36,16 @@ fn test_hkdf1() {
     .unwrap();
 
     /* test extract */
-    let prk_result = hkdf_extract(&ikm, &salt);
+    let prk_result = SimpleWhiteflagHkdf::<sha2::Sha256>::new(&ikm, &salt);
     assert_array_eq(
         &prk,
-        &prk_result,
+        &prk_result.as_ref(),
         Some("Should pass RFC 5869 A.1 Test Case 1 Extract"),
     );
 
     /* test expand */
-    let okm_result = hkdf_expand(&prk, &info, 42).unwrap();
+    let hk: SimpleWhiteflagHkdf<sha2::Sha256> = prk.as_slice().try_into().unwrap();
+    let okm_result = hk.expand(&info, 42).unwrap();
     assert_array_eq(
         &okm,
         &okm_result,
@@ -62,15 +63,17 @@ fn test_hkdf2() {
     let okm = hex::decode("b11e398dc80327a1c8e7f78c596a49344f012eda2d4efad8a050cc4c19afa97c59045a99cac7827271cb41c65e590e09da3275600c2f09b8367793a9aca3db71cc30c58179ec3e87c14c01d5c1f3434f1d87").unwrap();
 
     /* test extract */
-    let prk_result = hkdf_extract(&ikm, &salt);
+
+    let prk_result = SimpleWhiteflagHkdf::<sha2::Sha256>::new(&ikm, &salt);
     assert_array_eq(
         &prk,
-        &prk_result,
+        &prk_result.as_ref(),
         Some("Should pass RFC 5869 A.2 Test Case 2 Extract"),
     );
 
     /* test expand */
-    let okm_result = hkdf_expand(&prk, &info, 82).unwrap();
+    let hk: SimpleWhiteflagHkdf<sha2::Sha256> = prk.as_slice().try_into().unwrap();
+    let okm_result = hk.expand(&info, 82).unwrap();
     assert_array_eq(
         &okm,
         &okm_result,
