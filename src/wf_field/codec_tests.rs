@@ -1,8 +1,5 @@
 use super::{Field, FieldDefinition};
-use crate::{
-    wf_buffer::common::{decode_from_hexadecimal, to_hex},
-    wf_codec::encoding::*,
-};
+use crate::{wf_buffer::common::decode_from_hexadecimal, wf_codec::encoding::*};
 
 const FIELDNAME: &str = "TESTFIELD";
 
@@ -13,7 +10,7 @@ fn utf_encoding() {
 
     assert_eq!(
         "5746",
-        to_hex(&field.encode()),
+        field.encode_as_hex().as_ref(),
         "UTF-8 field should be correctly hexadecimal encoded"
     );
     assert_eq!(
@@ -46,7 +43,7 @@ fn bin_encoding_1() {
 
     assert_eq!(
         "bb",
-        to_hex(&field.encode()),
+        field.encode_as_hex().as_ref(),
         "Binary field should be correctly binary encoded"
     );
     assert_eq!(
@@ -79,7 +76,7 @@ fn bin_encoding_2() {
 
     assert_eq!(
         "80",
-        to_hex(&field.encode()),
+        field.encode_as_hex().as_ref(),
         "Binary field should be correctly binary encoded"
     );
     assert_eq!(
@@ -123,7 +120,7 @@ fn dec_encoding() {
 
     assert_eq!(
         "1230",
-        to_hex(&field.encode()),
+        field.encode_as_hex().as_ref(),
         "Decimal field should be correctly binary encoded"
     );
     assert_eq!(
@@ -156,7 +153,7 @@ fn hex_encoding() {
 
     assert_eq!(
         "3f",
-        to_hex(&field.encode()),
+        field.encode_as_hex().as_ref(),
         "Hexadecimal field should be correctly binary encoded"
     );
     assert_eq!(
@@ -192,7 +189,7 @@ fn datetime_encoding() {
 
     assert_eq!(
         "20200701214223",
-        to_hex(&field.encode()),
+        field.encode_as_hex().as_ref(),
         "DateTime field should be correctly binary encoded"
     );
     assert_eq!(
@@ -225,7 +222,7 @@ fn duration_encoding() {
 
     assert_eq!(
         "241130",
-        to_hex(&field.encode()),
+        field.encode_as_hex().as_ref(),
         "Duration field should be correctly binary encoded"
     );
     assert_eq!(
@@ -258,7 +255,7 @@ fn latitude_encoding() {
 
     assert_eq!(
         "919a1220",
-        to_hex(&field.encode()),
+        field.encode_as_hex().as_ref(),
         "Latitude field should be correctly binary encoded"
     );
     assert_eq!(
@@ -291,7 +288,7 @@ fn longitude_encoding() {
 
     assert_eq!(
         "0b19a12280",
-        to_hex(&field.encode()),
+        field.encode_as_hex().as_ref(),
         "Longitude field should be correctly binary encoded"
     );
     assert_eq!(

@@ -1,5 +1,6 @@
 use super::field_definition::FieldDefinition;
 use crate::wf_buffer::common::extract_bits;
+use crate::wf_buffer::HexadecimalString;
 use crate::wf_core::error::{WhiteflagError, WhiteflagResult};
 
 #[derive(Clone, Debug)]
@@ -51,6 +52,10 @@ impl Field {
 
     pub fn encode(&self) -> Vec<u8> {
         self.definition.encoding.encode(&self.value)
+    }
+
+    pub fn encode_as_hex(&self) -> HexadecimalString {
+        self.encode().as_slice().into()
     }
 
     pub fn decode(&mut self, data: Vec<u8>) -> String {
