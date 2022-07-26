@@ -1,30 +1,78 @@
+use hkdf::hmac::{Hmac, HmacCore};
+
 /// Zeroises a byte array
-pub fn zeroise(byteArray: &mut [u8]) {
-    for elem in byteArray.iter_mut() {
+pub fn zeroise(byte_array: &mut [u8]) {
+    for elem in byte_array.iter_mut() {
         *elem = 0xFF;
     } // All ones.
-    for elem in byteArray.iter_mut() {
+    for elem in byte_array.iter_mut() {
         *elem = 0xAA;
     } // Alternating.
-    for elem in byteArray.iter_mut() {
+    for elem in byte_array.iter_mut() {
         *elem = 0x55;
     } // Alternating the other way.
-    for elem in byteArray.iter_mut() {
+    for elem in byte_array.iter_mut() {
         *elem = 0x00;
     } // Zero it all out.
 }
 
-/// Performs RFC 5869 HKDF Step 1: extract
-pub fn hkdf_extract(ikm: &[u8], salt: &[u8]) -> Vec<u8> {
-    hkdf::Hkdf::<sha2::Sha256>::extract(Some(salt), ikm)
-        .0
-        .to_vec()
+pub type SimpleWhiteflagHkdf<H> = WhiteflagHkdf<H, Hmac<H>>;
+
+pub struct WhiteflagHkdf<H, I>
+where
+    H: hkdf::hmac::digest::OutputSizeUser,
+    I: hkdf::HmacImpl<H>,
+{
+    hk: hkdf::Hkdf<H, I>,
+    prk: Vec<u8>,
 }
 
-/// Performs RFC 5869 HKDF Step 2: expand
-pub fn hkdf_expand(prk: &[u8], info: &[u8], key_length: usize) -> Result<Vec<u8>, ()> {
-    let hk = hkdf::Hkdf::<sha2::Sha256>::from_prk(prk).map_err(|e| ())?;
-    let mut okm: Vec<u8> = vec![0; key_length];
-    hk.expand(info, &mut okm).map_err(|e| ())?;
-    Ok(okm)
+impl<H, I> WhiteflagHkdf<H, I>
+where
+    H: hkdf::hmac::digest::OutputSizeUser,
+    I: hkdf::HmacImpl<H>,
+{
+    /// Performs RFC 5869 HKDF Step 1: extract
+    pub fn new(ikm: &[u8], salt: &[u8]) -> Self {
+        let (prk, hk) = hkdf::Hkdf::<H, I>::extract(Some(salt), ikm);
+        WhiteflagHkdf {
+            hk,
+            prk: prk.to_vec(),
+        }
+    }
+
+    /// Performs RFC 5869 HKDF Step 2: expand
+    pub fn expand(&self, info: &[u8], key_length: usize) -> Result<Vec<u8>, ()> {
+        let mut okm: Vec<u8> = vec![0; key_length];
+        self.hk.expand(info, &mut okm).map_err(|e| ())?;
+        Ok(okm)
+    }
+}
+
+impl<H, I> TryFrom<&[u8]> for WhiteflagHkdf<H, I>
+where
+    H: hkdf::hmac::digest::OutputSizeUser,
+    I: hkdf::HmacImpl<H>,
+{
+    type Error = ();
+
+    fn try_from(prk: &[u8]) -> Result<Self, Self::Error> {
+        match hkdf::Hkdf::<H, I>::from_prk(prk) {
+            Ok(hk) => Ok(WhiteflagHkdf {
+                hk,
+                prk: prk.to_vec(),
+            }),
+            Err(_) => Err(()),
+        }
+    }
+}
+
+impl<H, I> AsRef<[u8]> for WhiteflagHkdf<H, I>
+where
+    H: hkdf::hmac::digest::OutputSizeUser,
+    I: hkdf::HmacImpl<H>,
+{
+    fn as_ref(&self) -> &[u8] {
+        &self.prk
+    }
 }
