@@ -13,7 +13,7 @@ impl WfCipher for WhiteflagCipher {
     IvParameterSpec iv;
     byte[] context;
 
-    fn new(WfEncryptionKey key) {
+    fn new(WfEncryptionKey key) -> WfCipher {
         this.key = key;
         try {
             this.cipher = Cipher.getInstance(key.method.cipherName);
@@ -50,11 +50,11 @@ impl WfCipher for WhiteflagCipher {
         return initialisationVector;
     }
 
-    fn WfCipher setInitVector(String initialisationVector) {
+    fn setInitVector(initialisation_vector: String) -> WfCipher {
         return setInitVector(convertToByteArray(initialisationVector));
     }
 
-    fn WfCipher setInitVector(initialisationVector: Vec<u8>) {
+    fn setInitVector(initialisationVector: Vec<u8>) -> WfCipher {
         checkDestroyed();
         this.iv = new IvParameterSpec(initialisationVector, 0, IVBYTELENGTH);
         return this;
