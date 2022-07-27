@@ -1,19 +1,15 @@
-struct WhiteflagCipher {}
+struct WhiteflagCipher {
+    cipher: Cipher,
+    key: WfEncryptionKey,
+    secretKey: SecretKey,
+    iv: Vec<u8>,
+    context: Vec<u8>,
+}
 
 trait WfCipher {}
 
 impl WfCipher for WhiteflagCipher {
-    pub IVBYTELENGTH: usize = 16;
-
-    destroyed: boolean = false;
-
-    Cipher cipher;
-    WfEncryptionKey key; 
-    SecretKey secretKey;
-    IvParameterSpec iv;
-    byte[] context;
-
-    fn new(WfEncryptionKey key) -> WfCipher {
+    fn new(key: WfEncryptionKey) -> WfCipher {
         this.key = key;
         try {
             this.cipher = Cipher.getInstance(key.method.cipherName);
@@ -22,25 +18,22 @@ impl WfCipher for WhiteflagCipher {
         }
     }
 
-    fn WfCipher fromKey(WfEncryptionKey key) {
-        if (Boolean.TRUE.equals(key.isDestroyed())) {
-            throw new IllegalArgumentException("Cannot create Whiteflag cipher from a destroyed key");
-        }
-        return new WfCipher(key);
+    fn fromKey(key: WfEncryptionKey) -> WfCipher {
+        return WfCipher::new(key);
     }
 
-    fn WfCipher setContext(String context) {
-        return setContext(convertToByteArray(context));
+    fn setContext(context: String) -> WfCipher {
+        return setContext(hex::decode(context).unwrap());
     }
 
-    fn WfCipher setContext(context: Vec<u8>) {
+    fn setContext(context: Vec<u8>) -> WfCipher {
         this.context = context;
         this.secretKey = key.getSecretKey(context);
         return this;
     }
 
     fn setInitVector() -> Vec<u8> {
-        byte[] initialisationVector = new byte[IVBYTELENGTH];
+        let initialisationVector = [u8; 32];
         try {
             SecureRandom.getInstanceStrong().nextBytes(initialisationVector);
             this.iv = new IvParameterSpec(initialisationVector);
@@ -55,7 +48,6 @@ impl WfCipher for WhiteflagCipher {
     }
 
     fn setInitVector(initialisationVector: Vec<u8>) -> WfCipher {
-        checkDestroyed();
         this.iv = new IvParameterSpec(initialisationVector, 0, IVBYTELENGTH);
         return this;
     }
@@ -65,7 +57,7 @@ impl WfCipher for WhiteflagCipher {
         return iv.getIV();
     }
 
-    fn isSet() -> boolean {
+    fn is_set() -> boolean {
         if (context == null || context.length == 0) return false;
         if (iv == null || iv.getIV().length != IVBYTELENGTH) return false;
         return !this.destroyed;
@@ -103,8 +95,8 @@ impl WfCipher for WhiteflagCipher {
         return Arrays.copyOf(context, context.length);
     }
 
-    fn checkSet() {
-        if (Boolean.FALSE.equals(isSet())) {
+    fn checkSet(&self) {
+        if (Boolean.FALSE.equals(self.is_set())) {
             throw new IllegalStateException("Context and/or initialisation vector have not been set");
         }
     }
