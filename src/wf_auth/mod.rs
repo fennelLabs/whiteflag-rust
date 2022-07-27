@@ -46,8 +46,9 @@ impl WhiteflagAuthToken {
             method: WhiteflagAuthMethod {
                 value: "2".into(),
                 length: 32,
-                hkdf_salt: "420abc48f5d69328c457d61725d3fd7af2883cad8460976167e375b9f2c14081"
-                    .into(),
+                hkdf_salt: hex::decode(
+                    "420abc48f5d69328c457d61725d3fd7af2883cad8460976167e375b9f2c14081"
+                ).unwrap(),
             }, /* method: WhiteflagAuthMethod {
                    value: TOKEN_PRESHARED.value.clone(),
                    length: TOKEN_PRESHARED.length,
