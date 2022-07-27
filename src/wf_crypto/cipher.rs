@@ -30,7 +30,7 @@ impl WfCipher for WhiteflagCipher {
     }
 
     fn set_context(&mut self, context: String) {
-        return self.set_context_from_bytes(hex::decode(context).unwrap());
+        self.set_context_from_bytes(hex::decode(context).unwrap())
     }
 
     fn set_context_from_bytes(&mut self, context: Vec<u8>) {
@@ -39,12 +39,12 @@ impl WfCipher for WhiteflagCipher {
 
     fn encrypt(&self, data: String) -> String {
         let (key, _) = generate_keys(&hex::decode(self.secret_key).unwrap());
-        return hex::encode(aes_encrypt(&key, data));
+        hex::encode(aes_encrypt(&key, data))
     }
 
     fn decrypt(&self, data: String) -> String {
         let (_, key) = generate_keys(&hex::decode(self.secret_key).unwrap());
-        return aes_decrypt(&key, hex::decode(data).unwrap());
+        aes_decrypt(&key, hex::decode(data).unwrap())
     }
 
     fn get_context(&self) -> Vec<u8> {
