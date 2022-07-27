@@ -50,3 +50,11 @@ impl TryFrom<HexadecimalString> for Vec<u8> {
         HexadecimalString::decode(value.as_ref())
     }
 }
+
+impl From<&'static str> for HexadecimalString {
+    fn from(value: &'static str) -> Self {
+        HexadecimalString {
+            hex: String::from(value),
+        }
+    }
+}
