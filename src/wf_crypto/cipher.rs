@@ -10,15 +10,15 @@ struct WhiteflagCipher {
 trait WfCipher {
     fn new(key: [u8; 32]) -> Self;
 
-    fn setContext(&mut self, context: String);
+    fn set_context(&mut self, context: String);
 
-    fn setContextFromBytes(&mut self, context: Vec<u8>);
+    fn set_context_from_bytes(&mut self, context: Vec<u8>);
 
     fn encrypt(&self, data: String) -> String;
 
     fn decrypt(&self, data: String) -> String;
 
-    fn getContext(&self) -> Vec<u8>;
+    fn get_context(&self) -> Vec<u8>;
 }
 
 impl WfCipher for WhiteflagCipher {
@@ -29,11 +29,11 @@ impl WfCipher for WhiteflagCipher {
         }
     }
 
-    fn setContext(&mut self, context: String) {
-        return self.setContextFromBytes(hex::decode(context).unwrap());
+    fn set_context(&mut self, context: String) {
+        return self.set_context_from_bytes(hex::decode(context).unwrap());
     }
 
-    fn setContextFromBytes(&mut self, context: Vec<u8>) {
+    fn set_context_from_bytes(&mut self, context: Vec<u8>) {
         self.context = context;
     }
 
@@ -47,7 +47,7 @@ impl WfCipher for WhiteflagCipher {
         return aes_decrypt(&key, hex::decode(data).unwrap());
     }
 
-    fn getContext(&self) -> Vec<u8> {
+    fn get_context(&self) -> Vec<u8> {
         self.context.clone()
     }
 }
