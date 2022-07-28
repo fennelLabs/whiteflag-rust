@@ -4,8 +4,10 @@ use crate::{wf_crypto::{wf_encryption_key::WhiteflagEncryptionKey, ecdh_keypair:
 
 /// Ports the interface found in https://github.com/fennelLabs/whiteflag-java/blob/master/src/main/java/org/whiteflagprotocol/java/WfAccount.java
 trait WfAccount {
+    fn new(owned: bool) -> Self;
+
     /// Checks if this account is owned by the current user.
-    fn is_self() -> bool;
+    fn is_owned() -> bool;
 
     /// Gets this account's public address.
     fn get_address() -> String;
