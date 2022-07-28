@@ -10,3 +10,4 @@ pub mod error;
 pub mod message;
 pub mod segment;
 pub mod types;
+pub mod account;
