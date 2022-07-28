@@ -22,7 +22,7 @@ fn test_generate_keypair() {
 fn test_generate_keypair_from_key() {
     let static_secret = get_session_secret();
     let public_key = get_session_public_key(&static_secret);
-    let keypair = generate_wfkeypair_from_key(static_secret);
+    let keypair = generate_wfkeypair_from_key(hex::encode(static_secret.to_bytes()));
     assert_eq!(public_key.as_bytes(), keypair.get_public_key().as_bytes());
 }
 
@@ -32,7 +32,7 @@ fn test_negotiate_key() {
     let static_secret_two = get_session_secret();
     let public_key_two = get_session_public_key(&static_secret_two);
     let shared_secret = get_shared_secret(static_secret.clone(), &public_key_two.clone());
-    let mut pair = generate_wfkeypair_from_key(static_secret);
+    let mut pair = generate_wfkeypair_from_key(hex::encode(static_secret.to_bytes()));
     let result = pair.negotiate_key_from_bytes(public_key_two.to_bytes());
     assert_eq!(shared_secret.to_bytes().to_vec(), result)
 }
