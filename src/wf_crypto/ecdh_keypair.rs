@@ -1,5 +1,5 @@
 use fennel_lib::dh_tools::{get_session_public_key, get_session_secret, get_shared_secret};
-use x25519_dalek::{PublicKey, SharedSecret, StaticSecret};
+use x25519_dalek::{PublicKey, StaticSecret};
 /// Whiteflag ECDH Key Pair class
 ///
 /// This class represents an Elleptic Curve Diffie-Hellmann key pair
@@ -12,13 +12,15 @@ use x25519_dalek::{PublicKey, SharedSecret, StaticSecret};
 pub trait WfECDHKeyPair {
     /// Returns the public key of this key pair
     fn get_public_key(&self) -> PublicKey;
-    fn get_shared_secret(&self) -> Option<&SharedSecret>;
 
     /// Returns the raw public key of the ECDH key pair
     fn get_raw_public_key(&self) -> [u8; 32];
 
+    /// Calculates the negotiated shared key with an originator from bytes
+    fn negotiate_key_from_bytes(&mut self, public_key: [u8; 32]) -> Vec<u8>;
+
     /// Calculates the negotiated shared key with an originator
-    fn negotiate_key(&mut self, public_key: [u8; 32]);
+    fn negotiate_key(&mut self, public_key: PublicKey) -> Vec<u8>;
 
     /// Creates a new random ECDH key with the curve specified for Whiteflag key negotiation
     fn create_keypair() -> WhiteflagECDHKeyPair;
@@ -40,7 +42,6 @@ pub struct WhiteflagECDHKeyPair {
     /// Main key pair properties
     session_secret: StaticSecret,
     public_key: PublicKey,
-    shared_secret: Option<SharedSecret>,
 }
 
 /// Constructs a new Whiteflag ECDH key pair
@@ -49,8 +50,9 @@ pub fn generate_wfkeypair() -> WhiteflagECDHKeyPair {
 }
 
 /// Constructs a new Whiteflag ECDH key pair from an existing private key
-pub fn generate_wfkeypair_from_key(private_key: StaticSecret) -> WhiteflagECDHKeyPair {
-    WhiteflagECDHKeyPair::create_keypair_from_secret(private_key)
+pub fn generate_wfkeypair_from_key(private_key: String) -> WhiteflagECDHKeyPair {
+    let private_key_bytes: [u8; 32] = hex::decode(private_key).unwrap().try_into().unwrap();
+    WhiteflagECDHKeyPair::create_keypair_from_secret(StaticSecret::from(private_key_bytes))
 }
 
 impl WfECDHKeyPair for WhiteflagECDHKeyPair {
@@ -59,19 +61,21 @@ impl WfECDHKeyPair for WhiteflagECDHKeyPair {
         self.public_key
     }
 
-    fn get_shared_secret(&self) -> Option<&SharedSecret> {
-        self.shared_secret.as_ref()
-    }
-
     /// Returns the raw public key of the ECDH key pair
     fn get_raw_public_key(&self) -> [u8; 32] {
         *self.get_public_key().as_bytes()
     }
 
-    /// Calculates the negotiated shared key with an originator
-    fn negotiate_key(&mut self, public_key: [u8; 32]) {
+    /// Calculates the negotiated shared key with an originator from bytes
+    fn negotiate_key_from_bytes(&mut self, public_key: [u8; 32]) -> Vec<u8> {
         let secret = get_shared_secret(self.session_secret.clone(), &PublicKey::from(public_key));
-        self.shared_secret = Some(secret);
+        secret.to_bytes().to_vec()   
+    }
+
+    /// Calculates the negotiated shared key with an originator
+    fn negotiate_key(&mut self, public_key: PublicKey) -> Vec<u8> {
+        let secret = get_shared_secret(self.session_secret.clone(), &public_key);
+        secret.to_bytes().to_vec()
     }
 
     /// Creates a new random ECDH key with the curve specified for Whiteflag key negotiation
@@ -93,7 +97,6 @@ impl WfECDHKeyPair for WhiteflagECDHKeyPair {
         WhiteflagECDHKeyPair {
             session_secret,
             public_key,
-            shared_secret: None,
         }
     }
 

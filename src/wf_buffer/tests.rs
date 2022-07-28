@@ -1,5 +1,5 @@
 use super::{
-    common::{concatinate_bits, extract_bits, to_hex},
+    common::{concatinate_bits, extract_bits},
     constants::BYTE,
     *,
 };
@@ -114,7 +114,7 @@ fn test_append_bits_1() {
     );
     assert_eq!(
         "e63884",
-        to_hex(buffer.as_ref()),
+        buffer.as_hex().as_ref(),
         "Byte array 1 should have been correctly added to the binary buffer"
     );
 
@@ -126,7 +126,7 @@ fn test_append_bits_1() {
     );
     assert_eq!(
         "e63885b9e0",
-        to_hex(buffer.as_ref()),
+        buffer.as_hex().as_ref(),
         "Byte array 2 should have been correctly added to the binary buffer"
     );
 }
@@ -144,7 +144,7 @@ fn test_append_bits_2() {
         "Binary buffer length should be 24 bits"
     );
     assert_eq!(
-        to_hex(buffer.as_ref()),
+        buffer.as_hex().as_ref(),
         "e63887",
         "Byte array 1 should have been correctly added to the binary buffer"
     );
@@ -157,7 +157,7 @@ fn test_append_bits_2() {
         "Binary buffer length should be 36 bits"
     );
     assert_eq!(
-        to_hex(buffer.as_ref()),
+        buffer.as_hex().as_ref(),
         "e638876e60",
         "Byte array 2 should have been correctly added to the binary buffer"
     );
@@ -182,7 +182,7 @@ fn test_append_bits_3() {
         "Binary buffer length should be 4 bits"
     );
     assert_eq!(
-        to_hex(buffer.as_ref()),
+        buffer.as_hex().as_ref(),
         "d0",
         "Byte array 1 should have been correctly added to the buffer"
     );
@@ -194,7 +194,7 @@ fn test_append_bits_3() {
         "Binary buffer length should be 7 bits"
     );
     assert_eq!(
-        to_hex(buffer.as_ref()),
+        buffer.as_hex().as_ref(),
         "da",
         "Byte array 2 should have been correctly added to the buffer"
     );
@@ -275,4 +275,19 @@ fn remove_hexadecimal_prefix() {
     let input_2 = common::remove_hexadecimal_prefix("f2sa0xasd");
     assert_eq!(input_1, "f2sa0xasd");
     assert_eq!(input_2, "f2sa0xasd");
+}
+
+mod hexadecimal_conversion {
+    use super::*;
+
+    #[test]
+    fn try_into() {
+        let test_string = "e638876e60";
+        let baseline_hex_decoded = hex::decode(test_string).unwrap();
+
+        let hex: HexadecimalString = test_string.into();
+        let decoded: Vec<u8> = hex.try_into().unwrap();
+
+        assert_array_eq(baseline_hex_decoded, decoded);
+    }
 }

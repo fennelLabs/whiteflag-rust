@@ -1,5 +1,7 @@
 use hkdf::hmac::Hmac;
 
+use crate::error::{WhiteflagError, WhiteflagResult};
+
 /// Zeroises a byte array
 pub fn zeroise(byte_array: &mut [u8]) {
     for elem in byte_array.iter_mut() {
@@ -42,9 +44,11 @@ where
     }
 
     /// Performs RFC 5869 HKDF Step 2: expand
-    pub fn expand(&self, info: &[u8], key_length: usize) -> Result<Vec<u8>, ()> {
+    pub fn expand(&self, info: &[u8], key_length: usize) -> WhiteflagResult<Vec<u8>> {
         let mut okm: Vec<u8> = vec![0; key_length];
-        self.hk.expand(info, &mut okm).map_err(|e| ())?;
+        self.hk
+            .expand(info, &mut okm)
+            .map_err(|e| WhiteflagError::HkdfOutput(e))?;
         Ok(okm)
     }
 }
@@ -54,16 +58,14 @@ where
     H: hkdf::hmac::digest::OutputSizeUser,
     I: hkdf::HmacImpl<H>,
 {
-    type Error = ();
+    type Error = WhiteflagError;
 
     fn try_from(prk: &[u8]) -> Result<Self, Self::Error> {
-        match hkdf::Hkdf::<H, I>::from_prk(prk) {
-            Ok(hk) => Ok(WhiteflagHkdf {
-                hk,
-                prk: prk.to_vec(),
-            }),
-            Err(_) => Err(()),
-        }
+        let hk = hkdf::Hkdf::<H, I>::from_prk(prk).map_err(|e| WhiteflagError::HkdfInput(e))?;
+        Ok(WhiteflagHkdf {
+            hk,
+            prk: prk.to_vec(),
+        })
     }
 }
 

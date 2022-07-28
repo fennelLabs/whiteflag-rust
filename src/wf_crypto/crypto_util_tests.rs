@@ -1,5 +1,4 @@
 use super::crypto_util::{zeroise, SimpleWhiteflagHkdf};
-use crate::wf_buffer::common::decode_from_hexadecimal;
 
 fn assert_array_eq<T: PartialEq + std::fmt::Debug>(l: &[T], r: &[T], msg: Option<&str>) {
     let success = l.iter().eq(r.iter());
@@ -12,7 +11,7 @@ fn assert_array_eq<T: PartialEq + std::fmt::Debug>(l: &[T], r: &[T], msg: Option
 
 #[test]
 fn test_zeroise() {
-    let mut buffer = decode_from_hexadecimal("f0f1f2f3f4f5f6f7f8f9").0;
+    let mut buffer = hex::decode("f0f1f2f3f4f5f6f7f8f9").unwrap();
     let zero = vec![0; buffer.len()];
 
     zeroise(&mut buffer);
