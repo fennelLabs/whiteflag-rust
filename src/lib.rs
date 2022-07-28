@@ -4,6 +4,7 @@ use error::WhiteflagError;
 mod tests;
 
 mod error;
+mod wf_account;
 mod wf_auth;
 mod wf_buffer;
 mod wf_codec;
