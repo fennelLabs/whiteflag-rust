@@ -2,13 +2,17 @@ use std::vec;
 
 use fennel_lib::{aes_decrypt, aes_encrypt, generate_keys};
 
-struct WhiteflagCipher {
+use super::wf_encryption_key::{WfEncryptionKey, WhiteflagEncryptionKey};
+
+pub struct WhiteflagCipher {
     secret_key: [u8; 32],
     context: Vec<u8>,
 }
 
-trait WfCipher {
+pub trait WfCipher {
     fn new(key: [u8; 32]) -> Self;
+
+    fn from_key(key: WhiteflagEncryptionKey) -> Self;
 
     fn set_context(&mut self, context: String);
 
@@ -29,6 +33,13 @@ impl WfCipher for WhiteflagCipher {
         }
     }
 
+    fn from_key(key: WhiteflagEncryptionKey) -> Self {
+        WhiteflagCipher {
+            secret_key: key.get_secret_key().try_into().unwrap(),
+            context: vec![],
+        }
+    }
+
     fn set_context(&mut self, context: String) {
         self.set_context_from_bytes(hex::decode(context).unwrap())
     }
@@ -38,12 +49,12 @@ impl WfCipher for WhiteflagCipher {
     }
 
     fn encrypt(&self, data: String) -> String {
-        let (key, _) = generate_keys(&hex::decode(self.secret_key).unwrap());
+        let (key, _) = generate_keys(&self.secret_key);
         hex::encode(aes_encrypt(&key, data))
     }
 
     fn decrypt(&self, data: String) -> String {
-        let (_, key) = generate_keys(&hex::decode(self.secret_key).unwrap());
+        let (_, key) = generate_keys(&self.secret_key);
         aes_decrypt(&key, hex::decode(data).unwrap())
     }
 

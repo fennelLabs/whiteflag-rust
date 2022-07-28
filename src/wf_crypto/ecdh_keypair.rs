@@ -50,8 +50,9 @@ pub fn generate_wfkeypair() -> WhiteflagECDHKeyPair {
 }
 
 /// Constructs a new Whiteflag ECDH key pair from an existing private key
-pub fn generate_wfkeypair_from_key(private_key: StaticSecret) -> WhiteflagECDHKeyPair {
-    WhiteflagECDHKeyPair::create_keypair_from_secret(private_key)
+pub fn generate_wfkeypair_from_key(private_key: String) -> WhiteflagECDHKeyPair {
+    let private_key_bytes: [u8; 32] = hex::decode(private_key).unwrap().try_into().unwrap();
+    WhiteflagECDHKeyPair::create_keypair_from_secret(StaticSecret::from(private_key_bytes))
 }
 
 impl WfECDHKeyPair for WhiteflagECDHKeyPair {

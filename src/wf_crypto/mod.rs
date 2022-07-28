@@ -5,7 +5,7 @@ mod keypair_tests;
 mod crypto_util_tests;
 
 #[cfg(test)]
-mod wf_encryption_key_tests;
+mod cipher_tests;
 
 mod crypto_util;
 mod cipher;
