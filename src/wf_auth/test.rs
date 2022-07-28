@@ -1,3 +1,5 @@
+use crate::wf_auth::AuthenticationMethod;
+
 use super::WhiteflagAuthToken;
 
 #[test]
@@ -9,15 +11,14 @@ fn test_auth_token() {
     let token = WhiteflagAuthToken::new(secret);
 
     /* Verify */
-    //assertEquals("Authentication token should have the correct authentication indicator", TOKEN_PRESHARED.fieldValue, token.method.fieldValue);
+    assert_eq!(
+        AuthenticationMethod::PresharedToken.get_method_code(),
+        token.as_ref().get_method_code(),
+        "Authentication token should have the correct authentication indicator"
+    );
     assert_eq!(
         verification_data,
-        token.get_verification_data(context),
+        token.get_verification_data(context).unwrap(),
         "Authentication token should give the correct verification data"
     );
-
-    println!(
-        "{:?}",
-        hex::decode("420abc48f5d69328c457d61725d3fd7af2883cad8460976167e375b9f2c14081").unwrap()
-    )
 }
