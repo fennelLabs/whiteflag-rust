@@ -23,9 +23,21 @@ impl HexadecimalString {
     }
 }
 
-impl Into<String> for HexadecimalString {
+/* impl Into<String> for HexadecimalString {
     fn into(self) -> String {
         self.hex
+    }
+} */
+
+impl From<String> for HexadecimalString {
+    fn from(s: String) -> Self {
+        HexadecimalString { hex: s }
+    }
+}
+
+impl From<HexadecimalString> for String {
+    fn from(value: HexadecimalString) -> Self {
+        value.hex
     }
 }
 
@@ -47,12 +59,35 @@ impl TryFrom<HexadecimalString> for Vec<u8> {
     type Error = FromHexError;
 
     fn try_from(value: HexadecimalString) -> Result<Self, Self::Error> {
-        HexadecimalString::decode(value.as_ref())
+        HexadecimalString::decode(value)
     }
 }
 
-impl From<&'static str> for HexadecimalString {
+impl TryFrom<&HexadecimalString> for Vec<u8> {
+    type Error = FromHexError;
+
+    fn try_from(value: &HexadecimalString) -> Result<Self, Self::Error> {
+        HexadecimalString::decode(value)
+    }
+}
+
+/* impl TryFrom<HexadecimalString> for &[u8] {
+    type Error = FromHexError;
+
+    fn try_from(value: HexadecimalString) -> Result<Self, Self::Error> {
+        HexadecimalString::decode(value.as_ref()).map(|r| r.as_slice())
+    }
+} */
+
+/* impl From<&'static str> for HexadecimalString {
     fn from(value: &'static str) -> Self {
+        HexadecimalString {
+            hex: String::from(value),
+        }
+    }
+} */
+impl From<&str> for HexadecimalString {
+    fn from(value: &str) -> Self {
         HexadecimalString {
             hex: String::from(value),
         }

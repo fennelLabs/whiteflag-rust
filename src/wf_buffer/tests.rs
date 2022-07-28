@@ -276,3 +276,29 @@ fn remove_hexadecimal_prefix() {
     assert_eq!(input_1, "f2sa0xasd");
     assert_eq!(input_2, "f2sa0xasd");
 }
+
+mod hexadecimal_conversion {
+    use super::*;
+
+    #[test]
+    fn try_into() {
+        let test_string = "e638876e60";
+        let baseline_hex_decoded = hex::decode(test_string).unwrap();
+
+        let hex: HexadecimalString = test_string.into();
+        let decoded: Vec<u8> = hex.try_into().unwrap();
+
+        assert_array_eq(baseline_hex_decoded, decoded);
+    }
+
+    /* #[test]
+    fn as_ref_try_into() {
+        let test_string = "e638876e60";
+        let baseline_hex_decoded = hex::decode(test_string).unwrap();
+
+        let hex: HexadecimalString = test_string.into();
+        let decoded: Vec<u8> = hex.as_ref().try_into().unwrap();
+
+        assert_array_eq(baseline_hex_decoded, decoded);
+    } */
+}
