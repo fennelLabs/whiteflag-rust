@@ -290,15 +290,4 @@ mod hexadecimal_conversion {
 
         assert_array_eq(baseline_hex_decoded, decoded);
     }
-
-    /* #[test]
-    fn as_ref_try_into() {
-        let test_string = "e638876e60";
-        let baseline_hex_decoded = hex::decode(test_string).unwrap();
-
-        let hex: HexadecimalString = test_string.into();
-        let decoded: Vec<u8> = hex.as_ref().try_into().unwrap();
-
-        assert_array_eq(baseline_hex_decoded, decoded);
-    } */
 }
