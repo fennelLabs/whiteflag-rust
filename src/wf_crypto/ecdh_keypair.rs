@@ -38,6 +38,7 @@ pub trait WfECDHKeyPair {
     fn create_private_key_from_raw(raw_private_key: [u8; 32]) -> StaticSecret;
 }
 
+#[derive(Clone)]
 pub struct WhiteflagECDHKeyPair {
     /// Main key pair properties
     session_secret: StaticSecret,

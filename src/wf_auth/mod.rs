@@ -55,7 +55,7 @@ impl WhiteflagAuthMethod {
     }
 }
 
-struct WhiteflagAuthToken {
+pub struct WhiteflagAuthToken {
     token: Vec<u8>,
     method: WhiteflagAuthMethod,
 }
