@@ -1,5 +1,4 @@
 use super::basic_message::BasicMessage;
-use super::segment::MessageSegment;
 use crate::wf_buffer::WhiteflagBuffer;
 use crate::wf_convert::FieldValue;
 use crate::wf_field::{generic_header_fields, get_message_body};
@@ -34,11 +33,7 @@ pub fn decode<T: AsRef<str>>(message: T) -> BasicMessage {
     //bit_cursor += header.bit_length();
     //next_field = body.fields.len();
 
-    BasicMessage::new(
-        code,
-        MessageSegment::from(header),
-        MessageSegment::from(body),
-    )
+    BasicMessage::new(code, header.into(), body.into())
 }
 
 /* public final WfMessageCreator decode(final WfBinaryBuffer msgBuffer) throws WfCoreException {

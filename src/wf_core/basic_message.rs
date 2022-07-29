@@ -1,5 +1,4 @@
 use super::segment::MessageSegment;
-use super::wf_buffer::common::{append_bits, crop_bits};
 use crate::wf_buffer::WhiteflagBuffer;
 use crate::wf_field::{get_field_value_from_array, Field};
 
@@ -10,19 +9,19 @@ pub struct BasicMessage {
 }
 
 impl BasicMessage {
-    pub fn new(message_code: char, header: MessageSegment, body: MessageSegment) -> BasicMessage {
+    pub fn new(message_code: char, header: Vec<Field>, body: Vec<Field>) -> BasicMessage {
         BasicMessage {
             message_code,
-            header,
-            body,
+            header: header.into(),
+            body: body.into(),
         }
     }
 
     pub fn encode(&mut self) -> Vec<u8> {
         let mut buffer = WhiteflagBuffer::default();
 
-        buffer.encode(&mut self.header.fields);
-        buffer.encode(&mut self.body.fields);
+        buffer.encode(&mut self.header);
+        buffer.encode(&mut self.body);
 
         buffer.crop()
     }
@@ -44,18 +43,15 @@ impl BasicMessage {
      * @return the field value, or NULL if field does not exist
      */
     pub fn get_option<T: AsRef<str>>(&self, fieldname: T) -> Option<&String> {
-        get_field_value_from_array(&self.header.fields, fieldname.as_ref())
-            .or(get_field_value_from_array(
-                &self.body.fields,
-                fieldname.as_ref(),
-            ))
+        get_field_value_from_array(&self.header, fieldname.as_ref())
+            .or(get_field_value_from_array(&self.body, fieldname.as_ref()))
             .or(None)
     }
 
     pub fn get_fields(&self) -> Vec<&Field> {
         let mut fields: Vec<&Field> = vec![];
-        fields.extend(&self.header.fields);
-        fields.extend(&self.body.fields);
+        fields.extend(self.header.iter());
+        fields.extend(self.body.iter());
         fields
     }
 }
