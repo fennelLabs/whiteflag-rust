@@ -25,13 +25,23 @@ pub enum FieldKind {
     REQUEST,
 }
 
-fn message_code() -> FieldDefinition {
+pub fn message_code() -> FieldDefinition {
     FieldDefinition::new(
         "MessageCode",
         Regex::new("^[A-Z]{1}$").ok(), //"(?=A|K|T|P|E|S|D|I|M|Q|R|F)^[A-Z]{1}$"
         UTF8,
         5,
         6,
+    )
+}
+
+pub fn test_message_code() -> FieldDefinition {
+    FieldDefinition::new(
+        "PseudoMessageCode",
+        Regex::new("^[A-Z]{1}$").ok(),
+        UTF8,
+        71,
+        72,
     )
 }
 
@@ -138,13 +148,7 @@ fn resource_body_fields() -> [FieldDefinition; 2] {
 }
 
 fn test_body_fields() -> [FieldDefinition; 1] {
-    [FieldDefinition::new(
-        "PseudoMessageCode",
-        Regex::new("^[A-Z]{1}$").ok(),
-        UTF8,
-        71,
-        72,
-    )]
+    [test_message_code()]
 }
 
 fn sign_signal_body_fields() -> [FieldDefinition; 9] {
