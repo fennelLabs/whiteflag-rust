@@ -120,6 +120,6 @@ impl FieldDefinition {
      * @return the bit length of the compressed encoded field value
      */
     pub fn bit_length(&self) -> usize {
-        return self.encoding.bit_length(self.byte_length());
+        return self.encoding.convert_to_bit_length(self.byte_length());
     }
 }

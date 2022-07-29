@@ -123,7 +123,7 @@ impl Encoding {
      * @return the number of bits in a compressed encoded field
      * java equivalent: Encoding.bitLength (WfMessageCodec.java)
      */
-    pub fn bit_length(&self, byte_length: usize) -> usize {
+    pub fn convert_to_bit_length(&self, byte_length: usize) -> usize {
         if self.is_fixed_length() {
             return self.bit_length;
         }
