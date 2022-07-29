@@ -1,5 +1,5 @@
 use super::{Field, FieldDefinition};
-use crate::{wf_buffer::HexadecimalString, wf_codec::encoding::*};
+use crate::wf_codec::encoding::*;
 
 const FIELDNAME: &str = "TESTFIELD";
 
@@ -10,7 +10,7 @@ fn utf_encoding() {
 
     assert_eq!(
         "5746",
-        field.encode_as_hex().as_ref(),
+        field.encode_as_hex(),
         "UTF-8 field should be correctly hexadecimal encoded"
     );
     assert_eq!(
@@ -43,7 +43,7 @@ fn bin_encoding_1() {
 
     assert_eq!(
         "bb",
-        field.encode_as_hex().as_ref(),
+        field.encode_as_hex(),
         "Binary field should be correctly binary encoded"
     );
     assert_eq!(
@@ -76,7 +76,7 @@ fn bin_encoding_2() {
 
     assert_eq!(
         "80",
-        field.encode_as_hex().as_ref(),
+        field.encode_as_hex(),
         "Binary field should be correctly binary encoded"
     );
     assert_eq!(
@@ -120,7 +120,7 @@ fn dec_encoding() {
 
     assert_eq!(
         "1230",
-        field.encode_as_hex().as_ref(),
+        field.encode_as_hex(),
         "Decimal field should be correctly binary encoded"
     );
     assert_eq!(
@@ -153,7 +153,7 @@ fn hex_encoding() {
 
     assert_eq!(
         "3f",
-        field.encode_as_hex().as_ref(),
+        field.encode_as_hex(),
         "Hexadecimal field should be correctly binary encoded"
     );
     assert_eq!(
@@ -171,7 +171,7 @@ fn hex_encoding() {
 #[test]
 fn hex_decoding() {
     let def = FieldDefinition::new(FIELDNAME, None, HEX, 0, 2);
-    let buffer = HexadecimalString::decode("0x3f").unwrap();
+    let buffer = crate::wf_buffer::decode_hex("0x3f").unwrap();
     let result = "3f";
 
     let actual: String = def.decode(buffer).into();
@@ -189,7 +189,7 @@ fn datetime_encoding() {
 
     assert_eq!(
         "20200701214223",
-        field.encode_as_hex().as_ref(),
+        field.encode_as_hex(),
         "DateTime field should be correctly binary encoded"
     );
     assert_eq!(
@@ -207,7 +207,7 @@ fn datetime_encoding() {
 #[test]
 fn datetime_decoding() {
     let def = FieldDefinition::new(FIELDNAME, None, DATETIME, 0, -1);
-    let buffer = HexadecimalString::decode("20200701214223").unwrap();
+    let buffer = hex::decode("20200701214223").unwrap();
     let result = "2020-07-01T21:42:23Z";
 
     let actual: String = def.decode(buffer).into();
@@ -222,7 +222,7 @@ fn duration_encoding() {
 
     assert_eq!(
         "241130",
-        field.encode_as_hex().as_ref(),
+        field.encode_as_hex(),
         "Duration field should be correctly binary encoded"
     );
     assert_eq!(
@@ -255,7 +255,7 @@ fn latitude_encoding() {
 
     assert_eq!(
         "919a1220",
-        field.encode_as_hex().as_ref(),
+        field.encode_as_hex(),
         "Latitude field should be correctly binary encoded"
     );
     assert_eq!(
@@ -288,7 +288,7 @@ fn longitude_encoding() {
 
     assert_eq!(
         "0b19a12280",
-        field.encode_as_hex().as_ref(),
+        field.encode_as_hex(),
         "Longitude field should be correctly binary encoded"
     );
     assert_eq!(

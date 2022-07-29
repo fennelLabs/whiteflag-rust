@@ -21,7 +21,7 @@ fn test_add_field_utf() {
 
     assert_eq!(
         "74657874",
-        buffer.as_hex().as_ref(),
+        buffer.as_hex(),
         "Message field (UTF) should be correctly encoded and added"
     );
 }
@@ -56,7 +56,7 @@ fn test_add_field_bin_1() {
 
     assert_eq!(
         "40",
-        buffer.as_hex().as_ref(),
+        buffer.as_hex(),
         "Message field (bin) should be correctly encoded and added"
     );
 }
@@ -78,7 +78,7 @@ fn test_add_field_bin_2() {
 
     assert_eq!(
         "a0",
-        buffer.as_hex().as_ref(),
+        buffer.as_hex(),
         "Message field (bin) should be correctly encoded and added"
     );
 }
@@ -100,7 +100,7 @@ fn test_add_field_dec() {
 
     assert_eq!(
         "1478",
-        buffer.as_hex().as_ref(),
+        buffer.as_hex(),
         "Message field (bin) should be correctly encoded and added"
     );
 }
@@ -137,7 +137,7 @@ fn test_add_field_hex() {
 
     assert_eq!(
         "3f8c",
-        buffer.as_hex().as_ref(),
+        buffer.as_hex(),
         "Message field (hex) should be correctly encoded and added"
     );
 }
@@ -174,7 +174,7 @@ fn test_add_field_date_time() {
 
     assert_eq!(
         "20200701214223",
-        buffer.as_hex().as_ref(),
+        buffer.as_hex(),
         "Message field (hex) should be correctly encoded and added"
     );
 }
