@@ -1,6 +1,9 @@
 use x25519_dalek::PublicKey;
 
-use crate::{wf_crypto::{wf_encryption_key::WhiteflagEncryptionKey, ecdh_keypair::WhiteflagECDHKeyPair}, wf_auth::WhiteflagAuthToken};
+use crate::{
+    wf_auth::WhiteflagAuthToken,
+    wf_crypto::{ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey},
+};
 
 use super::error::WhiteflagAccountResult;
 
@@ -34,7 +37,10 @@ pub trait WfAccount {
     /// Gets the own ECDH key pair used to negatiate keys with other participants
     /// Whiteflag Specification 5.2.4 Message Encryption
     fn get_ecdh_keypair(&mut self) -> Option<&WhiteflagECDHKeyPair>;
-    fn set_ecdh_keypair(&mut self, ecdh_keypair: WhiteflagECDHKeyPair) -> WhiteflagAccountResult<()>;
+    fn set_ecdh_keypair(
+        &mut self,
+        ecdh_keypair: WhiteflagECDHKeyPair,
+    ) -> WhiteflagAccountResult<()>;
 
     /// Gets the other's ECDH public key used to negatioate a key with this participant's account
     /// Whiteflag Specification 5.2.4 Message Encryption

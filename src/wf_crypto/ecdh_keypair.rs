@@ -70,7 +70,7 @@ impl WfECDHKeyPair for WhiteflagECDHKeyPair {
     /// Calculates the negotiated shared key with an originator from bytes
     fn negotiate_key_from_bytes(&mut self, public_key: [u8; 32]) -> Vec<u8> {
         let secret = get_shared_secret(self.session_secret.clone(), &PublicKey::from(public_key));
-        secret.to_bytes().to_vec()   
+        secret.to_bytes().to_vec()
     }
 
     /// Calculates the negotiated shared key with an originator

@@ -11,8 +11,12 @@ impl std::error::Error for WhiteflagAccountError {}
 impl fmt::Display for WhiteflagAccountError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            WhiteflagAccountError::CantSetECDHPair => write!(f, "cannot set ECDH key pair on other's account"),
-            WhiteflagAccountError::CantSetOwnECDHKey => write!(f, "Cannot set ECDH key on own account"),
+            WhiteflagAccountError::CantSetECDHPair => {
+                write!(f, "cannot set ECDH key pair on other's account")
+            }
+            WhiteflagAccountError::CantSetOwnECDHKey => {
+                write!(f, "Cannot set ECDH key on own account")
+            }
         }
     }
 }

@@ -73,7 +73,8 @@ impl WfEncryptionKey for WhiteflagEncryptionKey {
         mut ecdh_key_pair: WhiteflagECDHKeyPair,
     ) -> Self {
         WhiteflagEncryptionKey {
-            rawkey: ecdh_key_pair.negotiate_key_from_bytes(hex::decode(raw_public_key).unwrap().try_into().unwrap()),
+            rawkey: ecdh_key_pair
+                .negotiate_key_from_bytes(hex::decode(raw_public_key).unwrap().try_into().unwrap()),
             method: encryption_method_from_field_value("3".to_string()).unwrap(),
         }
     }
