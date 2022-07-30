@@ -1,5 +1,5 @@
 use self::{
-    common::{append_bits, crop_bits, extract_bits},
+    common::{append_bits, crop_bits, extract_bits, remove_hexadecimal_prefix},
     constants::BYTE,
 };
 use crate::wf_field::{Field, FieldDefinition};
@@ -11,6 +11,12 @@ pub mod common;
 pub mod constants;
 mod decode;
 mod encode;
+
+use hex::FromHexError;
+
+pub fn decode_hex<T: AsRef<str>>(value: T) -> Result<Vec<u8>, FromHexError> {
+    hex::decode(remove_hexadecimal_prefix(value.as_ref()))
+}
 
 pub struct WhiteflagBuffer {
     data: Vec<u8>,
@@ -64,6 +70,19 @@ impl WhiteflagBuffer {
 
     pub fn bit_length(&self) -> usize {
         self.bit_length
+    }
+
+    pub fn as_hex(&self) -> String {
+        hex::encode(&self.data)
+    }
+
+    /**
+     * decodes a hexadecimal string into a buffer and includes bit_length
+     * java equivalent: WfBinaryBuffer.convertToByteArray
+     */
+    pub fn decode_from_hexadecimal<T: AsRef<str>>(hex: T) -> Result<WhiteflagBuffer, FromHexError> {
+        let buffer = decode_hex(hex)?;
+        Ok(buffer.into())
     }
 }
 

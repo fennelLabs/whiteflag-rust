@@ -1,15 +1,12 @@
 use crate::{wf_buffer::WhiteflagBuffer, wf_field::Field};
+use std::ops::{Deref, DerefMut};
 
 #[derive(Clone)]
 pub struct MessageSegment {
-    pub fields: Vec<Field>,
+    fields: Vec<Field>,
 }
 
 impl MessageSegment {
-    pub fn from(fields: Vec<Field>) -> MessageSegment {
-        MessageSegment { fields }
-    }
-
     /**
      * Encodes this message segment
      * @return a binary buffer with the binary encoded message segment and its bit length
@@ -37,7 +34,7 @@ impl MessageSegment {
      * @return the bit length of this segment
      */
     pub fn bit_length(&self) -> usize {
-        self.bit_length_of_field(self.fields.len() as isize)
+        self.bit_length_of_field(self.len() as isize)
     }
 
     /**
@@ -55,7 +52,7 @@ impl MessageSegment {
         /* Calculate segment bit length */
         let mut bit_length = 0;
         for index in 0..last_field_index as usize {
-            bit_length += self.fields[index].bit_length();
+            bit_length += self[index].bit_length();
         }
 
         bit_length
@@ -67,7 +64,7 @@ impl MessageSegment {
      * @return the absolute field index or -1 if index out of bounds
      */
     fn get_absolute_index(&self, index: isize) -> isize {
-        let length = self.fields.len() as isize;
+        let length = self.len() as isize;
 
         if index >= 0 && index < length {
             return index;
@@ -78,5 +75,25 @@ impl MessageSegment {
         }
 
         return -1;
+    }
+}
+
+impl Deref for MessageSegment {
+    type Target = Vec<Field>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.fields
+    }
+}
+
+impl DerefMut for MessageSegment {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.fields
+    }
+}
+
+impl From<Vec<Field>> for MessageSegment {
+    fn from(fields: Vec<Field>) -> Self {
+        MessageSegment { fields }
     }
 }

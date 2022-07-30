@@ -1,8 +1,5 @@
 use super::{Field, FieldDefinition};
-use crate::{
-    wf_buffer::common::{decode_from_hexadecimal, to_hex},
-    wf_codec::encoding::*,
-};
+use crate::wf_codec::encoding::*;
 
 const FIELDNAME: &str = "TESTFIELD";
 
@@ -13,7 +10,7 @@ fn utf_encoding() {
 
     assert_eq!(
         "5746",
-        to_hex(&field.encode()),
+        field.encode_as_hex(),
         "UTF-8 field should be correctly hexadecimal encoded"
     );
     assert_eq!(
@@ -31,7 +28,7 @@ fn utf_encoding() {
 #[test]
 fn utf_decoding() {
     let def = FieldDefinition::new(FIELDNAME, None, UTF8, 0, -1);
-    let (buffer, _) = decode_from_hexadecimal("5746");
+    let buffer = hex::decode("5746").unwrap();
     let result = "WF";
 
     let actual: String = def.decode(buffer).into();
@@ -46,7 +43,7 @@ fn bin_encoding_1() {
 
     assert_eq!(
         "bb",
-        to_hex(&field.encode()),
+        field.encode_as_hex(),
         "Binary field should be correctly binary encoded"
     );
     assert_eq!(
@@ -64,7 +61,7 @@ fn bin_encoding_1() {
 #[test]
 fn bin_decoding_1() {
     let def = FieldDefinition::new(FIELDNAME, None, BIN, 1, 7);
-    let (buffer, _) = decode_from_hexadecimal("aa");
+    let buffer = hex::decode("aa").unwrap();
     let result = "101010";
 
     let actual: String = def.decode(buffer).into();
@@ -79,7 +76,7 @@ fn bin_encoding_2() {
 
     assert_eq!(
         "80",
-        to_hex(&field.encode()),
+        field.encode_as_hex(),
         "Binary field should be correctly binary encoded"
     );
     assert_eq!(
@@ -97,7 +94,7 @@ fn bin_encoding_2() {
 #[test]
 fn bin_decoding_2_a() {
     let def = FieldDefinition::new(FIELDNAME, None, BIN, 4, 5);
-    let (buffer, _) = decode_from_hexadecimal("80");
+    let buffer = hex::decode("80").unwrap();
     let result = "1";
 
     let actual: String = def.decode(buffer).into();
@@ -108,7 +105,7 @@ fn bin_decoding_2_a() {
 #[test]
 fn bin_decoding_2_b() {
     let def = FieldDefinition::new(FIELDNAME, None, BIN, 2, 3);
-    let (buffer, _) = decode_from_hexadecimal("7f");
+    let buffer = hex::decode("7f").unwrap();
     let result = "0";
 
     let actual: String = def.decode(buffer).into();
@@ -123,7 +120,7 @@ fn dec_encoding() {
 
     assert_eq!(
         "1230",
-        to_hex(&field.encode()),
+        field.encode_as_hex(),
         "Decimal field should be correctly binary encoded"
     );
     assert_eq!(
@@ -141,7 +138,7 @@ fn dec_encoding() {
 #[test]
 fn dec_decoding() {
     let def = FieldDefinition::new(FIELDNAME, None, DEC, 0, 3);
-    let (buffer, _) = decode_from_hexadecimal("1234");
+    let buffer = hex::decode("1234").unwrap();
     let result = "123";
 
     let actual: String = def.decode(buffer).into();
@@ -156,7 +153,7 @@ fn hex_encoding() {
 
     assert_eq!(
         "3f",
-        to_hex(&field.encode()),
+        field.encode_as_hex(),
         "Hexadecimal field should be correctly binary encoded"
     );
     assert_eq!(
@@ -174,7 +171,7 @@ fn hex_encoding() {
 #[test]
 fn hex_decoding() {
     let def = FieldDefinition::new(FIELDNAME, None, HEX, 0, 2);
-    let (buffer, _) = decode_from_hexadecimal("0x3f");
+    let buffer = crate::wf_buffer::decode_hex("0x3f").unwrap();
     let result = "3f";
 
     let actual: String = def.decode(buffer).into();
@@ -192,7 +189,7 @@ fn datetime_encoding() {
 
     assert_eq!(
         "20200701214223",
-        to_hex(&field.encode()),
+        field.encode_as_hex(),
         "DateTime field should be correctly binary encoded"
     );
     assert_eq!(
@@ -210,7 +207,7 @@ fn datetime_encoding() {
 #[test]
 fn datetime_decoding() {
     let def = FieldDefinition::new(FIELDNAME, None, DATETIME, 0, -1);
-    let (buffer, _) = decode_from_hexadecimal("20200701214223");
+    let buffer = hex::decode("20200701214223").unwrap();
     let result = "2020-07-01T21:42:23Z";
 
     let actual: String = def.decode(buffer).into();
@@ -225,7 +222,7 @@ fn duration_encoding() {
 
     assert_eq!(
         "241130",
-        to_hex(&field.encode()),
+        field.encode_as_hex(),
         "Duration field should be correctly binary encoded"
     );
     assert_eq!(
@@ -243,7 +240,7 @@ fn duration_encoding() {
 #[test]
 fn duration_decoding() {
     let def = FieldDefinition::new(FIELDNAME, None, DURATION, 0, 10);
-    let (buffer, _) = decode_from_hexadecimal("241130");
+    let buffer = hex::decode("241130").unwrap();
     let result = "P24D11H30M";
 
     let actual: String = def.decode(buffer).into();
@@ -258,7 +255,7 @@ fn latitude_encoding() {
 
     assert_eq!(
         "919a1220",
-        to_hex(&field.encode()),
+        field.encode_as_hex(),
         "Latitude field should be correctly binary encoded"
     );
     assert_eq!(
@@ -276,7 +273,7 @@ fn latitude_encoding() {
 #[test]
 fn latitude_decoding() {
     let def = FieldDefinition::new(FIELDNAME, None, LAT, 0, 9);
-    let (buffer, _) = decode_from_hexadecimal("919a1220");
+    let buffer = hex::decode("919a1220").unwrap();
     let result = "+23.34244";
 
     let actual: String = def.decode(buffer).into();
@@ -291,7 +288,7 @@ fn longitude_encoding() {
 
     assert_eq!(
         "0b19a12280",
-        to_hex(&field.encode()),
+        field.encode_as_hex(),
         "Longitude field should be correctly binary encoded"
     );
     assert_eq!(
@@ -309,7 +306,7 @@ fn longitude_encoding() {
 #[test]
 fn longitude_decoding_1() {
     let def = FieldDefinition::new(FIELDNAME, None, LONG, 0, 10);
-    let (buffer, _) = decode_from_hexadecimal("8b19a12380");
+    let buffer = hex::decode("8b19a12380").unwrap();
     let result = "+163.34247";
 
     let actual: String = def.decode(buffer).into();
@@ -323,7 +320,7 @@ fn longitude_decoding_1() {
 #[test]
 fn longitude_decoding_2() {
     let def = FieldDefinition::new(FIELDNAME, None, LONG, 0, 10);
-    let (buffer, _) = decode_from_hexadecimal("0319a12380");
+    let buffer = hex::decode("0319a12380").unwrap();
     let result = "-063.34247";
 
     let actual: String = def.decode(buffer).into();

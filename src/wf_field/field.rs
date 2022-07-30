@@ -53,6 +53,10 @@ impl Field {
         self.definition.encoding.encode(&self.value)
     }
 
+    pub fn encode_as_hex(&self) -> String {
+        hex::encode(self.encode())
+    }
+
     pub fn decode(&mut self, data: Vec<u8>) -> String {
         let s = self.definition.encoding.decode(data, self.bit_length());
         self.value = s.clone();

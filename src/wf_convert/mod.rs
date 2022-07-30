@@ -1,5 +1,4 @@
 use crate::wf_core::basic_message::BasicMessage;
-use crate::wf_core::segment::MessageSegment;
 use crate::wf_field::{generic_header_fields, get_message_body, Field, FieldDefinition};
 
 pub trait FieldValue: AsRef<str> + Into<String> {}
@@ -15,11 +14,7 @@ fn compile<T: FieldValue>(data: &[T]) -> BasicMessage {
 
     let body = set_all(body_field_defs, data.as_ref(), body_start_index);
 
-    BasicMessage::new(
-        code,
-        MessageSegment::from(header),
-        MessageSegment::from(body),
-    )
+    BasicMessage::new(code, header, body)
 }
 
 impl<T: FieldValue> From<&[T]> for BasicMessage {

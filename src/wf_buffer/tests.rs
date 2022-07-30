@@ -1,5 +1,5 @@
 use super::{
-    common::{concatinate_bits, extract_bits, to_hex},
+    common::{concatinate_bits, extract_bits},
     constants::BYTE,
     *,
 };
@@ -114,7 +114,7 @@ fn test_append_bits_1() {
     );
     assert_eq!(
         "e63884",
-        to_hex(buffer.as_ref()),
+        buffer.as_hex(),
         "Byte array 1 should have been correctly added to the binary buffer"
     );
 
@@ -126,7 +126,7 @@ fn test_append_bits_1() {
     );
     assert_eq!(
         "e63885b9e0",
-        to_hex(buffer.as_ref()),
+        buffer.as_hex(),
         "Byte array 2 should have been correctly added to the binary buffer"
     );
 }
@@ -144,7 +144,7 @@ fn test_append_bits_2() {
         "Binary buffer length should be 24 bits"
     );
     assert_eq!(
-        to_hex(buffer.as_ref()),
+        buffer.as_hex(),
         "e63887",
         "Byte array 1 should have been correctly added to the binary buffer"
     );
@@ -157,7 +157,7 @@ fn test_append_bits_2() {
         "Binary buffer length should be 36 bits"
     );
     assert_eq!(
-        to_hex(buffer.as_ref()),
+        buffer.as_hex(),
         "e638876e60",
         "Byte array 2 should have been correctly added to the binary buffer"
     );
@@ -182,7 +182,7 @@ fn test_append_bits_3() {
         "Binary buffer length should be 4 bits"
     );
     assert_eq!(
-        to_hex(buffer.as_ref()),
+        buffer.as_hex(),
         "d0",
         "Byte array 1 should have been correctly added to the buffer"
     );
@@ -194,7 +194,7 @@ fn test_append_bits_3() {
         "Binary buffer length should be 7 bits"
     );
     assert_eq!(
-        to_hex(buffer.as_ref()),
+        buffer.as_hex(),
         "da",
         "Byte array 2 should have been correctly added to the buffer"
     );

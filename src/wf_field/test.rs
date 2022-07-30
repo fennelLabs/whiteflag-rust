@@ -1,4 +1,3 @@
-use crate::wf_buffer::common::to_hex;
 use crate::wf_codec::encoding::{BIN, DATETIME, DEC, HEX, UTF8};
 use crate::{wf_buffer::WhiteflagBuffer, wf_field::Field, wf_field::FieldDefinition};
 
@@ -22,7 +21,7 @@ fn test_add_field_utf() {
 
     assert_eq!(
         "74657874",
-        to_hex(buffer.as_ref()),
+        buffer.as_hex(),
         "Message field (UTF) should be correctly encoded and added"
     );
 }
@@ -57,7 +56,7 @@ fn test_add_field_bin_1() {
 
     assert_eq!(
         "40",
-        to_hex(buffer.as_ref()),
+        buffer.as_hex(),
         "Message field (bin) should be correctly encoded and added"
     );
 }
@@ -79,7 +78,7 @@ fn test_add_field_bin_2() {
 
     assert_eq!(
         "a0",
-        to_hex(buffer.as_ref()),
+        buffer.as_hex(),
         "Message field (bin) should be correctly encoded and added"
     );
 }
@@ -101,7 +100,7 @@ fn test_add_field_dec() {
 
     assert_eq!(
         "1478",
-        to_hex(buffer.as_ref()),
+        buffer.as_hex(),
         "Message field (bin) should be correctly encoded and added"
     );
 }
@@ -138,7 +137,7 @@ fn test_add_field_hex() {
 
     assert_eq!(
         "3f8c",
-        to_hex(buffer.as_ref()),
+        buffer.as_hex(),
         "Message field (hex) should be correctly encoded and added"
     );
 }
@@ -175,7 +174,7 @@ fn test_add_field_date_time() {
 
     assert_eq!(
         "20200701214223",
-        to_hex(buffer.as_ref()),
+        buffer.as_hex(),
         "Message field (hex) should be correctly encoded and added"
     );
 }
