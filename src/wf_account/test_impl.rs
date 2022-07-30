@@ -13,7 +13,8 @@ use super::{
     error::{WhiteflagAccountError, WhiteflagAccountResult},
 };
 
-struct WhiteflagAccount {
+#[derive(Clone)]
+pub struct WhiteflagAccount {
     owned: bool,
     address: Option<Vec<u8>>,
     auth_url: Option<String>,
