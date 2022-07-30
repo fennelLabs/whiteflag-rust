@@ -90,7 +90,11 @@ impl FieldDefinition {
         }
     }
 
-    pub fn decode(self, data: Vec<u8>) -> Field {
+    pub fn decode(&self, data: Vec<u8>) -> String {
+        self.encoding.decode(data, self.bit_length())
+    }
+
+    pub fn decode_to_field(self, data: Vec<u8>) -> Field {
         let value = self.encoding.decode(data, self.bit_length());
         Field::new(self, value)
     }
@@ -120,6 +124,6 @@ impl FieldDefinition {
      * @return the bit length of the compressed encoded field value
      */
     pub fn bit_length(&self) -> usize {
-        return self.encoding.bit_length(self.byte_length());
+        return self.encoding.convert_to_bit_length(self.byte_length());
     }
 }
