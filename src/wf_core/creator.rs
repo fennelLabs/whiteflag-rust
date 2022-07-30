@@ -1,7 +1,9 @@
 use super::basic_message::BasicMessage;
 use crate::wf_buffer::WhiteflagBuffer;
-use crate::wf_convert::FieldValue;
-use crate::wf_field::{generic_header_fields, get_message_body};
+use crate::wf_convert::{FieldValue, MessageCodeParser};
+use crate::wf_field::{
+    generic_header_fields, get_body_from_code, get_message_body, get_test_message_code,
+};
 
 pub const PREFIX: &str = "WF";
 pub const PROTOCOL_VERSION: &str = "1";
@@ -29,11 +31,26 @@ pub fn decode<T: AsRef<str>>(message: T) -> BasicMessage {
     let (bit_cursor, header) = buffer.decode(generic_header_fields().to_vec(), 0);
 
     let (body_field_defs, code) = get_message_body(&header);
-    let (_, body) = buffer.decode(body_field_defs, bit_cursor);
+    let (bit_cursor_2, mut body) = buffer.decode(body_field_defs, bit_cursor);
     //bit_cursor += header.bit_length();
     //next_field = body.fields.len();
+    println!("the message code is {}", &code);
 
-    BasicMessage::new(code, header.into(), body.into())
+    body = match &code {
+        'T' => {
+            let test_message_code = get_test_message_code(&body);
+            println!("the test message code is {}", &test_message_code);
+            let test_body_defs = get_body_from_code(&test_message_code);
+            let (_, mut test_body) = buffer.decode(test_body_defs, bit_cursor_2);
+            body.append(&mut test_body);
+            body
+        }
+        _ => body,
+    };
+
+    println!("the body is {:#?}", &body);
+
+    BasicMessage::new(code, header, body)
 }
 
 /* public final WfMessageCreator decode(final WfBinaryBuffer msgBuffer) throws WfCoreException {

@@ -2,7 +2,7 @@
 mod codec_tests;
 mod test;
 
-mod definitions;
+pub mod definitions;
 mod field;
 mod field_definition;
 
@@ -45,7 +45,15 @@ pub fn get_field_value_from_array<T: AsRef<str>>(
 }
 
 pub fn get_message_code(fields: &[Field]) -> char {
-    match get_field_value_from_array(fields, &FIELD_MESSAGETYPE) {
+    get_message_code_base(fields, FIELD_MESSAGETYPE)
+}
+
+pub fn get_test_message_code(fields: &[Field]) -> char {
+    get_message_code_base(fields, FIELD_TESTMESSAGETYPE)
+}
+
+fn get_message_code_base(fields: &[Field], name: &'static str) -> char {
+    match get_field_value_from_array(fields, name) {
         Some(x) => x.chars().next(),
         _ => None,
     }
@@ -54,5 +62,18 @@ pub fn get_message_code(fields: &[Field]) -> char {
 
 pub fn get_message_body(fields: &[Field]) -> (Vec<FieldDefinition>, char) {
     let message_code = get_message_code(fields);
-    (get_body_from_code(&message_code), message_code)
+    let body = get_body_from_code(&message_code);
+
+    /* match message_code {
+        'T' => {
+            let test_message_code = get_test_message_code(&body);
+            let test_body_defs = get_body_from_code(&test_message_code);
+            let (_, mut test_body) = buffer.decode(test_body_defs, bit_cursor_2);
+            body.append(&mut test_body);
+            body
+        },
+        _ => (),
+    }; */
+
+    (body, message_code)
 }
