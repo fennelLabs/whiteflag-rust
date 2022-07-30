@@ -6,6 +6,7 @@ use super::error::{WhiteflagCryptoError, WhiteflagCryptoResult};
 /// No implementation specific properties and methods are defined by this class.
 ///
 /// Whiteflag Specification 5.2.3 Key and Token Derivation
+#[derive(Clone)]
 pub enum WhiteflagEncryptionMethod {
     /// Encryption Method 0: no encryption
     NoEncryption {

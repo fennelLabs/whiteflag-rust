@@ -11,6 +11,7 @@ use super::encryption_method::{encryption_method_from_field_value, WhiteflagEncr
 ///
 ///Whiteflag Specification 5.2.3 Key and Token Derivation
 ///Whiteflag Specification 5.2.4 Message Encryption
+#[derive(Clone)]
 pub struct WhiteflagEncryptionKey {
     /* The encryption method and keys */
     /**

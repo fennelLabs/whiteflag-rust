@@ -27,6 +27,7 @@ const PRESHARED_SECRET: [u8; 32] = [
     132, 96, 151, 97, 103, 227, 117, 185, 242, 193, 64, 129,
 ];
 
+#[derive(Clone)]
 struct WhiteflagAuthMethod {
     value: AuthenticationMethod,
     length: usize,
@@ -55,6 +56,7 @@ impl WhiteflagAuthMethod {
     }
 }
 
+#[derive(Clone)]
 pub struct WhiteflagAuthToken {
     token: Vec<u8>,
     method: WhiteflagAuthMethod,

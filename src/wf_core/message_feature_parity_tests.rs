@@ -1,8 +1,10 @@
+use crate::{wf_account::{test_impl::WhiteflagAccount, account::WfAccount}, wf_crypto::{wf_encryption_key::{WhiteflagEncryptionKey, WfEncryptionKey}, ecdh_keypair::{WhiteflagECDHKeyPair, generate_wfkeypair, WfECDHKeyPair}}};
+
 use super::message::WhiteflagMessage;
 
 #[test]
 fn testNewMessage() {
-    let message = WhiteflagMessage::new("S".to_string());
+    let mut message = WhiteflagMessage::new("S".to_string());
 
     assert_eq!("S", message.message_type());
     assert!(!message.is_valid());
@@ -43,7 +45,7 @@ fn testCryptoMessageCompilation() {
         "11",
         "d426bbe111221675e333f30ef608b1aa6e60a47080dd33cb49e96395894ef42f",
     ];
-    let message = WhiteflagMessage::compile(fieldValues).unwrap();
+    let message = WhiteflagMessage::compile(fieldValues.clone()).unwrap();
 
     /* Verify message */
     assert_eq!("K", message.message_type());
@@ -73,7 +75,7 @@ fn testAuthMessageCompilation() {
         "1",
         "b01218a30dd3c23d050af254bfcce31a715fecdff6a23fd59609612e6e0ef263",
     ];
-    let message = WhiteflagMessage::compile(fieldValues).unwrap();
+    let message = WhiteflagMessage::compile(fieldValues.clone()).unwrap();
 
     assert_eq!("A", message.message_type());
     assert_eq!(fieldValues[0], message.prefix());
@@ -102,7 +104,7 @@ fn testAuthMessageSerialization() {
         "2",
         "b01218a30dd3c23d050af254bfcce31a715fecdff6a23fd59609612e6e0ef263",
     ];
-    let message = WhiteflagMessage::compile(fieldValues).unwrap();
+    let message = WhiteflagMessage::compile(fieldValues.clone()).unwrap();
 
     assert_eq!("A", message.message_type());
     assert_eq!(fieldValues[4], message.message_type());
@@ -195,7 +197,7 @@ fn testSignSignalMessageEncoding() {
         "3210",
         "042",
     ];
-    let message = WhiteflagMessage::compile(fieldValues).unwrap();
+    let mut message = WhiteflagMessage::compile(fieldValues).unwrap();
 
     assert_eq!(None, message.set_transaction_hash("a1b2c3".to_string()));
     assert_eq!(
@@ -205,8 +207,8 @@ fn testSignSignalMessageEncoding() {
     assert_eq!(None, message.set_originator_address("abc123".to_string()));
     assert_eq!("abc123", message.get_originator_address());
     assert_eq!("M", message.message_type());
-    assert_eq!(messageEncoded, &hex::encode(message.encode()));
-    assert_eq!(messageEncoded, &hex::encode(message.encode()));
+    assert_eq!(messageEncoded, &message.encode().as_hex());
+    assert_eq!(messageEncoded, &message.encode().as_hex());
     assert!(message.is_valid());
 }
 
@@ -275,9 +277,9 @@ fn testTestMessage() {
         "3210",
         "042",
     ];
-    let message = WhiteflagMessage::compile(fieldValues).unwrap();
-    let messageEncoded: &str = &hex::encode(message.encode());
-    let messageDecoded = WhiteflagMessage::decode(messageEncoded).unwrap();
+    let mut message = WhiteflagMessage::compile(fieldValues.clone()).unwrap();
+    let messageEncoded = &message.encode().as_hex();
+    let mut messageDecoded = WhiteflagMessage::decode(messageEncoded).unwrap();
 
     assert_eq!(None, message.get_transaction_hash());
     assert_eq!("T", message.message_type());
@@ -350,8 +352,8 @@ fn testRequestMessage() {
         "20",
         "03",
     ];
-    let message = WhiteflagMessage::compile(fieldValues).unwrap();
-    let messageEncoded = &hex::encode(message.encode());
+    let message = WhiteflagMessage::compile(fieldValues.clone()).unwrap();
+    let messageEncoded = &message.encode().as_hex();
     let messageDecoded = WhiteflagMessage::decode(messageEncoded).unwrap();
 
     assert_eq!("Q", message.message_type());
@@ -384,7 +386,7 @@ fn testRequestMessage() {
 
 #[test]
 fn testFreeTextMessage() {
-    let message1 = WhiteflagMessage::deserialize("WF100F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!").unwrap();
+    let mut message1 = WhiteflagMessage::deserialize("WF100F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!").unwrap();
     let message2 = WhiteflagMessage::decode("57463130232fb60f0f6c4a8589bddcf076e790ac9eb1601d3fd9ced67eaaa62c9fb9644a16fabb434ba32b33630b3903a32b9ba1036b2b9b9b0b3b2908").unwrap();
 
     assert_eq!("F", message1.message_type());
@@ -411,7 +413,7 @@ fn testFreeTextMessage() {
 
 #[test]
 fn testJsonSerialization() {
-    let message1 = WhiteflagMessage::deserialize("WF100F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!").unwrap();
+    let mut message1 = WhiteflagMessage::deserialize("WF100F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!").unwrap();
     let jsonMessageStr: String = message1.to_json();
     let message2 = WhiteflagMessage::deserializeJson(jsonMessageStr).unwrap();
 
@@ -440,7 +442,7 @@ fn testJsonSerialization() {
 fn testJsonDeserialization() {
     let messageStr = "WF100F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!";
     let jsonMessageStr = "{\"MetaHeader\":{},\"MessageHeader\":{\"Prefix\":\"WF\",\"Version\":\"1\",\"EncryptionIndicator\":\"0\",\"DuressIndicator\":\"0\",\"MessageCode\":\"F\",\"ReferenceIndicator\":\"5\",\"ReferencedMessage\":\"f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942df\"},\"MessageBody\":{\"Text\":\"Whiteflag test message!\"}}";
-    let message = WhiteflagMessage::deserializeJson(jsonMessageStr).unwrap();
+    let message = WhiteflagMessage::deserializeJson(jsonMessageStr.to_string()).unwrap();
 
     assert_eq!(None, message.get_transaction_hash());
     assert_eq!("WF", message.prefix());
@@ -454,36 +456,36 @@ fn testMessageEncryption1() {
     let encodedMsg = "5746313223000000000088888889111111119999999a22222222aaaaaaab33333333bbbbbbbb0983098309830983118b118b118b118b1993199319931993219b219b219b219b29a329a329a329a331ab31ab31ab31a9b1b9b1b9b1b9b1b9c1c9c1c9c1c9c1c8";
     let encryptedMsg = "574631326d7658e7d17479677a0de95076989fcd7825b709349b143f2b17644e5cb2c8ded5c7f18d77447cf9dc2115e0c1c81d717b57fadaeedf27bfef8926448ff666d3d9a65168827c94b393974ebbe6b7f0599e184bfd1ace3569117c23ae17c5640f2f2d";
 
-    let originator = WfAccountImpl::new(true);
-    let recipient = WfAccountImpl::new(false);
-    originator.set_address("007a0baf6f84f0fa7402ea972686e56d50b707c9b67b108866");
-    recipient.set_shared_key(WfEncryptionKey::new(
-        "32676187ba7badda85ea63a69870a7133909f1999774abb2eed251073616a6e7",
+    let mut originator = WhiteflagAccount::new(true);
+    let mut recipient = WhiteflagAccount::new(false);
+    originator.set_address("007a0baf6f84f0fa7402ea972686e56d50b707c9b67b108866".to_string());
+    recipient.set_shared_key(WhiteflagEncryptionKey::new(
+        "32676187ba7badda85ea63a69870a7133909f1999774abb2eed251073616a6e7".to_string(),
     ));
 
     let message = WhiteflagMessage::decode(encodedMsg).unwrap();
-    message.set_originator(originator);
-    message.set_recipient(recipient);
+    message.set_originator(originator.clone());
+    message.set_recipient(recipient.clone());
     message.set_init_vector("40aa85015d24e4601448c1ba8d7bf1aa");
 
-    assert!(originator.isSelf());
-    assert!(!recipient.isSelf());
-    assert_eq!(encryptedMsg, &hex::encode(message.encode()));
+    assert!(originator.is_owned());
+    assert!(!recipient.is_owned());
+    assert_eq!(encryptedMsg, message.encode().as_hex());
 }
 
 #[test]
 fn testMessageEncryption2() {
-    let originator = WfAccountImpl::new(true);
-    let recipient = WfAccountImpl::new(false);
-    originator.set_address("ac000cdbe3c49955b218f8397ddfe533a32a4269658712a2f4a82e8b448e");
-    recipient.set_shared_key(WfEncryptionKey::new(
-        "b50cf705febdc9b6b2f7af10fa0955c1a5b454d6941494536d75d7810010a90d",
+    let mut originator = WhiteflagAccount::new(true);
+    let mut recipient = WhiteflagAccount::new(false);
+    originator.set_address("ac000cdbe3c49955b218f8397ddfe533a32a4269658712a2f4a82e8b448e".to_string());
+    recipient.set_shared_key(WhiteflagEncryptionKey::new(
+        "b50cf705febdc9b6b2f7af10fa0955c1a5b454d6941494536d75d7810010a90d".to_string(),
     ));
 
     let messageStr = "WF120F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!";
     let message1 = WhiteflagMessage::deserialize(messageStr).unwrap();
-    message1.set_originator(originator);
-    message1.set_recipient(recipient);
+    message1.set_originator(originator.clone());
+    message1.set_recipient(recipient.clone());
 
     let encryptedMsg = message1.encode();
     let initVector = message1.get_init_vector();
@@ -496,16 +498,16 @@ fn testMessageEncryption2() {
 
 #[test]
 fn testMessageEncryption3() {
-    let originator = WfAccountImpl::new(false);
-    let recipient = WfAccountImpl::new(true);
-    originator.set_address("b77b1cdb02efe1acccf0e277021cb303117bd83c689ea8a64fc549229dba");
-    originator.set_ecdh_public_key(WfECDHKeyPair::new().getPublicKey());
-    recipient.set_ecdh_keypair(WfECDHKeyPair::new());
+    let mut originator = WhiteflagAccount::new(false);
+    let mut recipient = WhiteflagAccount::new(true);
+    originator.set_address("b77b1cdb02efe1acccf0e277021cb303117bd83c689ea8a64fc549229dba".to_string());
+    originator.set_ecdh_public_key(generate_wfkeypair().get_public_key());
+    recipient.set_ecdh_keypair(generate_wfkeypair());
 
     let messageStr = "WF111Q13efb4e0cfa83122b242634254c1920a769d615dfcc4c670bb53eb6f12843c3ae802013-08-31T04:29:15ZP01D00H00M22+31.79658-033.826028799321000010022003";
     let message1 = WhiteflagMessage::deserialize(messageStr).unwrap();
-    message1.set_originator(originator);
-    message1.set_recipient(recipient);
+    message1.set_originator(originator.clone());
+    message1.set_recipient(recipient.clone());
 
     let encryptedMsg = message1.encrypt();
     let initVector = message1.get_init_vector();
@@ -519,15 +521,15 @@ fn testMessageEncryption3() {
 #[test]
 #[should_panic(expected = "WhiteflagError")]
 fn testMessageEncryption4() {
-    let originator = WfAccountImpl::new(false);
-    let recipient = WfAccountImpl::new(true);
-    originator.set_address("b77b1cdb02efe1acccf0e277021cb303117bd83c689ea8a64fc549229dba");
-    recipient.set_ecdh_keypair(WfECDHKeyPair::new());
+    let mut originator = WhiteflagAccount::new(false);
+    let mut recipient = WhiteflagAccount::new(true);
+    originator.set_address("b77b1cdb02efe1acccf0e277021cb303117bd83c689ea8a64fc549229dba".to_string());
+    recipient.set_ecdh_keypair(generate_wfkeypair());
 
     let message = WhiteflagMessage::deserialize("WF111Q13efb4e0cfa83122b242634254c1920a769d615dfcc4c670bb53eb6f12843c3ae802013-08-31T04:29:15ZP01D00H00M22+31.79658-033.826028799321000010022003").unwrap();
     message.set_originator(originator);
     message.set_recipient(recipient);
 
-    let encryptedMsg = message.encode();
-    let initVector = message.get_init_vector();
+    message.encode();
+    message.get_init_vector();
 }

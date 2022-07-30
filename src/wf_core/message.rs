@@ -1,3 +1,5 @@
+use crate::{wf_account::{account::WfAccount, test_impl::WhiteflagAccount}, wf_buffer::WhiteflagBuffer};
+
 #[derive(Clone)]
 pub struct WhiteflagMessage {
     pub prefix: String,
@@ -264,7 +266,7 @@ impl WhiteflagMessage {
         todo!()
     }
 
-    pub fn encode(&self) -> WfBinaryBuffer {
+    pub fn encode(&self) -> WhiteflagBuffer {
         todo!()
     }
 
@@ -281,15 +283,15 @@ impl WhiteflagMessage {
     }
 
     pub fn decrypt(
-        encrypted_msg: WfBinaryBuffer,
-        originator: WfAccountImpl,
-        recipient: WfAccountImpl,
+        encrypted_msg: WhiteflagBuffer,
+        originator: WhiteflagAccount,
+        recipient: WhiteflagAccount,
         init_vector: Vec<u8>,
     ) -> WhiteflagMessage {
         todo!()
     }
 
-    pub fn encrypt(&self) -> WhiteflagMessage {
+    pub fn encrypt(&self) -> WhiteflagBuffer {
         todo!()
     }
 
@@ -309,11 +311,11 @@ impl WhiteflagMessage {
         todo!()
     }
 
-    pub fn set_originator(&self, originator: WfAccountImpl) {
+    pub fn set_originator(&self, originator: WhiteflagAccount) {
         todo!()
     }
 
-    pub fn set_recipient(&self, recipient: WfAccountImpl) {
+    pub fn set_recipient(&self, recipient: WhiteflagAccount) {
         todo!()
     }
 
