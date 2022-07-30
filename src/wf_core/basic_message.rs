@@ -8,6 +8,18 @@ pub struct BasicMessage {
     body: MessageSegment,
 }
 
+impl MessageSegment {
+    pub fn serialize(&self) -> String {
+        let mut serial: String = String::new();
+        for f in self.iter() {
+            let value: &str = &f.get();
+            serial.push_str(value);
+        }
+
+        serial
+    }
+}
+
 impl BasicMessage {
     pub fn new(message_code: char, header: Vec<Field>, body: Vec<Field>) -> BasicMessage {
         BasicMessage {
@@ -15,6 +27,14 @@ impl BasicMessage {
             header: header.into(),
             body: body.into(),
         }
+    }
+
+    pub fn serialize(&self) -> String {
+        let mut serial = String::new();
+        serial.push_str(&self.header.serialize());
+        serial.push_str(&self.body.serialize());
+
+        serial
     }
 
     pub fn encode(&mut self) -> Vec<u8> {
