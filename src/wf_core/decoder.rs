@@ -38,8 +38,17 @@ impl Decoder {
                 body.push(field);
                 psuedo_message_code
             }
+            /* 'Q' => {
+                // one request object requires 2 fields of 8 bits
+                let request_objects_length = (self.buffer.bit_length() - self.bit_cursor) /16;
+            } */
             code => code,
         };
+
+        /* Extend request message body with request fields (calculated from remaining bits) */
+        /* final int nRequestObjects = (msgBuffer.bitLength() - bitCursor) / 16;   // One request object requires 2 fields of 8 bits
+        body.append(new WfMessageSegment(messageType.createRequestFields(nRequestObjects)));
+        break; */
 
         body.append(
             self.buffer
