@@ -1,8 +1,9 @@
 use super::basic_message::BasicMessage;
 use crate::wf_buffer::WhiteflagBuffer;
 use crate::wf_convert::FieldValue;
-use crate::wf_field::generic_header_fields;
-use crate::wf_parser::MessageCodeParser;
+use crate::wf_field::definitions::test_message_code;
+use crate::wf_field::{generic_header_fields, get_body_from_code, Field};
+use crate::wf_parser::{convert_value_to_code, MessageHeaderOrder};
 
 pub const PREFIX: &str = "WF";
 pub const PROTOCOL_VERSION: &str = "1";
@@ -27,20 +28,37 @@ pub fn decode<T: AsRef<str>>(message: T) -> BasicMessage {
     };
     //let mut next_field = 0;
 
-    let (bit_cursor, header) = buffer.decode(generic_header_fields().to_vec(), 0);
+    let (mut bit_cursor, header) = buffer.decode(generic_header_fields().to_vec(), 0);
 
-    let (parser, mut body, shift) = MessageCodeParser::parse_for_decode(&buffer);
-    let (_, mut body_2) = buffer.decode(
-        parser.get_field_definitions_for_decode(),
-        bit_cursor + shift.unwrap_or(0),
-    );
+    let mut body: Vec<Field> = vec![];
+    let code = convert_value_to_code(MessageHeaderOrder::MessageCode.get(&header).get());
 
-    body.append(&mut body_2);
+    let definitions = match &code {
+        'T' => {
+            let test_def = test_message_code();
+            let test_bit_length = test_def.bit_length();
+
+            // extract the psuedo message field
+            let field = buffer.extract_message_field(test_def, bit_cursor);
+            let psuedo_message_code = convert_value_to_code(field.get());
+            body.push(field);
+
+            // if this is a test message, then the pseudo message code data needs to be ignored
+            // in order to achieve this, the bit cursor needs to be shifted
+            // shift the bit the bit cursor instructs the program where the data extraction should begin
+            bit_cursor += test_bit_length;
+
+            get_body_from_code(&psuedo_message_code)
+        }
+        _ => get_body_from_code(&code),
+    };
+
+    body.append(buffer.decode(definitions, bit_cursor).1.as_mut());
 
     //bit_cursor += header.bit_length();
     //next_field = body.fields.len();
 
-    BasicMessage::new(parser.code, header, body)
+    BasicMessage::new(code, header, body)
 }
 
 /* public final WfMessageCreator decode(final WfBinaryBuffer msgBuffer) throws WfCoreException {

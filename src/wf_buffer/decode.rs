@@ -19,11 +19,7 @@ impl WhiteflagBuffer {
             panic!("field definition vector should not be empty")
         }
 
-        // if this is a test message, then the pseudo message code data needs to be ignored
-        // in order to achieve this, the bit cursor needs to be shifted
-        // the bit cursor instructs the program where the data extraction should begin
-        //let shift = shift_bits.unwrap_or(0);
-        let mut bit_cursor = start_bit; // + shift;
+        let mut bit_cursor = start_bit;
 
         // the byte cursor only ensures definitions are in their proper order relative to each other
         let mut byte_cursor = field_defs[0].start_byte;
