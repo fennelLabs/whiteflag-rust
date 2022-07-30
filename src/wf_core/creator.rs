@@ -1,7 +1,8 @@
 use super::basic_message::BasicMessage;
 use crate::wf_buffer::WhiteflagBuffer;
 use crate::wf_convert::FieldValue;
-use crate::wf_field::{generic_header_fields, get_message_body};
+use crate::wf_field::generic_header_fields;
+use crate::wf_parser::MessageCodeParser;
 
 pub const PREFIX: &str = "WF";
 pub const PROTOCOL_VERSION: &str = "1";
@@ -26,14 +27,18 @@ pub fn decode<T: AsRef<str>>(message: T) -> BasicMessage {
     };
     //let mut next_field = 0;
 
-    let (bit_cursor, header) = buffer.decode(generic_header_fields().to_vec(), 0);
+    let (bit_cursor, header) = buffer.decode(generic_header_fields().to_vec(), 0, None);
 
-    let (body_field_defs, code) = get_message_body(&header);
-    let (_, body) = buffer.decode(body_field_defs, bit_cursor);
+    let (parser, mut body, shift) = MessageCodeParser::parse_for_decode(&buffer);
+    let (_, mut body_2) =
+        buffer.decode(parser.get_field_definitions_for_decode(), bit_cursor, shift);
+
+    body.append(&mut body_2);
+
     //bit_cursor += header.bit_length();
     //next_field = body.fields.len();
 
-    BasicMessage::new(code, header.into(), body.into())
+    BasicMessage::new(parser.code, header, body)
 }
 
 /* public final WfMessageCreator decode(final WfBinaryBuffer msgBuffer) throws WfCoreException {

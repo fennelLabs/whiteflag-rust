@@ -1,6 +1,9 @@
 #[cfg(test)]
 mod message_tests;
 
+#[cfg(test)]
+mod edge_case_test;
+
 use super::wf_buffer;
 use super::wf_codec;
 

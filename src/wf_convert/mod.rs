@@ -14,7 +14,7 @@ pub fn compile<T: FieldValue>(data: &[T]) -> BasicMessage {
     let parser = MessageCodeParser::parse_for_encode(data);
 
     let body = convert_values_to_fields(
-        parser.get_field_definitions(),
+        parser.get_field_definitions_for_encode(),
         data.as_ref(),
         body_start_index,
     );
@@ -49,7 +49,7 @@ fn convert_values_to_fields<T: FieldValue>(
             let field = match f.set(value.as_ref()) {
                 Ok(field) => field,
                 Err(e) => panic!(
-                    "error while converting array of strings into fields\n{:?}",
+                    "{} error while converting array of strings into fields\n{0:?}",
                     e
                 ),
             };
