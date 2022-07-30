@@ -9,10 +9,12 @@ mod wf_auth;
 mod wf_buffer;
 mod wf_codec;
 mod wf_convert;
+#[allow(dead_code)]
 mod wf_core;
 mod wf_crypto;
 mod wf_field;
 mod wf_json;
+mod wf_parser;
 
 pub fn encode_from_json<T: AsRef<str>>(json: T) -> Result<String, WhiteflagError> {
     let message: wf_json::WhiteflagFieldValues =
