@@ -1,16 +1,14 @@
 #[cfg(test)]
 mod test;
 
-#[allow(dead_code)]
 mod message_code_parser;
-#[allow(dead_code)]
 mod message_header_parser;
 mod parsed_field_definition;
 
 pub use message_code_parser::MessageCodeParser;
 pub use message_header_parser::MessageHeaderParser;
 
-use crate::wf_field::Field;
+use crate::wf_field::{definitions::convert_value_to_code, Field};
 
 #[repr(usize)]
 #[derive(Copy, Clone)]
@@ -29,12 +27,9 @@ impl<'a> MessageHeaderOrder {
         let index: usize = *self as usize;
         &fields[index]
     }
-}
 
-/// fields that are codes are single characters
-pub fn convert_value_to_code(value: &str) -> char {
-    value
-        .chars()
-        .nth(0)
-        .unwrap_or_else(|| panic!("invalid message code"))
+    pub fn get_code(fields: &[Field]) -> (&Field, char) {
+        let field = Self::MessageCode.get(fields);
+        (field, convert_value_to_code(field.get()))
+    }
 }

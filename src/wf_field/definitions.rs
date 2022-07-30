@@ -2,7 +2,11 @@ use super::field_definition::FieldDefinition;
 use crate::wf_codec::encoding::*;
 use regex::Regex;
 
-pub fn get_body_from_code(code: &char) -> Vec<FieldDefinition> {
+pub fn get_body_from_code(code: &str) -> Vec<FieldDefinition> {
+    get_body_from_code_char(&convert_value_to_code(code))
+}
+
+pub fn get_body_from_code_char(code: &char) -> Vec<FieldDefinition> {
     match code {
         'A' => authentication_body_fields().to_vec(),
         'K' => crypto_body_fields().to_vec(),
@@ -12,6 +16,14 @@ pub fn get_body_from_code(code: &char) -> Vec<FieldDefinition> {
         'P' | 'E' | 'D' | 'S' | 'I' | 'M' | 'Q' => sign_signal_body_fields().to_vec(),
         _ => panic!("'{}' is not a valid message code", code),
     }
+}
+
+/// fields that are codes are single characters
+pub fn convert_value_to_code(value: &str) -> char {
+    value
+        .chars()
+        .nth(0)
+        .unwrap_or_else(|| panic!("invalid message code: {}", value))
 }
 
 pub enum FieldKind {

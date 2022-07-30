@@ -1,10 +1,13 @@
 use crate::{
     wf_buffer::WhiteflagBuffer,
     wf_convert::FieldValue,
-    wf_field::{get_body_from_code, Field, FieldDefinition},
+    wf_field::{
+        definitions::{convert_value_to_code, get_body_from_code_char},
+        generic_header_fields, get_body_from_code, Field, FieldDefinition,
+    },
 };
 
-use super::{convert_value_to_code, message_header_parser::MessageHeaderParser};
+use super::message_header_parser::MessageHeaderParser;
 
 #[derive(Debug)]
 pub struct MessageCodeParser {
@@ -13,9 +16,11 @@ pub struct MessageCodeParser {
 }
 
 impl MessageCodeParser {
-    pub fn parse_for_decode(buffer: &WhiteflagBuffer) -> (Self, Vec<Field>, Option<usize>) {
-        let mut body: Vec<Field> = vec![];
+    /* pub fn parse_for_decode(buffer: &WhiteflagBuffer) -> Vec<Field> {
+        let (bit_cursor, header) = buffer.decode(generic_header_fields().to_vec(), 0);
         let header_parser = MessageHeaderParser::default();
+
+        let mut body: Vec<Field> = vec![];
         let code = convert_value_to_code(&header_parser.message_code().extract(buffer));
         let mut shift: Option<usize> = None;
 
@@ -30,8 +35,8 @@ impl MessageCodeParser {
             None
         };
 
-        (MessageCodeParser { code, test_code }, body, shift)
-    }
+        //(MessageCodeParser { code, test_code }, body, shift)
+    } */
 
     /// extracts message code type from array of message values
     /// the 4th position is where the message code type resides
@@ -58,19 +63,16 @@ impl MessageCodeParser {
 
     /// collects all the field definitions based on the parsed codes
     pub fn get_field_definitions_for_decode(&self) -> Vec<FieldDefinition> {
-        match &self.test_code {
-            Some(c) => get_body_from_code(c),
-            None => get_body_from_code(&self.code),
-        }
+        get_body_from_code_char(&self.test_code.unwrap_or(self.code))
     }
 
     // collects all the field definitions based on the parsed codes
     pub fn get_field_definitions_for_encode(&self) -> Vec<FieldDefinition> {
-        let mut defs = get_body_from_code(&self.code);
+        let mut defs = get_body_from_code_char(&self.code);
 
         match &self.test_code {
             Some(c) => {
-                defs.append(get_body_from_code(c).as_mut());
+                defs.append(get_body_from_code_char(c).as_mut());
             }
             None => (),
         };

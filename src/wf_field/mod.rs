@@ -12,6 +12,8 @@ pub use definitions::{generic_header_fields, get_body_from_code};
 pub use field::Field;
 pub use field_definition::FieldDefinition;
 
+use self::definitions::get_body_from_code_char;
+
 pub const FIELD_PREFIX: &'static str = "Prefix";
 pub const FIELD_VERSION: &'static str = "Version";
 pub const FIELD_MESSAGETYPE: &'static str = "MessageCode";
@@ -63,7 +65,7 @@ fn get_message_code_base(fields: &[Field], name: &'static str) -> char {
 
 pub fn get_message_body(fields: &[Field]) -> (Vec<FieldDefinition>, char) {
     let message_code = get_message_code(fields);
-    let body = get_body_from_code(&message_code);
+    let body = get_body_from_code_char(&message_code);
 
     (body, message_code)
 }
