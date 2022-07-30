@@ -4,7 +4,7 @@ use crate::{
     wf_field::{get_body_from_code, FieldDefinition},
 };
 
-use super::message_header_parser::MessageHeaderParser;
+use super::{message_header_parser::MessageHeaderParser, convert_value_to_code};
 
 #[derive(Debug)]
 pub struct MessageCodeParser {
@@ -66,10 +66,4 @@ impl MessageCodeParser {
     }
 }
 
-/// fields that are codes are single characters
-fn convert_value_to_code(value: &str) -> char {
-    value
-        .chars()
-        .nth(0)
-        .unwrap_or_else(|| panic!("invalid message code"))
-}
+
