@@ -27,8 +27,8 @@ mod test_message {
 #[test]
 fn test_t_message() {
     let message: BasicMessage = crate::wf_convert::compile(test_message::VALUES);
-    let encoded_message = super::creator::encode(test_message::VALUES);
-    let decoded_message = super::creator::decode(test_message::ENCODED);
+    let encoded_message = super::encode(test_message::VALUES);
+    let decoded_message = super::decode(test_message::ENCODED);
 
     assert_eq!(
         test_message::SERIALIZED,
