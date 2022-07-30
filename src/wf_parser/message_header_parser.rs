@@ -90,7 +90,7 @@ impl MessageHeaderFields {
 
 impl MessageHeaderParser {
     pub fn parse(buffer: &WhiteflagBuffer) -> MessageHeaderFields {
-        let (bit_cursor, header) = buffer.decode(Self::default().to_vec(), 0, None);
+        let (bit_cursor, header) = buffer.decode(Self::default().to_vec(), 0);
         let code = MessageHeaderOrder::MessageCode.get(&header);
 
         MessageHeaderFields::new(header)
@@ -109,7 +109,7 @@ impl MessageHeaderParser {
     }
 
     pub fn to_fields(self, buffer: &WhiteflagBuffer) -> Vec<Field> {
-        buffer.decode(self.to_vec(), 0, None).1
+        buffer.decode(self.to_vec(), 0).1
         //self.to_vec().into_iter().map(|f| )
     }
 

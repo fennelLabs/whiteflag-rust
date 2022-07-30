@@ -27,11 +27,13 @@ pub fn decode<T: AsRef<str>>(message: T) -> BasicMessage {
     };
     //let mut next_field = 0;
 
-    let (bit_cursor, header) = buffer.decode(generic_header_fields().to_vec(), 0, None);
+    let (bit_cursor, header) = buffer.decode(generic_header_fields().to_vec(), 0);
 
     let (parser, mut body, shift) = MessageCodeParser::parse_for_decode(&buffer);
-    let (_, mut body_2) =
-        buffer.decode(parser.get_field_definitions_for_decode(), bit_cursor, shift);
+    let (_, mut body_2) = buffer.decode(
+        parser.get_field_definitions_for_decode(),
+        bit_cursor + shift.unwrap_or(0),
+    );
 
     body.append(&mut body_2);
 
