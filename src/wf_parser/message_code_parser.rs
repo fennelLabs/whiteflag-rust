@@ -1,13 +1,10 @@
 use crate::{
-    wf_buffer::WhiteflagBuffer,
-    wf_convert::FieldValue,
+    wf_core::FieldValue,
     wf_field::{
         definitions::{convert_value_to_code, get_body_from_code_char},
-        generic_header_fields, get_body_from_code, Field, FieldDefinition,
+        FieldDefinition,
     },
 };
-
-use super::message_header_parser::MessageHeaderParser;
 
 #[derive(Debug)]
 pub struct MessageCodeParser {

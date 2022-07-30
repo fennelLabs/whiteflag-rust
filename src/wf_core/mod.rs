@@ -11,7 +11,9 @@ pub mod message;
 mod segment;
 mod types;
 
-use crate::wf_convert::FieldValue;
+pub trait FieldValue: AsRef<str> + Into<String> + std::fmt::Debug {}
+impl<T> FieldValue for T where T: AsRef<str> + Into<String> + std::fmt::Debug {}
+
 use basic_message::BasicMessage;
 use decoder::Decoder;
 
