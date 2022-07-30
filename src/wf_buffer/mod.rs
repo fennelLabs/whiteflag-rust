@@ -49,6 +49,11 @@ impl WhiteflagBuffer {
     }
 
     pub fn extract_message_field(&self, definition: FieldDefinition, start_bit: usize) -> Field {
+        let value = self.extract_message_value(&definition, start_bit);
+        Field::new(definition, value)
+    }
+
+    pub fn extract_message_value(&self, definition: &FieldDefinition, start_bit: usize) -> String {
         let field_bit_length = definition.bit_length();
         let bit_length = if field_bit_length >= 1 {
             field_bit_length
