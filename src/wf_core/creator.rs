@@ -12,10 +12,6 @@ pub fn encode<T: FieldValue>(fields: &[T]) -> String {
     hex::encode(message_encoded)
 }
 
-struct WhiteflagMessageCreator {}
-
-impl WhiteflagMessageCreator {}
-
 /**
  * Decodes an encoded Whiteflag message and creates a new Whiteflag base message object
  * @since 1.1
