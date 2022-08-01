@@ -190,16 +190,3 @@ pub const LONG: Encoding = Encoding {
     byte_length: Some(10),
     kind: EncodingKind::LONG,
 };
-
-/* protected final WfBinaryBuffer encode() throws WfCoreException {
-    WfBinaryBuffer buffer = WfBinaryBuffer.create();
-    int byteCursor = fields[0].startByte;
-    for (WfMessageField field : fields) {
-        if (field.startByte != byteCursor) {
-            throw new WfCoreException("Invalid field order while encoding: did not expect field " + field.debugInfo() + " at byte " + byteCursor, null);
-        }
-        buffer.addMessageField(field);
-        byteCursor = field.endByte;
-    }
-    return buffer;
-} */

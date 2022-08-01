@@ -1,7 +1,4 @@
-use super::{
-    basic_message::BasicMessage,
-    creator::{decode, encode},
-};
+use super::{basic_message::BasicMessage, decode, encode};
 
 #[test]
 fn encode_sign_signal_message() {

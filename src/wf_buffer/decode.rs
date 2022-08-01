@@ -20,13 +20,15 @@ impl WhiteflagBuffer {
         }
 
         let mut bit_cursor = start_bit;
+
+        // the byte cursor only ensures definitions are in their proper order relative to each other
         let mut byte_cursor = field_defs[0].start_byte;
 
         let fields = field_defs
             .into_iter()
             .map(|f| {
                 if f.start_byte != byte_cursor {
-                    panic!("start byte should match byte cursor");
+                    panic!("\nstart byte should match byte cursor\n\tname: {}\n\tstart: {}\n\tcursor: {}\n", f.name, f.start_byte, byte_cursor);
                     //throw new WfCoreException("Invalid field order while decoding: did not expect field " + fields[index].debugInfo() + " at byte " + byteCursor, null);
                 }
                 /*
