@@ -8,8 +8,8 @@ use super::Field;
 
 #[derive(Clone, Debug)]
 pub struct FieldDefinition {
-    pub name: String,
-    pattern: Option<Regex>,
+    pub name: &'static str,
+    pub pattern: Option<Regex>,
     pub encoding: Encoding,
     pub start_byte: usize,
     pub end_byte: isize,
@@ -17,14 +17,14 @@ pub struct FieldDefinition {
 
 impl FieldDefinition {
     pub fn new(
-        name: &str,
+        name: &'static str,
         pattern: Option<Regex>,
         encoding: Encoding,
         start_byte: usize,
         end_byte: isize,
     ) -> FieldDefinition {
         FieldDefinition {
-            name: String::from(name),
+            name,
             pattern, //: pattern.expect(&format!("invalid regular expression pattern: {}", name)),
             encoding,
             start_byte,
@@ -33,14 +33,14 @@ impl FieldDefinition {
     }
 
     pub fn new2(
-        name: &str,
+        name: &'static str,
         pattern: Result<Regex, regex::Error>,
         encoding: Encoding,
         start_byte: usize,
         end_byte: isize,
     ) -> FieldDefinition {
         FieldDefinition {
-            name: String::from(name),
+            name,
             pattern: pattern.ok(), //: pattern.expect(&format!("invalid regular expression pattern: {}", name)),
             encoding,
             start_byte,
