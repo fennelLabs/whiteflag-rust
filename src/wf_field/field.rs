@@ -46,11 +46,11 @@ impl Field {
      * @return the byte length of the unencoded field value
      */
     pub fn byte_length(&self) -> usize {
-        if self.definition.end_byte < 0 {
-            return self.value.len();
+        if let Some(len) = self.definition.expected_byte_length() {
+            return len;
         }
 
-        return self.definition.end_byte as usize - self.definition.start_byte;
+        self.value.len()
     }
 
     /**

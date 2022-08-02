@@ -9,7 +9,7 @@ pub struct FieldDefinition {
     pub pattern: Option<Regex>,
     pub encoding: Encoding,
     pub start_byte: usize,
-    pub end_byte: isize,
+    pub end_byte: Option<usize>,
 }
 
 impl FieldDefinition {
@@ -25,7 +25,11 @@ impl FieldDefinition {
             pattern, //: pattern.expect(&format!("invalid regular expression pattern: {}", name)),
             encoding,
             start_byte,
-            end_byte,
+            end_byte: if end_byte < 1 {
+                None
+            } else {
+                Some(end_byte as usize)
+            },
         }
     }
 
@@ -34,7 +38,7 @@ impl FieldDefinition {
         pattern: Result<Regex, regex::Error>,
         encoding: Encoding,
         start_byte: usize,
-        end_byte: isize,
+        end_byte: Option<usize>,
     ) -> FieldDefinition {
         FieldDefinition {
             name,
@@ -46,11 +50,11 @@ impl FieldDefinition {
     }
 
     pub fn get_minimum_starting_position(&self) -> usize {
-        if self.end_byte < 0 {
-            return self.start_byte;
+        if let Some(e) = self.end_byte {
+            return e;
         }
 
-        self.end_byte as usize
+        return self.start_byte;
     }
 
     /**
@@ -76,16 +80,14 @@ impl FieldDefinition {
         self.encoding.encode(data)
     }
 
-    /**
-     * Gets the byte length of the unencoded field value
-     * @return the byte length of the unencoded field value
-     */
-    pub fn byte_length(&self) -> usize {
-        if self.end_byte < 0 {
-            return 0;
+    /// returns the byte length of the unencoded field value
+    /// if the field definition does not have a fixed length then it will return `0`
+    pub fn expected_byte_length(&self) -> Option<usize> {
+        if let Some(e) = self.end_byte && e > 0 && e > self.start_byte {
+            return Some(e - self.start_byte);
         }
 
-        return self.end_byte as usize - self.start_byte;
+        return None;
     }
 
     /**
@@ -93,6 +95,8 @@ impl FieldDefinition {
      * @return the bit length of the compressed encoded field value
      */
     pub fn bit_length(&self) -> usize {
-        return self.encoding.convert_to_bit_length(self.byte_length());
+        return self
+            .encoding
+            .convert_to_bit_length(self.expected_byte_length().unwrap_or(0));
     }
 }

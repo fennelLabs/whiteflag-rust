@@ -14,11 +14,10 @@ pub trait Validation {
 
 impl Validation for FieldDefinition {
     fn validate(&self, value: &str) -> Result<bool, ValidationError> {
-        let expected_byte_length = self.byte_length();
-        if expected_byte_length != 0 && value.len() != expected_byte_length {
+        if let Some(len) = self.expected_byte_length() && value.len() != len {
             return Err(ValidationError::InvalidLength(
                 value.to_string(),
-                expected_byte_length,
+                len,
             ));
         }
 

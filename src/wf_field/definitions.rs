@@ -80,7 +80,7 @@ macro_rules! message_fields {
                     pattern: None,
                     encoding: crate::wf_codec::encoding::$encoding,
                     start_byte: $start,
-                    end_byte: if $end == 0 { -1 } else { $end },
+                    end_byte: if $end == 0 { None } else { Some($end) },
                     //byte_length: if $end > $start { Some($end - $start) } else { None }
                 }; )*
 
