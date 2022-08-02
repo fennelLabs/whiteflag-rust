@@ -159,7 +159,7 @@ macro_rules! encoding {
                 }
 
                 if match self.kind {
-                    $( EncodingKind::$name => rx::$name.is_match(value),  )*
+                    $( EncodingKind::$name => rx::$name.is_match(value), )*
                 } == false {
                     return Err(ValidationError::InvalidCharset);
                 }
