@@ -12,17 +12,14 @@ pub struct Encoding {
     pub kind: EncodingKind,
 }
 
-#[derive(Clone, Debug)]
-pub enum EncodingKind {
-    BIN,
-    DEC,
-    HEX,
-    UTF8,
-    DATETIME,
-    DURATION,
-    LAT,
-    LONG,
-}
+/* impl EncodingKind {
+    pub fn get_charset(&self) -> &'static str {
+        match self {
+            EncodingKind::BIN => "[01]",
+            _ => "",
+        }
+    }
+} */
 
 impl Encoding {
     fn new(
@@ -135,58 +132,45 @@ impl Encoding {
  * The equivalent of following constants can be found as an enum called "Encoding" in WfMessageCodec.java
  */
 
-pub const BIN: Encoding = Encoding {
-    charset: "[01]",
-    bit_length: BIT,
-    byte_length: None,
-    kind: EncodingKind::BIN,
-};
+macro_rules! encoding {
+    (
+        $( $name:ident, $charset:expr, $bit_length:expr, $byte_length:expr );*
+    ) => {
+        #[derive(Clone, Debug)]
+        pub enum EncodingKind {
+            $(
+                $name,
+            )*
+        }
 
-pub const DEC: Encoding = Encoding {
-    charset: "[0-9]",
-    bit_length: QUADBIT,
-    byte_length: None,
-    kind: EncodingKind::DEC,
-};
+        impl EncodingKind {
+            pub fn get_encoding(&self) -> Encoding {
+                match &self {
+                    $( EncodingKind::$name => $name, )*
+                }
+            }
+        }
 
-pub const HEX: Encoding = Encoding {
-    charset: "[a-fA-F0-9]",
-    bit_length: QUADBIT,
-    byte_length: None,
-    kind: EncodingKind::HEX,
-};
+        $( pub const $name: Encoding = Encoding {
+            charset: charsets::$name,
+            bit_length: $bit_length,
+            byte_length: $byte_length,
+            kind: EncodingKind::$name
+        }; )*
 
-pub const UTF8: Encoding = Encoding {
-    charset: r"[\u0000-\u007F]",
-    bit_length: OCTET,
-    byte_length: None,
-    kind: EncodingKind::UTF8,
-};
+        pub mod charsets {
+            $( pub const $name: &'static str = $charset; )*
+        }
+    };
+}
 
-pub const DATETIME: Encoding = Encoding {
-    charset: "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z",
-    bit_length: 56,
-    byte_length: Some(20),
-    kind: EncodingKind::DATETIME,
-};
-
-pub const DURATION: Encoding = Encoding {
-    charset: "P[0-9]{2}D[0-9]{2}H[0-9]{2}M",
-    bit_length: 24,
-    byte_length: Some(10),
-    kind: EncodingKind::DURATION,
-};
-
-pub const LAT: Encoding = Encoding {
-    charset: "[+\\-][0-9]{2}\\.[0-9]{5}",
-    bit_length: 29,
-    byte_length: Some(9),
-    kind: EncodingKind::LAT,
-};
-
-pub const LONG: Encoding = Encoding {
-    charset: "[+\\-][0-9]{3}\\.[0-9]{5}",
-    bit_length: 33,
-    byte_length: Some(10),
-    kind: EncodingKind::LONG,
-};
+encoding!(
+    BIN, "[01]", BIT, None;
+    DEC, "[0-9]", QUADBIT, None;
+    HEX, "[a-fA-F0-9]", QUADBIT, None;
+    UTF8, r"[\u0000-\u007F]", OCTET, None;
+    DATETIME, "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z", 56, Some(20);
+    DURATION, "P[0-9]{2}D[0-9]{2}H[0-9]{2}M", 24, Some(10);
+    LAT, "[+\\-][0-9]{2}\\.[0-9]{5}", 29, Some(9);
+    LONG, "[+\\-][0-9]{3}\\.[0-9]{5}", 33, Some(10)
+);
