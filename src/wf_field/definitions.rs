@@ -1,5 +1,3 @@
-use crate::wf_validation::{Validation, ValidationError};
-
 use super::field_definition::FieldDefinition;
 
 pub fn get_body_from_code(code: &str) -> Vec<FieldDefinition> {
@@ -77,11 +75,9 @@ macro_rules! message_fields {
 
                 $( pub const $upp: FieldDefinition = FieldDefinition {
                     name: names::$upp,
-                    pattern: None,
                     encoding: crate::wf_codec::encoding::$encoding,
                     start_byte: $start,
                     end_byte: if $end == 0 { None } else { Some($end) },
-                    //byte_length: if $end > $start { Some($end - $start) } else { None }
                 }; )*
 
                 pub const DEFINITIONS: &'static [FieldDefinition] = &[$( $upp, )*];

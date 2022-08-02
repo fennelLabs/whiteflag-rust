@@ -6,7 +6,6 @@ use super::Field;
 #[derive(Clone, Debug)]
 pub struct FieldDefinition {
     pub name: &'static str,
-    pub pattern: Option<Regex>,
     pub encoding: Encoding,
     pub start_byte: usize,
     pub end_byte: Option<usize>,
@@ -22,7 +21,6 @@ impl FieldDefinition {
     ) -> FieldDefinition {
         FieldDefinition {
             name,
-            pattern, //: pattern.expect(&format!("invalid regular expression pattern: {}", name)),
             encoding,
             start_byte,
             end_byte: if end_byte < 1 {
@@ -30,22 +28,6 @@ impl FieldDefinition {
             } else {
                 Some(end_byte as usize)
             },
-        }
-    }
-
-    pub fn new2(
-        name: &'static str,
-        pattern: Result<Regex, regex::Error>,
-        encoding: Encoding,
-        start_byte: usize,
-        end_byte: Option<usize>,
-    ) -> FieldDefinition {
-        FieldDefinition {
-            name,
-            pattern: pattern.ok(), //: pattern.expect(&format!("invalid regular expression pattern: {}", name)),
-            encoding,
-            start_byte,
-            end_byte,
         }
     }
 
