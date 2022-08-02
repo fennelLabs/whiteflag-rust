@@ -169,19 +169,6 @@ fn decode_auth_message() {
     //assertTrue("Message should be valid", message.isValid());
 }
 
-#[test]
-fn encode_auth_message_incorrect_length() {
-    let data = "000000000000000000000000000000000000000000000000000000000000000";
-
-    assert!(
-        matches!(
-            definitions::Header::REFERENCED_MESSAGE.validate(data),
-            Err(ValidationError::InvalidLength(_, _))
-        ),
-        "invalid length should be thrown"
-    );
-}
-
 fn assert_message_headers_are_valid(data: &[&str], message: &BasicMessage) {
     assert_eq!(
         data[0],

@@ -1,5 +1,8 @@
 use crate::wf_field::FieldDefinition;
 
+#[cfg(test)]
+mod test;
+
 #[derive(thiserror::Error, Debug, PartialEq)]
 pub enum ValidationError {
     #[error("length is invalid\nvalue: {0}\nexpected byte length: {1}")]
