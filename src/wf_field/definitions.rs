@@ -1,3 +1,5 @@
+use crate::wf_validation::{Validation, ValidationError};
+
 use super::field_definition::FieldDefinition;
 
 pub fn get_body_from_code(code: &str) -> Vec<FieldDefinition> {
@@ -48,10 +50,6 @@ pub enum FieldKind {
     REQUEST,
 }
 
-trait Validation {
-    fn validate(&self, value: &str) -> bool;
-}
-
 macro_rules! message_fields {
     (
         $(
@@ -72,14 +70,18 @@ macro_rules! message_fields {
         $(
             pub mod $group {
                 use super::*;
-                use regex::Regex;
+
+                pub mod names {
+                    $( pub const $upp: &str = stringify!($name); )*
+                }
 
                 $( pub const $upp: FieldDefinition = FieldDefinition {
-                    name: stringify!($name),
+                    name: names::$upp,
                     pattern: None,
                     encoding: crate::wf_codec::encoding::$encoding,
                     start_byte: $start,
-                    end_byte: $end
+                    end_byte: if $end == 0 { -1 } else { $end },
+                    //byte_length: if $end > $start { Some($end - $start) } else { None }
                 }; )*
 
                 pub const DEFINITIONS: &'static [FieldDefinition] = &[$( $upp, )*];
@@ -90,28 +92,14 @@ macro_rules! message_fields {
                     )*
                 }
 
-                impl Validation for $group::MessageFields {
-                    fn validate(&self, value: &str) -> bool {
-                        match self {
-                            $( MessageFields::$name => {
-                                rx::$upp.is_match(value)
-                            }, )*
-                        }
-                    }
-                }
-
                 pub mod rx {
-                    use super::*;
+                    use regex::Regex;
                     lazy_static!{
                         $( pub static ref $upp: Regex = Regex::new($pat).unwrap(); )*
                     }
                 }
-
-
             }
         )*
-
-
     }
 }
 
@@ -127,18 +115,18 @@ message_fields!(
 
     define Authentication
     VerificationMethod, VERIFICATION_METHOD, "(?=1|2)^[a-fA-F0-9]{1}$", HEX, 71, 72;
-    VerificationData, VERIFICATION_DATA, r"^[\u0000-\u007F]*$", UTF8, 72, -1
+    VerificationData, VERIFICATION_DATA, r"^[\u0000-\u007F]*$", UTF8, 72, 0
 
     define Crypto
     CryptoDataType, CRYPTO_DATA_TYPE, "^[a-fA-F0-9]{2}$", HEX, 71, 73;
-    CryptoData, CRYPTO_DATA, "^[a-fA-F0-9]*$", HEX, 73, -1
+    CryptoData, CRYPTO_DATA, "^[a-fA-F0-9]*$", HEX, 73, 0
 
     define FreeText
-    Text, TEXT, r"^[\u0000-\u007F]*$", UTF8, 71, -1
+    Text, TEXT, r"^[\u0000-\u007F]*$", UTF8, 71, 0
 
     define Resource
     ResourceMethod, RESOURCE_METHOD, "(?=1)^[a-fA-F0-9]{1}$", HEX, 71, 72;
-    ResourceData, RESOURCE_DATA, r"^[\u0000-\u007F]*$", UTF8, 72, -1
+    ResourceData, RESOURCE_DATA, r"^[\u0000-\u007F]*$", UTF8, 72, 0
 
     define Test
     PseudoMessageCode, PSEUDO_MESSAGE_CODE, "^[A-Z]{1}$", UTF8, 71, 72

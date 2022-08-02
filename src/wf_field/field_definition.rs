@@ -1,7 +1,4 @@
-use crate::{
-    wf_codec::encoding::*,
-    wf_core::error::{WhiteflagError, WhiteflagResult},
-};
+use crate::{wf_codec::encoding::*, wf_validation::*};
 use regex::Regex;
 
 use super::Field;
@@ -61,33 +58,9 @@ impl FieldDefinition {
      * @param data the data representing the field value
      * @return TRUE if field value is set, FALSE if field already set or data is invalid
      */
-    pub fn set<T: AsRef<str> + Into<String>>(self, data: T) -> WhiteflagResult<Field> {
-        if !self.is_valid(data.as_ref()) {
-            return Err(WhiteflagError::InvalidPattern);
-        }
-
+    pub fn set<T: AsRef<str> + Into<String>>(self, data: T) -> Result<Field, ValidationError> {
+        self.validate(data.as_ref())?;
         Ok(Field::new(self, data.into()))
-    }
-
-    /* pub fn get(&self, data: Vec<String>) -> WhiteflagResult<String> {
-        if data.len() < self.get_minimum_starting_position() {
-            return Err(WhiteflagError::InvalidLength);
-        }
-
-        data[self.start_byte..self.end_byte as usize]
-            .first()
-            .ok_or(WhiteflagError::InvalidLength)
-    } */
-
-    /**
-     * Checks if the message field contains a valid value
-     * @return TRUE if the field contains a valid value, else FALSE
-     */
-    pub fn is_valid<T: AsRef<str>>(&self, data: T) -> bool {
-        match self.pattern.as_ref() {
-            Some(re) => re.is_match(data.as_ref()),
-            None => true,
-        }
     }
 
     pub fn decode(&self, data: Vec<u8>) -> String {
@@ -102,10 +75,6 @@ impl FieldDefinition {
     pub fn encode(&self, data: String) -> Vec<u8> {
         self.encoding.encode(data)
     }
-
-    /* pub fn decode(&mut self, data: Vec<u8>) -> String {
-        self.encoding.decode(data, self.bit_length())
-    } */
 
     /**
      * Gets the byte length of the unencoded field value

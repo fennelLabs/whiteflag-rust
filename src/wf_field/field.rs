@@ -23,30 +23,8 @@ impl Field {
             .ok_or(WhiteflagError::InvalidLength)
     } */
 
-    /**
-     * Sets the value of the message field if not already set
-     * @param data the data representing the field value
-     * @return TRUE if field value is set, FALSE if field already set or data is invalid
-     */
-    pub fn set<T: AsRef<str> + Into<String>>(&mut self, data: T) -> WhiteflagResult<()> {
-        if !self.definition.is_valid(data.as_ref()) {
-            return Err(WhiteflagError::InvalidPattern);
-        }
-
-        self.value = data.into();
-        Ok(())
-    }
-
     pub fn get(&self) -> &String {
         &self.value
-    }
-
-    /**
-     * Checks if the message field value has been set. FieldDefinition is considered set if it contains a valid value.
-     * @return TRUE if the field has been set, else FALSE
-     */
-    pub fn is_set(&self) -> bool {
-        self.definition.is_valid(&self.value)
     }
 
     pub fn encode(&self) -> Vec<u8> {
