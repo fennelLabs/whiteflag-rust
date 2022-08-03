@@ -137,7 +137,7 @@ macro_rules! encoding {
     (
         $( $name:ident, $charset:expr, $bit_length:expr, $byte_length:expr );*
     ) => {
-        #[derive(Clone, Debug)]
+        #[derive(Clone, Copy, Debug)]
         pub enum EncodingKind {
             $(
                 $name,
@@ -155,7 +155,11 @@ macro_rules! encoding {
         impl Validation for crate::wf_codec::encoding::Encoding {
             fn validate(&self, value: &str) -> Result<bool, ValidationError> {
                 if let Some(x) = self.byte_length && value.len() != x {
-                    return Err(ValidationError::InvalidLength(value.to_string(), x));
+                    return Err(ValidationError::InvalidLength {
+                        data: value.to_string(),
+                        expected_length: x,
+                        specification_level: format!("== Encoding Error for {:?} ==", self.kind)
+                    });
                 }
 
                 if match self.kind {
