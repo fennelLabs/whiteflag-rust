@@ -48,7 +48,7 @@ fn from_hex_digit(data: u8) -> char {
  * @return a (hexa)decimal string with the decoded data
  * java equivalent: WfMessageCodec.decodeBDX
  */
-pub fn decode_bdx(buffer: Vec<u8>, bit_length: usize) -> String {
+pub fn decode_bdx(buffer: &[u8], bit_length: usize) -> String {
     let mut hexadecimal_string: Vec<char> = Vec::new();
 
     for bit_index in (0..bit_length).step_by(BYTE) {

@@ -66,7 +66,7 @@ impl WhiteflagBuffer {
         let field_buffer: Vec<u8> =
             extract_bits(&self.data, self.bit_length, start_bit, bit_length);
 
-        definition.decode(field_buffer)
+        definition.decode(&field_buffer)
     }
 
     pub fn crop(&self) -> Vec<u8> {

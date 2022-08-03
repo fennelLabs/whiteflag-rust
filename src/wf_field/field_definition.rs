@@ -49,11 +49,11 @@ impl FieldDefinition {
         Ok(Field::new(self, data.into()))
     }
 
-    pub fn decode(&self, data: Vec<u8>) -> String {
+    pub fn decode(&self, data: &[u8]) -> String {
         self.encoding.decode(data, self.bit_length())
     }
 
-    pub fn decode_to_field(self, data: Vec<u8>) -> Field {
+    pub fn decode_to_field(self, data: &[u8]) -> Field {
         let value = self.encoding.decode(data, self.bit_length());
         Field::new(self, value)
     }

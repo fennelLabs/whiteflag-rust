@@ -64,12 +64,12 @@ impl Encoding {
      * @return the uncompressed value of the field
      * java equivalent: WfMessageCodec.decodeField
      */
-    pub fn decode(&self, buffer: Vec<u8>, bit_length: usize) -> String {
+    pub fn decode(&self, buffer: &[u8], bit_length: usize) -> String {
         let mut s = String::new();
 
         match &self.kind {
             EncodingKind::UTF8 => {
-                return String::from_utf8(buffer).expect("utf8 error");
+                return std::str::from_utf8(buffer).expect("utf8 error").to_string();
             }
             EncodingKind::BIN => {
                 return decode_binary(&buffer, bit_length);
@@ -103,7 +103,7 @@ impl Encoding {
                 };
 
                 s.push(sign);
-                s.push_str(decode_bdx(shift_left(&buffer, 1), bit_length - 1).as_str());
+                s.push_str(decode_bdx(&shift_left(buffer, 1), bit_length - 1).as_str());
                 s.insert(s.len() - 5, '.');
             }
         }
