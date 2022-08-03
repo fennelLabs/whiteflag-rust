@@ -115,7 +115,7 @@ fn bin_decoding_2_b() {
 
 #[test]
 fn dec_encoding() {
-    let mut dec = FieldDefinition::new(FIELDNAME, None, DEC, 0, 3);
+    let dec = FieldDefinition::new(FIELDNAME, None, DEC, 0, 4);
     let field = dec.set("1230").unwrap();
 
     assert_eq!(
@@ -124,12 +124,12 @@ fn dec_encoding() {
         "Decimal field should be correctly binary encoded"
     );
     assert_eq!(
-        3,
+        4,
         field.byte_length(),
         "Unencoded Decimal field should be 3 bytes"
     );
     assert_eq!(
-        12,
+        16,
         field.bit_length(),
         "Encoded Decimal field should be 12 bits"
     );

@@ -1,59 +1,42 @@
-use crate::{
-    wf_codec::encoding::*,
-    wf_core::error::{WhiteflagError, WhiteflagResult},
-};
+use crate::{wf_codec::encoding::*, wf_validation::*};
 use regex::Regex;
 
 use super::Field;
 
 #[derive(Clone, Debug)]
 pub struct FieldDefinition {
-    pub name: String,
-    pattern: Option<Regex>,
+    pub name: &'static str,
     pub encoding: Encoding,
     pub start_byte: usize,
-    pub end_byte: isize,
+    pub end_byte: Option<usize>,
 }
 
 impl FieldDefinition {
     pub fn new(
-        name: &str,
+        name: &'static str,
         pattern: Option<Regex>,
         encoding: Encoding,
         start_byte: usize,
         end_byte: isize,
     ) -> FieldDefinition {
         FieldDefinition {
-            name: String::from(name),
-            pattern, //: pattern.expect(&format!("invalid regular expression pattern: {}", name)),
+            name,
             encoding,
             start_byte,
-            end_byte,
-        }
-    }
-
-    pub fn new2(
-        name: &str,
-        pattern: Result<Regex, regex::Error>,
-        encoding: Encoding,
-        start_byte: usize,
-        end_byte: isize,
-    ) -> FieldDefinition {
-        FieldDefinition {
-            name: String::from(name),
-            pattern: pattern.ok(), //: pattern.expect(&format!("invalid regular expression pattern: {}", name)),
-            encoding,
-            start_byte,
-            end_byte,
+            end_byte: if end_byte < 1 {
+                None
+            } else {
+                Some(end_byte as usize)
+            },
         }
     }
 
     pub fn get_minimum_starting_position(&self) -> usize {
-        if self.end_byte < 0 {
-            return self.start_byte;
+        if let Some(e) = self.end_byte {
+            return e;
         }
 
-        self.end_byte as usize
+        return self.start_byte;
     }
 
     /**
@@ -61,33 +44,9 @@ impl FieldDefinition {
      * @param data the data representing the field value
      * @return TRUE if field value is set, FALSE if field already set or data is invalid
      */
-    pub fn set<T: AsRef<str> + Into<String>>(self, data: T) -> WhiteflagResult<Field> {
-        if !self.is_valid(data.as_ref()) {
-            return Err(WhiteflagError::InvalidPattern);
-        }
-
+    pub fn set<T: AsRef<str> + Into<String>>(self, data: T) -> Result<Field, ValidationError> {
+        self.validate(data.as_ref())?;
         Ok(Field::new(self, data.into()))
-    }
-
-    /* pub fn get(&self, data: Vec<String>) -> WhiteflagResult<String> {
-        if data.len() < self.get_minimum_starting_position() {
-            return Err(WhiteflagError::InvalidLength);
-        }
-
-        data[self.start_byte..self.end_byte as usize]
-            .first()
-            .ok_or(WhiteflagError::InvalidLength)
-    } */
-
-    /**
-     * Checks if the message field contains a valid value
-     * @return TRUE if the field contains a valid value, else FALSE
-     */
-    pub fn is_valid<T: AsRef<str>>(&self, data: T) -> bool {
-        match self.pattern.as_ref() {
-            Some(re) => re.is_match(data.as_ref()),
-            None => true,
-        }
     }
 
     pub fn decode(&self, data: Vec<u8>) -> String {
@@ -103,20 +62,14 @@ impl FieldDefinition {
         self.encoding.encode(data)
     }
 
-    /* pub fn decode(&mut self, data: Vec<u8>) -> String {
-        self.encoding.decode(data, self.bit_length())
-    } */
-
-    /**
-     * Gets the byte length of the unencoded field value
-     * @return the byte length of the unencoded field value
-     */
-    pub fn byte_length(&self) -> usize {
-        if self.end_byte < 0 {
-            return 0;
+    /// returns the byte length of the unencoded field value
+    /// if the field definition does not have a fixed length then it will return `0`
+    pub fn expected_byte_length(&self) -> Option<usize> {
+        if let Some(e) = self.end_byte && e > 0 && e > self.start_byte {
+            return Some(e - self.start_byte);
         }
 
-        return self.end_byte as usize - self.start_byte;
+        return None;
     }
 
     /**
@@ -124,6 +77,8 @@ impl FieldDefinition {
      * @return the bit length of the compressed encoded field value
      */
     pub fn bit_length(&self) -> usize {
-        return self.encoding.convert_to_bit_length(self.byte_length());
+        return self
+            .encoding
+            .convert_to_bit_length(self.expected_byte_length().unwrap_or(0));
     }
 }

@@ -3,12 +3,13 @@ use super::common::{remove_all_invalid_hex_characters, shift_left};
 use super::constants::*;
 use super::hexadecimal::{decode_bdx, encode_bdx};
 use super::latlong::encode_latlong;
+use crate::wf_validation::{Validation, ValidationError};
 
 #[derive(Clone, Debug)]
 pub struct Encoding {
     pub charset: &'static str,
     pub bit_length: usize,
-    pub byte_length: Option<u8>,
+    pub byte_length: Option<usize>,
     pub kind: EncodingKind,
 }
 
@@ -25,7 +26,7 @@ impl Encoding {
     fn new(
         charset: &'static str,
         bit_length: usize,
-        byte_length: Option<u8>,
+        byte_length: Option<usize>,
         kind: EncodingKind,
     ) -> Encoding {
         Encoding {
@@ -136,7 +137,7 @@ macro_rules! encoding {
     (
         $( $name:ident, $charset:expr, $bit_length:expr, $byte_length:expr );*
     ) => {
-        #[derive(Clone, Debug)]
+        #[derive(Clone, Copy, Debug)]
         pub enum EncodingKind {
             $(
                 $name,
@@ -151,6 +152,26 @@ macro_rules! encoding {
             }
         }
 
+        impl Validation for crate::wf_codec::encoding::Encoding {
+            fn validate(&self, value: &str) -> Result<bool, ValidationError> {
+                if let Some(x) = self.byte_length && value.len() != x {
+                    return Err(ValidationError::InvalidLength {
+                        data: value.to_string(),
+                        expected_length: x,
+                        specification_level: format!("== Encoding Error for {:?} ==", self.kind)
+                    });
+                }
+
+                if match self.kind {
+                    $( EncodingKind::$name => rx::$name.is_match(value), )*
+                } == false {
+                    return Err(ValidationError::InvalidCharset);
+                }
+
+                Ok(true)
+            }
+        }
+
         $( pub const $name: Encoding = Encoding {
             charset: charsets::$name,
             bit_length: $bit_length,
@@ -160,6 +181,13 @@ macro_rules! encoding {
 
         pub mod charsets {
             $( pub const $name: &'static str = $charset; )*
+        }
+
+        pub mod rx {
+            use regex::Regex;
+            lazy_static!{
+                $( pub static ref $name: Regex = Regex::new(super::charsets::$name).unwrap(); )*
+            }
         }
     };
 }

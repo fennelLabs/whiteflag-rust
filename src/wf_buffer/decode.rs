@@ -41,7 +41,7 @@ impl WhiteflagBuffer {
                 let field = self.extract_message_field(f, bit_cursor);
 
                 bit_cursor += field.bit_length();
-                byte_cursor = field.definition.end_byte as usize;
+                byte_cursor = field.definition.end_byte.unwrap_or(0);
 
                 field
             })

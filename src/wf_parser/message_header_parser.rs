@@ -90,7 +90,7 @@ impl MessageHeaderFields {
 }
 
 impl MessageHeaderParser {
-    pub fn new(defs: [FieldDefinition; 7]) -> Self {
+    pub fn new(defs: &[FieldDefinition]) -> Self {
         let mut parsed_defs = ParsedFieldDefinition::parse(defs.to_vec());
 
         MessageHeaderParser {
