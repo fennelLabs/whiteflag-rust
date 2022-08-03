@@ -37,7 +37,16 @@ fn to_hex_digit(data: Option<&char>) -> u8 {
  * java equivalent: N/A
  */
 fn from_hex_digit(data: u8) -> char {
-    std::char::from_digit(data as u32, HEXRADIX as u32).expect("failed to convert to char")
+    match data {
+        0..=9 => (data + b'0') as char,
+        10 => 'a',
+        11 => 'b',
+        12 => 'c',
+        13 => 'd',
+        14 => 'e',
+        15 => 'f',
+        16.. => panic!("invalid data"),
+    }
 }
 
 /**
@@ -49,15 +58,16 @@ fn from_hex_digit(data: u8) -> char {
  * java equivalent: WfMessageCodec.decodeBDX
  */
 pub fn decode_bdx(buffer: &[u8], bit_length: usize) -> String {
-    let mut hexadecimal_string: Vec<char> = Vec::new();
-
-    for bit_index in (0..bit_length).step_by(BYTE) {
-        let byte_cursor = bit_index as usize / BYTE;
-        hexadecimal_string.push(from_hex_digit((buffer[byte_cursor] >> QUADBIT) & 0xF));
-        if (bit_index + QUADBIT) < bit_length {
-            hexadecimal_string.push(from_hex_digit(buffer[byte_cursor] & 0xF));
-        }
-    }
-
-    hexadecimal_string.into_iter().collect()
+    (0..(bit_length / QUADBIT))
+        .map(|i| {
+            let x = i % 2;
+            let b = buffer[(i - x) / 2];
+            if x == 0 {
+                (b >> QUADBIT) & 0xF
+            } else {
+                b & 0xF
+            }
+        })
+        .map(from_hex_digit)
+        .collect()
 }
