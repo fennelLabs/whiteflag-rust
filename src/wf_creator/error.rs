@@ -17,4 +17,4 @@ impl fmt::Display for WhiteflagCreatorError {
     }
 }
 
-pub type WhiteflagResult<T> = Result<T, WhiteflagCreatorError>;
+pub type WhiteflagCreatorResult<T> = Result<T, WhiteflagCreatorError>;

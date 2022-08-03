@@ -1,8 +1,17 @@
+mod error;
+
 use std::collections::HashMap;
 
 use fennel_lib::wf_core::types::{MessageType, MessageTypeEnum};
 
-use crate::{wf_buffer::WhiteflagBuffer, wf_field::Field, wf_core::{basic_message::BasicMessage, segment::MessageSegment}, error::{WhiteflagResult, WhiteflagCreatorError}};
+use crate::{
+    error::{WhiteflagCreatorResult},
+    wf_buffer::WhiteflagBuffer,
+    wf_core::{basic_message::BasicMessage, segment::MessageSegment},
+    wf_field::Field,
+};
+
+use error::WhiteflagCreatorError;
 
 const PREFIX: &str = "WF";
 const PROTOCOL_VERSION: &str = "1";
@@ -13,27 +22,31 @@ const FIELD_TESTMESSAGETYPE: &str = "PseudoMessageCode";
 
 struct WhiteflagMessageCreator {
     messageType: MessageType,
-    header: Vec<Field>,
-    body: Vec<Field>,
+    header: Option<MessageSegment>,
+    body: Option<MessageSegment>,
 }
 
 impl WhiteflagMessageCreator {
     fn new() -> WhiteflagMessageCreator {
         WhiteflagMessageCreator {
             messageType: MessageType::from_code_option(None),
-            header: vec![],
-            body: vec![],
+            header: None,
+            body: None,
         }
     }
 
     fn create(&self) -> BasicMessage {
-        return BasicMessage::new(' ', self.header, self.body);
+        return BasicMessage::new(
+            ' ',
+            self.header.as_deref().unwrap().to_vec(),
+            self.body.as_deref().unwrap().to_vec(),
+        );
     }
 
     fn message_type(&self, messageType: MessageType) -> &WhiteflagMessageCreator {
         self.messageType = messageType;
-        self.header = MessageSegment::new(messageType.getHeaderFields());
-        self.body = MessageSegment::new(messageType.getBodyFields());
+        self.header = Some(MessageSegment::new(messageType.getHeaderFields()));
+        self.body = Some(MessageSegment::new(messageType.getBodyFields()));
 
         self.header.set(FIELD_PREFIX, PREFIX);
         self.header.set(FIELD_VERSION, PROTOCOL_VERSION);
@@ -46,7 +59,7 @@ impl WhiteflagMessageCreator {
         &self,
         headerValues: HashMap<String, String>,
         bodyValues: HashMap<String, String>,
-    ) -> WhiteflagResult<&WhiteflagMessageCreator> {
+    ) -> WhiteflagCreatorResult<&WhiteflagMessageCreator> {
         self.header = self.messageType.getHeaderFields();
         if !self.header.setAll(headerValues) {
             return Err(WhiteflagCreatorError::InvalidHeaderField);
@@ -58,14 +71,12 @@ impl WhiteflagMessageCreator {
             MessageTypeEnum::Test => {
                 let pseudoMessageType =
                     MessageType::from_code(bodyValues.get(FIELD_TESTMESSAGETYPE));
-                self.body
-                    .append(pseudoMessageType.getBodyFields());
+                self.body.append(pseudoMessageType.getBodyFields());
             }
             MessageTypeEnum::Request => {
                 let nRequestObjects = (bodyValues.size() - body.getNoFields()) / 2;
-                self.body.append(
-                    self.messageType.createRequestFields(nRequestObjects),
-                );
+                self.body
+                    .append(self.messageType.createRequestFields(nRequestObjects));
             }
             _ => {}
         }
@@ -87,16 +98,15 @@ impl WhiteflagMessageCreator {
         nextField = self.body.getNoFields();
         match (self.messageType) {
             MessageTypeEnum::Test => {
-                let pseudoMessageType = MessageType::from_code(self.body.get(FIELD_TESTMESSAGETYPE));
-                self.body
-                    .append(pseudoMessageType.getBodyFields());
+                let pseudoMessageType =
+                    MessageType::from_code(self.body.get(FIELD_TESTMESSAGETYPE));
+                self.body.append(pseudoMessageType.getBodyFields());
             }
             MessageTypeEnum::Request => {
                 let lastFieldByte = self.body.getField(-1).endByte;
                 let nRequestObjects = (serializedMsg.length() - lastFieldByte) / 4; // One request object requires 2 fields of 2 bytes
-                self.body.append(
-                    self.messageType.createRequestFields(nRequestObjects),
-                );
+                self.body
+                    .append(self.messageType.createRequestFields(nRequestObjects));
             }
             _ => {}
         }
@@ -121,14 +131,12 @@ impl WhiteflagMessageCreator {
             MessageTypeEnum::Test => {
                 let pseudoMessageType =
                     MessageType::from_code(self.body.get(FIELD_TESTMESSAGETYPE));
-                self.body
-                    .append(pseudoMessageType.getBodyFields());
+                self.body.append(pseudoMessageType.getBodyFields());
             }
             MessageTypeEnum::Request => {
                 let nRequestObjects = (msgBuffer.bitLength() - bitCursor) / 16; // One request object requires 2 fields of 8 bits
-                self.body.append(
-                    self.messageType.createRequestFields(nRequestObjects),
-                );
+                self.body
+                    .append(self.messageType.createRequestFields(nRequestObjects));
             }
             _ => {}
         }
@@ -136,7 +144,7 @@ impl WhiteflagMessageCreator {
         self
     }
 
-    fn getUnencryptedHeader(&self, msgBuffer: WhiteflagBuffer) -> Vec<Field> {
+    fn getUnencryptedHeader(&self, msgBuffer: WhiteflagBuffer) -> Option<MessageSegment> {
         self.header = MessageType::ANY.getUnencryptedHeaderFields();
         self.header.decode(msgBuffer, 0, 0);
         return self.header;
@@ -150,19 +158,17 @@ impl WhiteflagMessageCreator {
         let bodyStartIndex = self.header.getNoFields();
         self.body = self.messageType.getBodyFields();
 
-        match (self.messageType) {
+        match self.messageType {
             MessageTypeEnum::Test => {
                 let pseudoMessageType = MessageType::from_code(fieldValues[bodyStartIndex]);
-                self.body
-                    .append(pseudoMessageType.getBodyFields());
+                self.body.append(pseudoMessageType.getBodyFields());
             }
             MessageTypeEnum::Request => {
                 let nRequestObjects = (fieldValues.length
                     - (self.header.getNoFields() + self.body.getNoFields()))
                     / 2; // One request object requires 2 fields
-                self.body.append(
-                    self.messageType.createRequestFields(nRequestObjects),
-                );
+                self.body
+                    .append(self.messageType.createRequestFields(nRequestObjects));
             }
             _ => {}
         }

@@ -76,6 +76,10 @@ impl MessageSegment {
 
         return -1;
     }
+
+    pub fn new(fields: Vec<Field>) -> Self {
+        MessageSegment { fields: fields }
+    }
 }
 
 impl Deref for MessageSegment {
