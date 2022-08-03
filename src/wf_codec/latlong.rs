@@ -28,5 +28,5 @@ pub fn encode_latlong<T: AsRef<str>>(data: T) -> Vec<u8> {
         buffer[0] |= 0x80;
     }
 
-    crop_bits(&buffer, bit_length as isize)
+    crop_bits(&buffer, bit_length)
 }

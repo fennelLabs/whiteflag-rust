@@ -70,7 +70,7 @@ impl WhiteflagBuffer {
     }
 
     pub fn crop(&self) -> Vec<u8> {
-        crop_bits(&self.data, self.bit_length as isize)
+        crop_bits(&self.data, self.bit_length)
     }
 
     pub fn bit_length(&self) -> usize {
