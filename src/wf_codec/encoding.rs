@@ -1,7 +1,7 @@
 use super::binary::{decode_binary, encode_binary};
 use super::common::{remove_all_invalid_hex_characters, shift_left};
 use super::constants::*;
-use super::hexadecimal::{decode_bdx, encode_bdx};
+use super::hexadecimal::{decode_to_bdx, encode_from_bdx};
 use super::latlong::encode_latlong;
 use crate::wf_validation::{Validation, ValidationError};
 
@@ -48,9 +48,9 @@ impl Encoding {
         match &self.kind {
             EncodingKind::UTF8 => value.as_ref().as_bytes().to_vec(),
             EncodingKind::BIN => encode_binary(value),
-            EncodingKind::DEC | EncodingKind::HEX => encode_bdx(value),
+            EncodingKind::DEC | EncodingKind::HEX => encode_from_bdx(value),
             EncodingKind::DATETIME | EncodingKind::DURATION => {
-                encode_bdx(remove_all_invalid_hex_characters(value))
+                encode_from_bdx(remove_all_invalid_hex_characters(value))
             }
             EncodingKind::LAT | EncodingKind::LONG => encode_latlong(value),
         }
@@ -75,10 +75,10 @@ impl Encoding {
                 return decode_binary(buffer, bit_length);
             }
             EncodingKind::DEC | EncodingKind::HEX => {
-                return decode_bdx(buffer, bit_length);
+                return decode_to_bdx(buffer, bit_length);
             }
             EncodingKind::DATETIME => {
-                s.push_str(&decode_bdx(buffer, bit_length));
+                s.push_str(&decode_to_bdx(buffer, bit_length));
 
                 s.insert(4, '-');
                 s.insert(7, '-');
@@ -88,7 +88,7 @@ impl Encoding {
                 s.insert(19, 'Z');
             }
             EncodingKind::DURATION => {
-                s.push_str(&decode_bdx(buffer, bit_length));
+                s.push_str(&decode_to_bdx(buffer, bit_length));
 
                 s.insert(0, 'P');
                 s.insert(3, 'D');
@@ -103,7 +103,7 @@ impl Encoding {
                 };
 
                 s.push(sign);
-                s.push_str(decode_bdx(&shift_left(buffer, 1), bit_length - 1).as_str());
+                s.push_str(decode_to_bdx(&shift_left(buffer, 1), bit_length - 1).as_str());
                 s.insert(s.len() - 5, '.');
             }
         }
