@@ -72,13 +72,13 @@ impl Encoding {
                 return std::str::from_utf8(buffer).expect("utf8 error").to_string();
             }
             EncodingKind::BIN => {
-                return decode_binary(&buffer, bit_length);
+                return decode_binary(buffer, bit_length);
             }
             EncodingKind::DEC | EncodingKind::HEX => {
                 return decode_bdx(buffer, bit_length);
             }
             EncodingKind::DATETIME => {
-                s.push_str(decode_bdx(buffer, bit_length).as_str());
+                s.push_str(&decode_bdx(buffer, bit_length));
 
                 s.insert(4, '-');
                 s.insert(7, '-');
@@ -88,7 +88,7 @@ impl Encoding {
                 s.insert(19, 'Z');
             }
             EncodingKind::DURATION => {
-                s.push_str(decode_bdx(buffer, bit_length).as_str());
+                s.push_str(&decode_bdx(buffer, bit_length));
 
                 s.insert(0, 'P');
                 s.insert(3, 'D');
