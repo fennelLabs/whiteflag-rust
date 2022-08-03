@@ -10,6 +10,8 @@ mod wf_buffer;
 mod wf_codec;
 mod wf_convert;
 mod wf_core;
+
+mod wf_creator;
 mod wf_crypto;
 mod wf_field;
 mod wf_json;

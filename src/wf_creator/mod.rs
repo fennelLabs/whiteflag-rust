@@ -2,9 +2,7 @@ use std::collections::HashMap;
 
 use fennel_lib::wf_core::types::{MessageType, MessageTypeEnum};
 
-use crate::{wf_buffer::WhiteflagBuffer, wf_field::Field};
-
-use super::{basic_message::BasicMessage, segment::MessageSegment, error::{WhiteflagResult, WhiteflagError}};
+use crate::{wf_buffer::WhiteflagBuffer, wf_field::Field, wf_core::{basic_message::BasicMessage, segment::MessageSegment}, error::{WhiteflagResult, WhiteflagCreatorError}};
 
 const PREFIX: &str = "WF";
 const PROTOCOL_VERSION: &str = "1";
@@ -51,28 +49,28 @@ impl WhiteflagMessageCreator {
     ) -> WhiteflagResult<&WhiteflagMessageCreator> {
         self.header = self.messageType.getHeaderFields();
         if !self.header.setAll(headerValues) {
-            return Err(WhiteflagError::InvalidHeaderField);
+            return Err(WhiteflagCreatorError::InvalidHeaderField);
         }
-        self.messageType = WfMessageType.fromCode(self.header.get(FIELD_MESSAGETYPE));
+        self.messageType = MessageType::from_code(self.header.get(FIELD_MESSAGETYPE));
 
         self.body = self.messageType.getBodyFields();
         match (self.messageType) {
             MessageTypeEnum::Test => {
                 let pseudoMessageType =
-                    WfMessageType.fromCode(bodyValues.get(FIELD_TESTMESSAGETYPE));
+                    MessageType::from_code(bodyValues.get(FIELD_TESTMESSAGETYPE));
                 self.body
                     .append(pseudoMessageType.getBodyFields());
             }
             MessageTypeEnum::Request => {
                 let nRequestObjects = (bodyValues.size() - body.getNoFields()) / 2;
                 self.body.append(
-                    messageType.createRequestFields(nRequestObjects),
+                    self.messageType.createRequestFields(nRequestObjects),
                 );
             }
             _ => {}
         }
         if !self.body.setAll(bodyValues) {
-            return Err(WhiteflagError::InvalidBodyField);
+            return Err(WhiteflagCreatorError::InvalidBodyField);
         }
         Ok(self)
     }
@@ -82,14 +80,14 @@ impl WhiteflagMessageCreator {
 
         self.header = self.messageType.getHeaderFields();
         self.header.deserialize(serializedMsg, nextField);
-        self.messageType = WfMessageType.fromCode(self.header.get(FIELD_MESSAGETYPE));
+        self.messageType = MessageType::from_code(self.header.get(FIELD_MESSAGETYPE));
 
         self.body = self.messageType.getBodyFields();
         self.body.deserialize(serializedMsg, nextField);
         nextField = self.body.getNoFields();
         match (self.messageType) {
             MessageTypeEnum::Test => {
-                let pseudoMessageType = WfMessageType.fromCode(self.body.get(FIELD_TESTMESSAGETYPE));
+                let pseudoMessageType = MessageType::from_code(self.body.get(FIELD_TESTMESSAGETYPE));
                 self.body
                     .append(pseudoMessageType.getBodyFields());
             }
@@ -113,7 +111,7 @@ impl WhiteflagMessageCreator {
         self.header = self.messageType.getHeaderFields();
         self.header.decode(msgBuffer, bitCursor, nextField);
         bitCursor += self.header.bitLength();
-        self.messageType = WfMessageType.fromCode(self.header.get(FIELD_MESSAGETYPE));
+        self.messageType = MessageType::from_code(self.header.get(FIELD_MESSAGETYPE));
 
         self.body = self.messageType.getBodyFields();
         self.body.decode(msgBuffer, bitCursor, nextField);
@@ -122,7 +120,7 @@ impl WhiteflagMessageCreator {
         match (self.messageType) {
             MessageTypeEnum::Test => {
                 let pseudoMessageType =
-                    WfMessageType.fromCode(self.body.get(FIELD_TESTMESSAGETYPE));
+                    MessageType::from_code(self.body.get(FIELD_TESTMESSAGETYPE));
                 self.body
                     .append(pseudoMessageType.getBodyFields());
             }
@@ -139,7 +137,7 @@ impl WhiteflagMessageCreator {
     }
 
     fn getUnencryptedHeader(&self, msgBuffer: WhiteflagBuffer) -> Vec<Field> {
-        self.header = WfMessageType.ANY.getUnencryptedHeaderFields();
+        self.header = MessageType::ANY.getUnencryptedHeaderFields();
         self.header.decode(msgBuffer, 0, 0);
         return self.header;
     }
@@ -147,14 +145,14 @@ impl WhiteflagMessageCreator {
     fn compile(&self, fieldValues: Vec<String>) -> &WhiteflagMessageCreator {
         self.header = self.messageType.getHeaderFields();
         self.header.setAll(fieldValues, 0);
-        self.messageType = WfMessageType.fromCode(self.header.get(FIELD_MESSAGETYPE));
+        self.messageType = MessageType::from_code(self.header.get(FIELD_MESSAGETYPE));
 
         let bodyStartIndex = self.header.getNoFields();
         self.body = self.messageType.getBodyFields();
 
         match (self.messageType) {
             MessageTypeEnum::Test => {
-                let pseudoMessageType = WfMessageType.fromCode(fieldValues[bodyStartIndex]);
+                let pseudoMessageType = MessageType::from_code(fieldValues[bodyStartIndex]);
                 self.body
                     .append(pseudoMessageType.getBodyFields());
             }
