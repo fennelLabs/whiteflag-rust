@@ -1,4 +1,4 @@
-use super::binary::{decode_binary, encode_binary};
+use super::binary::{decode_to_binary, encode_from_binary};
 use super::common::{remove_all_invalid_hex_characters, shift_left};
 use super::constants::*;
 use super::hexadecimal::{decode_to_bdx, encode_from_bdx};
@@ -47,7 +47,7 @@ impl Encoding {
     pub fn encode<T: AsRef<str> + std::fmt::Display>(&self, value: T) -> Vec<u8> {
         match &self.kind {
             EncodingKind::UTF8 => value.as_ref().as_bytes().to_vec(),
-            EncodingKind::BIN => encode_binary(value),
+            EncodingKind::BIN => encode_from_binary(value),
             EncodingKind::DEC | EncodingKind::HEX => encode_from_bdx(value),
             EncodingKind::DATETIME | EncodingKind::DURATION => {
                 encode_from_bdx(remove_all_invalid_hex_characters(value))
@@ -72,7 +72,7 @@ impl Encoding {
                 return std::str::from_utf8(buffer).expect("utf8 error").to_string();
             }
             EncodingKind::BIN => {
-                return decode_binary(buffer, bit_length);
+                return decode_to_binary(buffer, bit_length);
             }
             EncodingKind::DEC | EncodingKind::HEX => {
                 return decode_to_bdx(buffer, bit_length);
