@@ -89,7 +89,7 @@ mod field_definition {
         assert_eq!(2, def.expected_byte_length().expect("start and end byte for Request::OBJECT_TYPE_QUANT field definition is not configured properly"));
     }
 }
-/* 
+/*
 #[test]
 fn invalid_values_1() {
     let def = definitions::Header::PREFIX;
