@@ -34,24 +34,24 @@ pub fn byte_length(bit_length: usize) -> usize {
  * Shortens the byte array to fit the length of the used bits
  * java equivalent: WfBinaryBuffer.cropBits
  */
-pub fn crop_bits(buffer: &[u8], bit_length: usize) -> Vec<u8> {
+pub fn crop_bits(buffer: &mut Vec<u8>, bit_length: usize) {
     if bit_length == 0 {
-        return buffer.to_vec();
+        return;
     }
 
+    let buffer_length = buffer.len();
     let byte_len = byte_length(bit_length);
-    if byte_len > buffer.len() {
-        return buffer[0..byte_len].to_vec();
+    buffer.drain(byte_len..);
+
+    if byte_len > buffer_length {
+        return;
     }
-    let clear_bits = BYTE - (bit_length % BYTE);
-    let mut cropped_buffer = buffer[0..byte_len].to_vec();
 
     /* Clear unused bits in last byte */
-    if clear_bits < BYTE {
-        cropped_buffer[byte_len - 1] &= 0xFF << clear_bits;
+    let clear_bits = BYTE - (bit_length % BYTE);
+    if clear_bits < BYTE && let Some(x) = buffer.last_mut() {
+        *x &= 0xFF << clear_bits;
     }
-
-    cropped_buffer
 }
 
 /**
@@ -157,7 +157,8 @@ pub fn extract_bits(
         }
     }
 
-    crop_bits(&new_byte_array, bit_length)
+    crop_bits(new_byte_array.as_mut(), bit_length);
+    new_byte_array
 }
 
 /**
@@ -246,5 +247,6 @@ pub fn concatinate_bits(
         byte_cursor += 1;
     }
 
-    return crop_bits(&new_byte_array, bit_length);
+    crop_bits(new_byte_array.as_mut(), bit_length);
+    new_byte_array
 }

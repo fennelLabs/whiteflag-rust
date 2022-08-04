@@ -28,5 +28,6 @@ pub fn encode_latlong<T: AsRef<str>>(data: T) -> Vec<u8> {
         buffer[0] |= 0x80;
     }
 
-    crop_bits(&buffer, bit_length)
+    crop_bits(buffer.as_mut(), bit_length);
+    buffer
 }
