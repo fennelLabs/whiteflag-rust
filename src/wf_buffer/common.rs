@@ -49,7 +49,11 @@ pub fn crop_bits(buffer: &mut Vec<u8>, bit_length: usize) {
 
     /* Clear unused bits in last byte */
     let clear_bits = BYTE - (bit_length % BYTE);
-    if clear_bits < BYTE && let Some(x) = buffer.last_mut() {
+    if !(clear_bits < BYTE) {
+        return;
+    }
+
+    if let Some(x) = buffer.last_mut() {
         *x &= 0xFF << clear_bits;
     }
 }

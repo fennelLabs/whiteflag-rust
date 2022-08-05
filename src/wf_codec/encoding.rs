@@ -154,13 +154,14 @@ macro_rules! encoding {
 
         impl Validation for crate::wf_codec::encoding::Encoding {
             fn validate(&self, value: &str) -> Result<bool, ValidationError> {
-                if let Some(x) = self.byte_length && value.len() != x {
-                    return Err(ValidationError::InvalidLength {
+                match self.byte_length {
+                    Some(x) if value.len() != x => return Err(ValidationError::InvalidLength {
                         data: value.to_string(),
                         expected_length: x,
                         specification_level: format!("== Encoding Error for {:?} ==", self.kind)
-                    });
-                }
+                    }),
+                    _ => (),
+                };
 
                 if match self.kind {
                     $( EncodingKind::$name => rx::$name.is_match(value), )*
