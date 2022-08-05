@@ -43,7 +43,7 @@ pub fn get_field_value_from_array<T: AsRef<str>>(
 ) -> Option<&String> {
     fields
         .iter()
-        .find(|f| f.definition.name == field_name.as_ref())
+        .find(|f| f.definition.get_name() == field_name.as_ref())
         .map(|s| s.get())
 }
 

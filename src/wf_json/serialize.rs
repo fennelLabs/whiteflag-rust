@@ -13,7 +13,7 @@ impl Serialize for BasicMessage {
 
         for f in fields {
             let json_name =
-                name_map(&f.definition.name).map_err(|e| serde::ser::Error::custom(e))?;
+                name_map(&f.definition.get_name()).map_err(|e| serde::ser::Error::custom(e))?;
             state.serialize_field(json_name, f.get())?;
         }
 

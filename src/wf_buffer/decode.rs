@@ -28,7 +28,10 @@ impl WhiteflagBuffer {
             .into_iter()
             .map(|f| {
                 if f.start_byte != byte_cursor {
-                    panic!("\nstart byte should match byte cursor\n\tname: {}\n\tstart: {}\n\tcursor: {}\n", f.name, f.start_byte, byte_cursor);
+                    panic!(
+                        "\nstart byte should match byte cursor\n\tcursor: {}\n\tfield: {:#?}",
+                        byte_cursor, f
+                    );
                     //throw new WfCoreException("Invalid field order while decoding: did not expect field " + fields[index].debugInfo() + " at byte " + byteCursor, null);
                 }
                 /*

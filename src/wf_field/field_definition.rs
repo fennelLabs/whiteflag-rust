@@ -1,19 +1,32 @@
 use crate::{wf_codec::encoding::*, wf_validation::*};
 use regex::Regex;
 
-use super::Field;
+use super::{definitions::Namer, Field};
 
 #[derive(Clone, Debug)]
 pub struct FieldDefinition {
-    pub name: &'static str,
+    pub name: Namer,
     pub encoding: Encoding,
     pub start_byte: usize,
     pub end_byte: Option<usize>,
 }
 
 impl FieldDefinition {
+    pub fn get_name(&self) -> String {
+        self.name.name()
+    }
+
     pub fn new(
         name: &'static str,
+        encoding: Encoding,
+        start_byte: usize,
+        end_byte: usize,
+    ) -> FieldDefinition {
+        FieldDefinition::new_from_namer(Namer::new_from_str(name), encoding, start_byte, end_byte)
+    }
+
+    pub fn new_from_namer(
+        name: Namer,
         encoding: Encoding,
         start_byte: usize,
         end_byte: usize,

@@ -1,4 +1,4 @@
-use super::field_definition::FieldDefinition;
+use super::field_definition::*;
 
 pub fn get_body_from_code(code: &str) -> Vec<FieldDefinition> {
     get_body_from_code_char(&convert_value_to_code(code)).to_vec()
@@ -48,6 +48,47 @@ pub enum FieldKind {
     REQUEST,
 }
 
+#[derive(Clone, Debug)]
+pub struct Namer {
+    name: &'static str,
+    prefix: Option<String>,
+    suffix: Option<String>,
+}
+
+impl Namer {
+    pub fn new(name: &'static str, prefix: Option<String>, suffix: Option<String>) -> Self {
+        Namer {
+            name,
+            prefix,
+            suffix,
+        }
+    }
+
+    pub fn new_from_str(name: &'static str) -> Self {
+        Namer::new(name, None, None)
+    }
+
+    pub fn name(&self) -> String {
+        if self.prefix == None && self.suffix == None {
+            return self.name.into();
+        }
+
+        let mut s = String::new();
+
+        if let Some(pre) = &self.prefix {
+            s.push_str(pre);
+        }
+
+        s.push_str(self.name);
+
+        if let Some(suff) = &self.suffix {
+            s.push_str(suff);
+        }
+
+        s
+    }
+}
+
 macro_rules! message_fields {
     (
         $(
@@ -74,7 +115,11 @@ macro_rules! message_fields {
                 }
 
                 $( pub const $upp: FieldDefinition = FieldDefinition {
-                    name: names::$upp,
+                    name: Namer {
+                        name: names::$upp,
+                        prefix: None,
+                        suffix: None,
+                    },
                     encoding: crate::wf_codec::encoding::$encoding,
                     start_byte: $start,
                     end_byte: if $end == 0 { None } else { Some($end) },
