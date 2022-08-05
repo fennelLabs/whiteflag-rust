@@ -14,20 +14,15 @@ pub struct FieldDefinition {
 impl FieldDefinition {
     pub fn new(
         name: &'static str,
-        pattern: Option<Regex>,
         encoding: Encoding,
         start_byte: usize,
-        end_byte: isize,
+        end_byte: usize,
     ) -> FieldDefinition {
         FieldDefinition {
             name,
             encoding,
             start_byte,
-            end_byte: if end_byte < 1 {
-                None
-            } else {
-                Some(end_byte as usize)
-            },
+            end_byte: if end_byte < 1 { None } else { Some(end_byte) },
         }
     }
 
