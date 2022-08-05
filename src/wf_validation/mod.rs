@@ -31,9 +31,9 @@ impl Validation for FieldDefinition {
             Some(len) if len != value.len() => Err(ValidationError::InvalidLength {
                 data: value.to_string(),
                 expected_length: len,
-                specification_level: format!("== Field Definition Error for {} ==", self.name)
+                specification_level: format!("== Field Definition Error for {} ==", self.name),
             }),
-            _ => self.encoding.validate(value)
+            _ => self.encoding.validate(value),
         }
     }
 }
