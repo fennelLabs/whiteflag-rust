@@ -41,20 +41,13 @@ impl Decoder {
             code => code,
         };
 
-        let (cursor, mut field_body) = self
-            .buffer
-            .decode(get_body_from_code_char(&code), self.bit_cursor);
+        let mut field_body = self.decode_fields(get_body_from_code_char(&code));
         body.append(field_body.as_mut());
 
         if code == 'Q' {
             // one request object requires 2 fields of 8 bits
-            let n = (self.buffer.bit_length() - cursor) / 16;
-            body.append(
-                self.buffer
-                    .decode(create_request_fields(n), cursor)
-                    .1
-                    .as_mut(),
-            );
+            let n = (self.buffer.bit_length() - self.bit_cursor) / 16;
+            body.append(self.decode_fields(create_request_fields(n)).as_mut());
         }
 
         BasicMessage::new(code, self.header, body)
@@ -72,5 +65,11 @@ impl Decoder {
         self.bit_cursor += definition.bit_length();
 
         Field::new(definition, psuedo_message_code)
+    }
+
+    fn decode_fields(&mut self, defs: Vec<FieldDefinition>) -> Vec<Field> {
+        let (cursor, fields) = self.buffer.decode(defs, self.bit_cursor);
+        self.bit_cursor = cursor;
+        fields
     }
 }
