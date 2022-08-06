@@ -56,16 +56,20 @@ pub struct Namer {
 }
 
 impl Namer {
-    pub fn new(name: &'static str, prefix: Option<String>, suffix: Option<String>) -> Self {
+    pub fn new<T: ToString>(name: &'static str, prefix: Option<T>, suffix: Option<T>) -> Self {
         Namer {
             name,
-            prefix,
-            suffix,
+            prefix: prefix.map(|s| s.to_string()),
+            suffix: suffix.map(|s| s.to_string()),
         }
     }
 
     pub fn new_from_str(name: &'static str) -> Self {
-        Namer::new(name, None, None)
+        Namer {
+            name,
+            prefix: None,
+            suffix: None,
+        }
     }
 
     pub fn name(&self) -> String {
@@ -86,6 +90,10 @@ impl Namer {
         }
 
         s
+    }
+
+    pub fn new_namer<T: ToString>(&self, prefix: Option<T>, suffix: Option<T>) -> Namer {
+        Namer::new(self.name, prefix, suffix)
     }
 }
 

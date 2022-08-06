@@ -55,8 +55,6 @@ mod request_signal_message {
 fn test_t_message() {
     test(test_message::SERIALIZED, test_message::VALUES)
     /*
-    assert!(message.is_valid());
-    assert!(messageDecoded.is_valid());
     assert_eq!(
         None,
         messageDecoded.set_transaction_hash("a1b2c3".to_string())
@@ -74,15 +72,13 @@ fn test_t_message() {
     assert_eq!("abc123", messageDecoded.get_originator_address()); */
 }
 
-/* #[test]
+#[test]
 fn test_q_message() {
     test(
         request_signal_message::SERIALIZED,
         request_signal_message::VALUES,
     )
-    /* assert!(message.is_valid());
-    assert!(messageDecoded.is_valid()); */
-} */
+}
 
 fn test(serialized: &'static str, values: &'static [&'static str]) {
     let mut message: BasicMessage = values.into();

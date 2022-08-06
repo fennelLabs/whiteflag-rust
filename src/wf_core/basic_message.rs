@@ -1,7 +1,10 @@
 use super::segment::MessageSegment;
 use super::FieldValue;
 use crate::wf_buffer::WhiteflagBuffer;
-use crate::wf_field::{generic_header_fields, get_field_value_from_array, Field, FieldDefinition};
+use crate::wf_field::{
+    create_request_fields, generic_header_fields, get_field_value_from_array, Field,
+    FieldDefinition,
+};
 use crate::wf_parser::MessageCodeParser;
 
 pub struct BasicMessage {
@@ -28,14 +31,16 @@ impl BasicMessage {
 
         let body_start_index = header.len();
 
-        //need switch statement here
         let parser = MessageCodeParser::parse_for_encode(data);
 
-        let body = convert_values_to_fields(
-            parser.get_field_definitions_for_encode(),
-            data.as_ref(),
-            body_start_index,
-        );
+        let mut defs = parser.get_field_definitions_for_encode();
+
+        if parser.code == 'Q' {
+            let n = (data.len() - (header.len() + defs.len())) / 2;
+            defs.append(create_request_fields(n).as_mut());
+        }
+
+        let body = convert_values_to_fields(defs, data.as_ref(), body_start_index);
 
         BasicMessage::new(parser.code, header, body)
     }

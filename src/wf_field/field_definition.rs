@@ -88,4 +88,8 @@ impl FieldDefinition {
             .encoding
             .convert_to_bit_length(self.expected_byte_length().unwrap_or(0));
     }
+
+    pub fn namer<T: ToString>(&self, prefix: Option<T>, suffix: Option<T>) -> Namer {
+        self.name.new_namer(prefix, suffix)
+    }
 }

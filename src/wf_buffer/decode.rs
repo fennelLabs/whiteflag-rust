@@ -50,6 +50,6 @@ impl WhiteflagBuffer {
             })
             .collect();
 
-        (bit_cursor - start_bit, fields)
+        (bit_cursor, fields)
     }
 }

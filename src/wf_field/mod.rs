@@ -6,11 +6,13 @@ mod test;
 pub mod definitions;
 mod field;
 mod field_definition;
+mod request;
 
 use crate::wf_buffer::WhiteflagBuffer;
 pub use definitions::{generic_header_fields, get_body_from_code, message_code, test_message_code};
 pub use field::Field;
 pub use field_definition::FieldDefinition;
+pub use request::create_request_fields;
 
 use self::definitions::get_body_from_code_char;
 
