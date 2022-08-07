@@ -6,6 +6,7 @@ use crate::wf_field::{
     FieldDefinition,
 };
 use crate::wf_parser::MessageCodeParser;
+use crate::wf_validation::Validation;
 
 pub struct BasicMessage {
     message_code: char,
@@ -125,20 +126,19 @@ fn convert_values_to_fields<T: FieldValue>(
     field_defs
         .into_iter()
         .map(|f| {
-            /* if (Boolean.FALSE.equals(field.set(data[index]))) {
-                throw new WfCoreException("Field " + field.debugInfo() + " already set or array item " + index + " contains invalid data: " + data[index], null);
-            } */
-            let value = &data[index];
-            let field = match f.set(value.as_ref()) {
-                Ok(field) => field,
+            let value = data[index].as_ref();
+            match f.validate(value) {
                 Err(e) => panic!(
                     "{} error while converting array of strings into fields\n{0:?}",
                     e
                 ),
+                _ => (),
             };
+
+            let field = Field::new(f, value.into());
+
             index += 1;
             field
         })
         .collect()
-    //return this.isValid();
 }
