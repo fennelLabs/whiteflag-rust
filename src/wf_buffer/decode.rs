@@ -32,14 +32,7 @@ impl WhiteflagBuffer {
                         "\nstart byte should match byte cursor\n\tcursor: {}\n\tfield: {:#?}",
                         byte_cursor, f
                     );
-                    //throw new WfCoreException("Invalid field order while decoding: did not expect field " + fields[index].debugInfo() + " at byte " + byteCursor, null);
                 }
-                /*
-                try {
-                    buffer.extractMessageField(fields[index], bitCursor);
-                } catch (WfCoreException e) {
-                    throw new WfCoreException("Could not decode field at bit " + bitCursor + " of buffer: " + buffer.toHexString(), e);
-                } */
 
                 let field = self.extract_message_field(f, bit_cursor);
 
