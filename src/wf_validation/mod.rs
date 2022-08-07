@@ -22,11 +22,11 @@ pub enum ValidationError {
 }
 
 pub trait Validation {
-    fn validate(&self, value: &str) -> Result<bool, ValidationError>;
+    fn validate(&self, value: &str) -> Result<(), ValidationError>;
 }
 
 impl Validation for FieldDefinition {
-    fn validate(&self, value: &str) -> Result<bool, ValidationError> {
+    fn validate(&self, value: &str) -> Result<(), ValidationError> {
         match self.expected_byte_length() {
             Some(len) if len != value.len() => Err(ValidationError::InvalidLength {
                 data: value.to_string(),
