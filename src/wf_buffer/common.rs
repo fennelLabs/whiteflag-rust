@@ -25,8 +25,8 @@ pub fn remove_hexadecimal_prefix_mut(mut data: &str) {
  * Calculates the number of bytes required to hold the given number of bits
  * java equivalent: WfBinaryBuffer.byteLength
  */
-pub fn byte_length(bit_length: isize) -> isize {
-    let i_byte = BYTE as isize;
+pub fn byte_length(bit_length: usize) -> usize {
+    let i_byte = BYTE;
     (bit_length / i_byte) + (if (bit_length % i_byte) > 0 { 1 } else { 0 })
 }
 
@@ -34,39 +34,28 @@ pub fn byte_length(bit_length: isize) -> isize {
  * Shortens the byte array to fit the length of the used bits
  * java equivalent: WfBinaryBuffer.cropBits
  */
-pub fn crop_bits(buffer: &[u8], bit_length: isize) -> Vec<u8> {
+pub fn crop_bits(buffer: &mut Vec<u8>, bit_length: usize) {
     if bit_length == 0 {
-        return buffer.to_vec();
+        return;
     }
 
-    let is_positive = bit_length > 0;
-    let u_bit_length = bit_length as usize;
+    let buffer_length = buffer.len();
+    let byte_len = byte_length(bit_length);
+    buffer.drain(byte_len..);
 
-    let (byte_length, clear_bits) = match is_positive {
-        true => {
-            let length = byte_length(bit_length);
-            if length > buffer.len() as isize {
-                return buffer[0..length as usize].to_vec();
-            }
-            (length as usize, BYTE - (u_bit_length % BYTE))
-        }
-        false => {
-            let length: isize = buffer.len() as isize + (bit_length / (BYTE as isize));
-            if length < 1 {
-                return vec![0];
-            }
-            (length as usize, u_bit_length)
-        }
-    };
-
-    let mut cropped_buffer = buffer[0..byte_length].to_vec();
+    if byte_len > buffer_length {
+        return;
+    }
 
     /* Clear unused bits in last byte */
-    if clear_bits < BYTE {
-        cropped_buffer[byte_length - 1] &= 0xFF << clear_bits;
+    let clear_bits = BYTE - (bit_length % BYTE);
+    if !(clear_bits < BYTE) {
+        return;
     }
 
-    cropped_buffer
+    if let Some(x) = buffer.last_mut() {
+        *x &= 0xFF << clear_bits;
+    }
 }
 
 /**
@@ -123,7 +112,7 @@ pub fn shift_left(buffer: &[u8], shift: isize) -> Vec<u8> {
         }
     }
 
-    crop_bits(&new_buffer, -(shift % BYTE as isize))
+    new_buffer
 }
 
 /**
@@ -144,7 +133,7 @@ pub fn extract_bits(
     }
 
     let start_byte = start_bit / BYTE;
-    let byte_length = byte_length(bit_length as isize) as usize;
+    let byte_length = byte_length(bit_length);
     let shift = start_bit % BYTE;
     let mask: u8 = (BYTE - shift).checked_shl(0xFF).unwrap_or(u8::MAX as usize) as u8;
 
@@ -172,7 +161,8 @@ pub fn extract_bits(
         }
     }
 
-    crop_bits(&new_byte_array, bit_length as isize)
+    crop_bits(new_byte_array.as_mut(), bit_length);
+    new_byte_array
 }
 
 /**
@@ -230,7 +220,7 @@ pub fn concatinate_bits(
     let free_bits = if shift == 0 { 0 } else { BYTE - shift };
     let byte_length_1 = (n_bits_1 / BYTE) + (if free_bits == 0 { 0 } else { 1 });
     let bit_length = n_bits_1 + n_bits_2;
-    let byte_length = byte_length(bit_length as isize) as usize;
+    let byte_length = byte_length(bit_length);
 
     /* Prepare byte arrays */
     let byte_array_2_shift = shift_right(&byte_array_2, shift as isize);
@@ -261,5 +251,6 @@ pub fn concatinate_bits(
         byte_cursor += 1;
     }
 
-    return crop_bits(&new_byte_array, bit_length as isize);
+    crop_bits(new_byte_array.as_mut(), bit_length);
+    new_byte_array
 }

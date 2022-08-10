@@ -62,7 +62,8 @@ impl BasicMessage {
         buffer.encode(&mut self.header);
         buffer.encode(&mut self.body);
 
-        buffer.crop()
+        buffer.crop();
+        buffer.into()
     }
 
     pub fn encode_as_hex(&mut self) -> String {

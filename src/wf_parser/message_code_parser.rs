@@ -45,11 +45,8 @@ impl MessageCodeParser {
     pub fn get_field_definitions_for_encode(&self) -> Vec<FieldDefinition> {
         let mut defs = get_body_from_code_char(&self.code);
 
-        match &self.test_code {
-            Some(c) => {
-                defs.append(get_body_from_code_char(c).as_mut());
-            }
-            None => (),
+        if let Some(c) = &self.test_code {
+            defs.append(get_body_from_code_char(c).as_mut());
         };
 
         defs

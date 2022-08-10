@@ -27,14 +27,13 @@ pub trait Validation {
 
 impl Validation for FieldDefinition {
     fn validate(&self, value: &str) -> Result<bool, ValidationError> {
-        if let Some(len) = self.expected_byte_length() && value.len() != len {
-            return Err(ValidationError::InvalidLength {
+        match self.expected_byte_length() {
+            Some(len) if len != value.len() => Err(ValidationError::InvalidLength {
                 data: value.to_string(),
                 expected_length: len,
-                specification_level: format!("== Field Definition Error for {} ==", self.name)
-            });
+                specification_level: format!("== Field Definition Error for {} ==", self.name),
+            }),
+            _ => self.encoding.validate(value),
         }
-
-        self.encoding.validate(value)
     }
 }

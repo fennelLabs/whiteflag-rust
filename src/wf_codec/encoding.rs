@@ -1,7 +1,7 @@
-use super::binary::{decode_binary, encode_binary};
+use super::binary::{decode_to_binary, encode_from_binary};
 use super::common::{remove_all_invalid_hex_characters, shift_left};
 use super::constants::*;
-use super::hexadecimal::{decode_bdx, encode_bdx};
+use super::hexadecimal::{decode_to_bdx, encode_from_bdx};
 use super::latlong::encode_latlong;
 use crate::wf_validation::{Validation, ValidationError};
 
@@ -47,10 +47,10 @@ impl Encoding {
     pub fn encode<T: AsRef<str> + std::fmt::Display>(&self, value: T) -> Vec<u8> {
         match &self.kind {
             EncodingKind::UTF8 => value.as_ref().as_bytes().to_vec(),
-            EncodingKind::BIN => encode_binary(value),
-            EncodingKind::DEC | EncodingKind::HEX => encode_bdx(value),
+            EncodingKind::BIN => encode_from_binary(value),
+            EncodingKind::DEC | EncodingKind::HEX => encode_from_bdx(value),
             EncodingKind::DATETIME | EncodingKind::DURATION => {
-                encode_bdx(remove_all_invalid_hex_characters(value))
+                encode_from_bdx(remove_all_invalid_hex_characters(value))
             }
             EncodingKind::LAT | EncodingKind::LONG => encode_latlong(value),
         }
@@ -64,21 +64,21 @@ impl Encoding {
      * @return the uncompressed value of the field
      * java equivalent: WfMessageCodec.decodeField
      */
-    pub fn decode(&self, buffer: Vec<u8>, bit_length: usize) -> String {
+    pub fn decode(&self, buffer: &[u8], bit_length: usize) -> String {
         let mut s = String::new();
 
         match &self.kind {
             EncodingKind::UTF8 => {
-                return String::from_utf8(buffer).expect("utf8 error");
+                return std::str::from_utf8(buffer).expect("utf8 error").to_string();
             }
             EncodingKind::BIN => {
-                return decode_binary(&buffer, bit_length);
+                return decode_to_binary(buffer, bit_length);
             }
             EncodingKind::DEC | EncodingKind::HEX => {
-                return decode_bdx(buffer, bit_length);
+                return decode_to_bdx(buffer, bit_length);
             }
             EncodingKind::DATETIME => {
-                s.push_str(decode_bdx(buffer, bit_length).as_str());
+                s.push_str(&decode_to_bdx(buffer, bit_length));
 
                 s.insert(4, '-');
                 s.insert(7, '-');
@@ -88,7 +88,7 @@ impl Encoding {
                 s.insert(19, 'Z');
             }
             EncodingKind::DURATION => {
-                s.push_str(decode_bdx(buffer, bit_length).as_str());
+                s.push_str(&decode_to_bdx(buffer, bit_length));
 
                 s.insert(0, 'P');
                 s.insert(3, 'D');
@@ -103,7 +103,7 @@ impl Encoding {
                 };
 
                 s.push(sign);
-                s.push_str(decode_bdx(shift_left(&buffer, 1), bit_length - 1).as_str());
+                s.push_str(decode_to_bdx(&shift_left(buffer, 1), bit_length - 1).as_str());
                 s.insert(s.len() - 5, '.');
             }
         }
@@ -154,13 +154,14 @@ macro_rules! encoding {
 
         impl Validation for crate::wf_codec::encoding::Encoding {
             fn validate(&self, value: &str) -> Result<bool, ValidationError> {
-                if let Some(x) = self.byte_length && value.len() != x {
-                    return Err(ValidationError::InvalidLength {
+                match self.byte_length {
+                    Some(x) if value.len() != x => return Err(ValidationError::InvalidLength {
                         data: value.to_string(),
                         expected_length: x,
                         specification_level: format!("== Encoding Error for {:?} ==", self.kind)
-                    });
-                }
+                    }),
+                    _ => (),
+                };
 
                 if match self.kind {
                     $( EncodingKind::$name => rx::$name.is_match(value), )*

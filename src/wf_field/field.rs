@@ -35,7 +35,7 @@ impl Field {
         hex::encode(self.encode())
     }
 
-    pub fn decode(&mut self, data: Vec<u8>) -> String {
+    pub fn decode(&mut self, data: &[u8]) -> String {
         let s = self.definition.encoding.decode(data, self.bit_length());
         self.value = s.clone();
         s
@@ -92,7 +92,7 @@ impl Field {
             bit_length,
         );
 
-        self.decode(field_buffer)
+        self.decode(&field_buffer)
     }
 }
 

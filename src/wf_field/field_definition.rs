@@ -49,11 +49,11 @@ impl FieldDefinition {
         Ok(Field::new(self, data.into()))
     }
 
-    pub fn decode(&self, data: Vec<u8>) -> String {
+    pub fn decode(&self, data: &[u8]) -> String {
         self.encoding.decode(data, self.bit_length())
     }
 
-    pub fn decode_to_field(self, data: Vec<u8>) -> Field {
+    pub fn decode_to_field(self, data: &[u8]) -> Field {
         let value = self.encoding.decode(data, self.bit_length());
         Field::new(self, value)
     }
@@ -65,11 +65,10 @@ impl FieldDefinition {
     /// returns the byte length of the unencoded field value
     /// if the field definition does not have a fixed length then it will return `0`
     pub fn expected_byte_length(&self) -> Option<usize> {
-        if let Some(e) = self.end_byte && e > 0 && e > self.start_byte {
-            return Some(e - self.start_byte);
+        match self.end_byte {
+            Some(e) if e > 0 && e > self.start_byte => Some(e - self.start_byte),
+            _ => None,
         }
-
-        return None;
     }
 
     /**
