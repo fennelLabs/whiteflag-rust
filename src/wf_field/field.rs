@@ -11,7 +11,7 @@ pub struct Field {
 
 impl Field {
     pub fn new(definition: FieldDefinition, value: String) -> Field {
-        let name = definition.get_name();
+        let name = definition.get_name().expect("must give Field a name");
         Field::new_with_name(definition, value, name)
     }
 
@@ -23,8 +23,8 @@ impl Field {
         }
     }
 
-    pub fn get_name(&self) -> String {
-        self.name
+    pub fn get_name(&self) -> &str {
+        &self.name
     }
 
     /* pub fn get(&self, data: Vec<String>) -> WhiteflagResult<String> {

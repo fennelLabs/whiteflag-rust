@@ -1,19 +1,17 @@
+use super::Field;
 use crate::{wf_codec::encoding::*, wf_validation::*};
-use regex::Regex;
-
-use super::{definitions::Namer, Field};
 
 #[derive(Clone, Debug)]
 pub struct FieldDefinition {
-    pub name: Namer,
+    pub name: Option<&'static str>,
     pub encoding: Encoding,
     pub start_byte: usize,
     pub end_byte: Option<usize>,
 }
 
 impl FieldDefinition {
-    pub fn get_name(&self) -> String {
-        self.name.name()
+    pub fn get_name(&self) -> Option<String> {
+        self.name.map(|f| f.to_string())
     }
 
     pub fn new(
@@ -22,17 +20,30 @@ impl FieldDefinition {
         start_byte: usize,
         end_byte: usize,
     ) -> FieldDefinition {
-        FieldDefinition::new_from_namer(Namer::new_from_str(name), encoding, start_byte, end_byte)
+        FieldDefinition {
+            name: Some(name),
+            encoding,
+            start_byte,
+            end_byte: if end_byte < 1 { None } else { Some(end_byte) },
+        }
     }
 
-    pub fn new_from_namer(
-        name: Namer,
+    pub fn next(&self, end: Option<usize>) -> FieldDefinition {
+        FieldDefinition {
+            name: None,
+            encoding: self.encoding.kind.get_encoding(),
+            start_byte: self.end_byte.expect("next() assumes an end_byte"),
+            end_byte: end,
+        }
+    }
+
+    pub fn new_without_name(
         encoding: Encoding,
         start_byte: usize,
         end_byte: usize,
     ) -> FieldDefinition {
         FieldDefinition {
-            name,
+            name: None,
             encoding,
             start_byte,
             end_byte: if end_byte < 1 { None } else { Some(end_byte) },
@@ -89,7 +100,7 @@ impl FieldDefinition {
             .convert_to_bit_length(self.expected_byte_length().unwrap_or(0));
     }
 
-    pub fn namer<T: ToString>(&self, prefix: Option<T>, suffix: Option<T>) -> Namer {
+    /* pub fn namer<T: ToString>(&self, prefix: Option<T>, suffix: Option<T>) -> Namer {
         self.name.new_namer(prefix, suffix)
-    }
+    } */
 }

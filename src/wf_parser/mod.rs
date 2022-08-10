@@ -4,9 +4,11 @@ mod test;
 mod message_code_parser;
 mod message_header_parser;
 mod parsed_field_definition;
+mod wf_header;
 
 pub use message_code_parser::MessageCodeParser;
 pub use message_header_parser::MessageHeaderParser;
+pub use wf_header::MessageHeaderFields;
 
 use crate::wf_field::{definitions::convert_value_to_code, Field};
 

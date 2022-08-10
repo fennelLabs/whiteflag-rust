@@ -48,55 +48,6 @@ pub enum FieldKind {
     REQUEST,
 }
 
-#[derive(Clone, Debug)]
-pub struct Namer {
-    name: &'static str,
-    prefix: Option<String>,
-    suffix: Option<String>,
-}
-
-impl Namer {
-    pub fn new<T: ToString>(name: &'static str, prefix: Option<T>, suffix: Option<T>) -> Self {
-        Namer {
-            name,
-            prefix: prefix.map(|s| s.to_string()),
-            suffix: suffix.map(|s| s.to_string()),
-        }
-    }
-
-    pub fn new_from_str(name: &'static str) -> Self {
-        Namer {
-            name,
-            prefix: None,
-            suffix: None,
-        }
-    }
-
-    pub fn name(&self) -> String {
-        if self.prefix == None && self.suffix == None {
-            return self.name.into();
-        }
-
-        let mut s = String::new();
-
-        if let Some(pre) = &self.prefix {
-            s.push_str(pre);
-        }
-
-        s.push_str(self.name);
-
-        if let Some(suff) = &self.suffix {
-            s.push_str(suff);
-        }
-
-        s
-    }
-
-    pub fn new_namer<T: ToString>(&self, prefix: Option<T>, suffix: Option<T>) -> Namer {
-        Namer::new(self.name, prefix, suffix)
-    }
-}
-
 macro_rules! message_fields {
     (
         $(
@@ -123,11 +74,7 @@ macro_rules! message_fields {
                 }
 
                 $( pub const $upp: FieldDefinition = FieldDefinition {
-                    name: Namer {
-                        name: names::$upp,
-                        prefix: None,
-                        suffix: None,
-                    },
+                    name: Some(names::$upp),
                     encoding: crate::wf_codec::encoding::$encoding,
                     start_byte: $start,
                     end_byte: if $end == 0 { None } else { Some($end) },

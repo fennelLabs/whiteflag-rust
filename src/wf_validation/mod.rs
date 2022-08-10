@@ -33,7 +33,7 @@ impl Validation for FieldDefinition {
                 expected_length: len,
                 specification_level: format!(
                     "== Field Definition Error for {} ==",
-                    self.get_name()
+                    self.get_name().unwrap_or(String::from("NULL FIELD NAME"))
                 ),
             }),
             _ => self.encoding.validate(value),
