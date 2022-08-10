@@ -6,11 +6,25 @@ use crate::wf_core::error::{WhiteflagError, WhiteflagResult};
 pub struct Field {
     pub definition: FieldDefinition,
     value: String,
+    name: String,
 }
 
 impl Field {
     pub fn new(definition: FieldDefinition, value: String) -> Field {
-        Field { definition, value }
+        let name = definition.get_name().expect("must give Field a name");
+        Field::new_with_name(value, name.to_string(), definition)
+    }
+
+    pub fn new_with_name(value: String, name: String, definition: FieldDefinition) -> Field {
+        Field {
+            definition,
+            value,
+            name,
+        }
+    }
+
+    pub fn get_name(&self) -> &str {
+        &self.name
     }
 
     /* pub fn get(&self, data: Vec<String>) -> WhiteflagResult<String> {

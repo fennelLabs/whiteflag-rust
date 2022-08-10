@@ -5,7 +5,7 @@ const FIELDNAME: &str = "TESTFIELD";
 
 #[test]
 fn utf_encoding() {
-    let def = FieldDefinition::new(FIELDNAME, None, UTF8, 0, -1);
+    let def = FieldDefinition::new(FIELDNAME, UTF8, 0, 0);
     let field = def.set("WF").unwrap();
 
     assert_eq!(
@@ -27,7 +27,7 @@ fn utf_encoding() {
 
 #[test]
 fn utf_decoding() {
-    let def = FieldDefinition::new(FIELDNAME, None, UTF8, 0, -1);
+    let def = FieldDefinition::new(FIELDNAME, UTF8, 0, 0);
     let buffer = hex::decode("5746").unwrap();
     let result = "WF";
 
@@ -38,7 +38,7 @@ fn utf_decoding() {
 
 #[test]
 fn bin_encoding_1() {
-    let bin = FieldDefinition::new(FIELDNAME, None, BIN, 0, 8);
+    let bin = FieldDefinition::new(FIELDNAME, BIN, 0, 8);
     let field = bin.set("10111011").unwrap();
 
     assert_eq!(
@@ -60,7 +60,7 @@ fn bin_encoding_1() {
 
 #[test]
 fn bin_decoding_1() {
-    let def = FieldDefinition::new(FIELDNAME, None, BIN, 1, 7);
+    let def = FieldDefinition::new(FIELDNAME, BIN, 1, 7);
     let buffer = hex::decode("aa").unwrap();
     let result = "101010";
 
@@ -71,7 +71,7 @@ fn bin_decoding_1() {
 
 #[test]
 fn bin_encoding_2() {
-    let bin = FieldDefinition::new(FIELDNAME, None, BIN, 4, 5);
+    let bin = FieldDefinition::new(FIELDNAME, BIN, 4, 5);
     let field = bin.set("1").unwrap();
 
     assert_eq!(
@@ -93,7 +93,7 @@ fn bin_encoding_2() {
 
 #[test]
 fn bin_decoding_2_a() {
-    let def = FieldDefinition::new(FIELDNAME, None, BIN, 4, 5);
+    let def = FieldDefinition::new(FIELDNAME, BIN, 4, 5);
     let buffer = hex::decode("80").unwrap();
     let result = "1";
 
@@ -104,7 +104,7 @@ fn bin_decoding_2_a() {
 
 #[test]
 fn bin_decoding_2_b() {
-    let def = FieldDefinition::new(FIELDNAME, None, BIN, 2, 3);
+    let def = FieldDefinition::new(FIELDNAME, BIN, 2, 3);
     let buffer = hex::decode("7f").unwrap();
     let result = "0";
 
@@ -115,7 +115,7 @@ fn bin_decoding_2_b() {
 
 #[test]
 fn dec_encoding() {
-    let dec = FieldDefinition::new(FIELDNAME, None, DEC, 0, 4);
+    let dec = FieldDefinition::new(FIELDNAME, DEC, 0, 4);
     let field = dec.set("1230").unwrap();
 
     assert_eq!(
@@ -137,7 +137,7 @@ fn dec_encoding() {
 
 #[test]
 fn dec_decoding() {
-    let def = FieldDefinition::new(FIELDNAME, None, DEC, 0, 3);
+    let def = FieldDefinition::new(FIELDNAME, DEC, 0, 3);
     let buffer = hex::decode("1234").unwrap();
     let result = "123";
 
@@ -148,7 +148,7 @@ fn dec_decoding() {
 
 #[test]
 fn hex_encoding() {
-    let hex = FieldDefinition::new(FIELDNAME, None, HEX, 0, 2);
+    let hex = FieldDefinition::new(FIELDNAME, HEX, 0, 2);
     let field = hex.set("3f").unwrap();
 
     assert_eq!(
@@ -170,7 +170,7 @@ fn hex_encoding() {
 
 #[test]
 fn hex_decoding() {
-    let def = FieldDefinition::new(FIELDNAME, None, HEX, 0, 2);
+    let def = FieldDefinition::new(FIELDNAME, HEX, 0, 2);
     let buffer = crate::wf_buffer::decode_hex("0x3f").unwrap();
     let result = "3f";
 
@@ -184,7 +184,7 @@ fn hex_decoding() {
 
 #[test]
 fn datetime_encoding() {
-    let datetime = FieldDefinition::new(FIELDNAME, None, DATETIME, 0, -1);
+    let datetime = FieldDefinition::new(FIELDNAME, DATETIME, 0, 0);
     let field = datetime.set("2020-07-01T21:42:23Z").unwrap();
 
     assert_eq!(
@@ -206,7 +206,7 @@ fn datetime_encoding() {
 
 #[test]
 fn datetime_decoding() {
-    let def = FieldDefinition::new(FIELDNAME, None, DATETIME, 0, -1);
+    let def = FieldDefinition::new(FIELDNAME, DATETIME, 0, 0);
     let buffer = hex::decode("20200701214223").unwrap();
     let result = "2020-07-01T21:42:23Z";
 
@@ -217,7 +217,7 @@ fn datetime_decoding() {
 
 #[test]
 fn duration_encoding() {
-    let duration = FieldDefinition::new(FIELDNAME, None, DURATION, 0, 10);
+    let duration = FieldDefinition::new(FIELDNAME, DURATION, 0, 10);
     let field = duration.set("P24D11H30M").unwrap();
 
     assert_eq!(
@@ -239,7 +239,7 @@ fn duration_encoding() {
 
 #[test]
 fn duration_decoding() {
-    let def = FieldDefinition::new(FIELDNAME, None, DURATION, 0, 10);
+    let def = FieldDefinition::new(FIELDNAME, DURATION, 0, 10);
     let buffer = hex::decode("241130").unwrap();
     let result = "P24D11H30M";
 
@@ -250,7 +250,7 @@ fn duration_decoding() {
 
 #[test]
 fn latitude_encoding() {
-    let lat = FieldDefinition::new(FIELDNAME, None, LAT, 0, 9);
+    let lat = FieldDefinition::new(FIELDNAME, LAT, 0, 9);
     let field = lat.set("+23.34244").unwrap(); // 1001 0001 1001 1010 0001 0010 0010 0000
 
     assert_eq!(
@@ -272,7 +272,7 @@ fn latitude_encoding() {
 
 #[test]
 fn latitude_decoding() {
-    let def = FieldDefinition::new(FIELDNAME, None, LAT, 0, 9);
+    let def = FieldDefinition::new(FIELDNAME, LAT, 0, 9);
     let buffer = hex::decode("919a1220").unwrap();
     let result = "+23.34244";
 
@@ -283,7 +283,7 @@ fn latitude_decoding() {
 
 #[test]
 fn longitude_encoding() {
-    let long = FieldDefinition::new(FIELDNAME, None, LONG, 0, 10);
+    let long = FieldDefinition::new(FIELDNAME, LONG, 0, 10);
     let field = long.set("-163.34245").unwrap(); // 0000 1011 0001 1001 1010 0001 0010 0010 1000
 
     assert_eq!(
@@ -305,7 +305,7 @@ fn longitude_encoding() {
 
 #[test]
 fn longitude_decoding_1() {
-    let def = FieldDefinition::new(FIELDNAME, None, LONG, 0, 10);
+    let def = FieldDefinition::new(FIELDNAME, LONG, 0, 10);
     let buffer = hex::decode("8b19a12380").unwrap();
     let result = "+163.34247";
 
@@ -319,7 +319,7 @@ fn longitude_decoding_1() {
 
 #[test]
 fn longitude_decoding_2() {
-    let def = FieldDefinition::new(FIELDNAME, None, LONG, 0, 10);
+    let def = FieldDefinition::new(FIELDNAME, LONG, 0, 10);
     let buffer = hex::decode("0319a12380").unwrap();
     let result = "-063.34247";
 

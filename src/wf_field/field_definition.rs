@@ -1,33 +1,52 @@
-use crate::{wf_codec::encoding::*, wf_validation::*};
-use regex::Regex;
-
 use super::Field;
+use crate::{wf_codec::encoding::*, wf_validation::*};
 
 #[derive(Clone, Debug)]
 pub struct FieldDefinition {
-    pub name: &'static str,
+    pub name: Option<&'static str>,
     pub encoding: Encoding,
     pub start_byte: usize,
     pub end_byte: Option<usize>,
 }
 
 impl FieldDefinition {
+    pub fn get_name(&self) -> Option<&'static str> {
+        self.name
+    }
+
     pub fn new(
         name: &'static str,
-        pattern: Option<Regex>,
         encoding: Encoding,
         start_byte: usize,
-        end_byte: isize,
+        end_byte: usize,
     ) -> FieldDefinition {
         FieldDefinition {
-            name,
+            name: Some(name),
             encoding,
             start_byte,
-            end_byte: if end_byte < 1 {
-                None
-            } else {
-                Some(end_byte as usize)
-            },
+            end_byte: if end_byte < 1 { None } else { Some(end_byte) },
+        }
+    }
+
+    pub fn next(&self, end: Option<usize>) -> FieldDefinition {
+        FieldDefinition {
+            name: None,
+            encoding: self.encoding.kind.get_encoding(),
+            start_byte: self.end_byte.expect("next() assumes an end_byte"),
+            end_byte: end,
+        }
+    }
+
+    pub fn new_without_name(
+        encoding: Encoding,
+        start_byte: usize,
+        end_byte: usize,
+    ) -> FieldDefinition {
+        FieldDefinition {
+            name: None,
+            encoding,
+            start_byte,
+            end_byte: if end_byte < 1 { None } else { Some(end_byte) },
         }
     }
 

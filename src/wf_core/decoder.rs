@@ -3,23 +3,24 @@ use crate::wf_buffer::WhiteflagBuffer;
 use crate::wf_field::definitions::{
     convert_value_to_code, get_body_from_code_char, test_message_code,
 };
-use crate::wf_field::{generic_header_fields, Field, FieldDefinition};
-use crate::wf_parser::MessageHeaderOrder;
+use crate::wf_field::{create_request_fields, Field, FieldDefinition};
+use crate::wf_parser::MessageHeaderFields;
+use crate::wf_parser::FieldDefinitionParser;
 
 pub struct Decoder {
     buffer: WhiteflagBuffer,
-    header: Vec<Field>,
+    header: MessageHeaderFields,
     bit_cursor: usize,
 }
 
 impl Decoder {
     pub fn new<T: AsRef<str>>(message: T) -> Self {
-        let buffer = match WhiteflagBuffer::decode_from_hexadecimal(message) {
+        let mut buffer = match WhiteflagBuffer::decode_from_hexadecimal(message) {
             Ok(buffer) => buffer,
             Err(e) => panic!("{}", e),
         };
 
-        let (bit_cursor, header) = buffer.decode(generic_header_fields().to_vec(), 0);
+        let (bit_cursor, header) = MessageHeaderFields::from_buffer(&mut buffer);
 
         Decoder {
             bit_cursor,
@@ -31,33 +32,26 @@ impl Decoder {
     pub fn decode(mut self) -> BasicMessage {
         let mut body: Vec<Field> = Vec::new();
 
-        let code = match MessageHeaderOrder::get_code(&self.header).1 {
+        let code = match self.header.get_code() {
             'T' => {
                 let field = self.decode_field(test_message_code());
                 let psuedo_message_code = convert_value_to_code(field.get());
                 body.push(field);
                 psuedo_message_code
             }
-            /* 'Q' => {
-                // one request object requires 2 fields of 8 bits
-                let request_objects_length = (self.buffer.bit_length() - self.bit_cursor) /16;
-            } */
             code => code,
         };
 
-        /* Extend request message body with request fields (calculated from remaining bits) */
-        /* final int nRequestObjects = (msgBuffer.bitLength() - bitCursor) / 16;   // One request object requires 2 fields of 8 bits
-        body.append(new WfMessageSegment(messageType.createRequestFields(nRequestObjects)));
-        break; */
+        let mut field_body = self.decode_fields(get_body_from_code_char(&code));
+        body.append(field_body.as_mut());
 
-        body.append(
-            self.buffer
-                .decode(get_body_from_code_char(&code), self.bit_cursor)
-                .1
-                .as_mut(),
-        );
+        if code == 'Q' {
+            // one request object requires 2 fields of 8 bits
+            let n = (self.buffer.bit_length() - self.bit_cursor) / 16;
+            body.append(create_request_fields(n, &mut self).as_mut());
+        }
 
-        BasicMessage::new(code, self.header, body)
+        BasicMessage::new(code, self.header.to_vec(), body)
     }
 
     fn decode_field(&mut self, definition: FieldDefinition) -> Field {
@@ -73,38 +67,20 @@ impl Decoder {
 
         Field::new(definition, psuedo_message_code)
     }
+
+    fn decode_fields(&mut self, defs: Vec<FieldDefinition>) -> Vec<Field> {
+        let (cursor, fields) = self.buffer.decode(defs, self.bit_cursor);
+        self.bit_cursor = cursor;
+        fields
+    }
 }
 
-/* public final WfMessageCreator decode(final WfBinaryBuffer msgBuffer) throws WfCoreException {
-    /* Keep track of fields and bit position */
-    int bitCursor = 0;
-    int nextField = 0;
-
-    /* Decode message header, and determine message type */
-    header = new WfMessageSegment(messageType.getHeaderFields());
-    header.decode(msgBuffer, bitCursor, nextField);
-    bitCursor += header.bitLength();
-    messageType = WfMessageType.fromCode(header.get(FIELD_MESSAGETYPE));
-
-    /* Decode message body and add fields as required for certain message types */
-    body = new WfMessageSegment(messageType.getBodyFields());
-    body.decode(msgBuffer, bitCursor, nextField);
-    nextField = body.getNoFields();
-    bitCursor += body.bitLength();
-    switch (messageType) {
-        case T:
-            /* Determine pseudo message type and extend test message body with pseudo message body */
-            final WfMessageType pseudoMessageType = WfMessageType.fromCode(body.get(FIELD_TESTMESSAGETYPE));
-            body.append(new WfMessageSegment(pseudoMessageType.getBodyFields()));
-            break;
-        case Q:
-            /* Extend request message body with request fields (calculated from remaining bits) */
-            final int nRequestObjects = (msgBuffer.bitLength() - bitCursor) / 16;   // One request object requires 2 fields of 8 bits
-            body.append(new WfMessageSegment(messageType.createRequestFields(nRequestObjects)));
-            break;
-        default:
-            break;
+impl FieldDefinitionParser for Decoder {
+    fn parse(&mut self, definition: &FieldDefinition) -> String {
+        let value = self
+            .buffer
+            .extract_message_value(definition, self.bit_cursor);
+        self.bit_cursor += definition.bit_length();
+        value
     }
-    body.decode(msgBuffer, bitCursor, nextField);
-    return this;
-} */
+}

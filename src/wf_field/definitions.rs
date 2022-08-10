@@ -1,4 +1,4 @@
-use super::field_definition::FieldDefinition;
+use super::field_definition::*;
 
 pub fn get_body_from_code(code: &str) -> Vec<FieldDefinition> {
     get_body_from_code_char(&convert_value_to_code(code)).to_vec()
@@ -74,7 +74,7 @@ macro_rules! message_fields {
                 }
 
                 $( pub const $upp: FieldDefinition = FieldDefinition {
-                    name: names::$upp,
+                    name: Some(names::$upp),
                     encoding: crate::wf_codec::encoding::$encoding,
                     start_byte: $start,
                     end_byte: if $end == 0 { None } else { Some($end) },

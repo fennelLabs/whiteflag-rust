@@ -153,7 +153,7 @@ macro_rules! encoding {
         }
 
         impl Validation for crate::wf_codec::encoding::Encoding {
-            fn validate(&self, value: &str) -> Result<bool, ValidationError> {
+            fn validate(&self, value: &str) -> Result<(), ValidationError> {
                 match self.byte_length {
                     Some(x) if value.len() != x => return Err(ValidationError::InvalidLength {
                         data: value.to_string(),
@@ -169,7 +169,7 @@ macro_rules! encoding {
                     return Err(ValidationError::InvalidCharset);
                 }
 
-                Ok(true)
+                Ok(())
             }
         }
 

@@ -6,11 +6,13 @@ mod test;
 pub mod definitions;
 mod field;
 mod field_definition;
+mod request;
 
 use crate::wf_buffer::WhiteflagBuffer;
 pub use definitions::{generic_header_fields, get_body_from_code, message_code, test_message_code};
 pub use field::Field;
 pub use field_definition::FieldDefinition;
+pub use request::create_request_fields;
 
 use self::definitions::get_body_from_code_char;
 
@@ -43,7 +45,7 @@ pub fn get_field_value_from_array<T: AsRef<str>>(
 ) -> Option<&String> {
     fields
         .iter()
-        .find(|f| f.definition.name == field_name.as_ref())
+        .find(|f| f.get_name() == field_name.as_ref())
         .map(|s| s.get())
 }
 

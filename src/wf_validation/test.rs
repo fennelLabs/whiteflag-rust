@@ -109,7 +109,7 @@ fn invalid_values_1() {
     );
 } */
 
-fn test<T: Validation>(validator: T, data: &str) -> Result<bool, ValidationError> {
+fn test<T: Validation>(validator: T, data: &str) -> Result<(), ValidationError> {
     let result = validator.validate(data);
     assert!(result.is_err(), "the test did not throw an error");
     if result.is_err() && PRINT_ERRORS {

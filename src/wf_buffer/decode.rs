@@ -28,15 +28,11 @@ impl WhiteflagBuffer {
             .into_iter()
             .map(|f| {
                 if f.start_byte != byte_cursor {
-                    panic!("\nstart byte should match byte cursor\n\tname: {}\n\tstart: {}\n\tcursor: {}\n", f.name, f.start_byte, byte_cursor);
-                    //throw new WfCoreException("Invalid field order while decoding: did not expect field " + fields[index].debugInfo() + " at byte " + byteCursor, null);
+                    panic!(
+                        "\nstart byte should match byte cursor\n\tcursor: {}\n\tfield: {:#?}",
+                        byte_cursor, f
+                    );
                 }
-                /*
-                try {
-                    buffer.extractMessageField(fields[index], bitCursor);
-                } catch (WfCoreException e) {
-                    throw new WfCoreException("Could not decode field at bit " + bitCursor + " of buffer: " + buffer.toHexString(), e);
-                } */
 
                 let field = self.extract_message_field(f, bit_cursor);
 
@@ -47,6 +43,6 @@ impl WhiteflagBuffer {
             })
             .collect();
 
-        (bit_cursor - start_bit, fields)
+        (bit_cursor, fields)
     }
 }
