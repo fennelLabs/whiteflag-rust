@@ -3,12 +3,12 @@ use crate::wf_buffer::WhiteflagBuffer;
 use crate::wf_field::definitions::{
     convert_value_to_code, get_body_from_code_char, test_message_code,
 };
-use crate::wf_field::{create_request_fields, generic_header_fields, Field, FieldDefinition};
-use crate::wf_parser::MessageHeaderOrder;
+use crate::wf_field::{create_request_fields, Field, FieldDefinition};
+use crate::wf_parser::MessageHeaderFields;
 
 pub struct Decoder {
     buffer: WhiteflagBuffer,
-    header: Vec<Field>,
+    header: MessageHeaderFields,
     bit_cursor: usize,
 }
 
@@ -19,7 +19,7 @@ impl Decoder {
             Err(e) => panic!("{}", e),
         };
 
-        let (bit_cursor, header) = buffer.decode(generic_header_fields().to_vec(), 0);
+        let (bit_cursor, header) = MessageHeaderFields::from_buffer(&buffer);
 
         Decoder {
             bit_cursor,
@@ -31,7 +31,7 @@ impl Decoder {
     pub fn decode(mut self) -> BasicMessage {
         let mut body: Vec<Field> = Vec::new();
 
-        let code = match MessageHeaderOrder::get_code(&self.header).1 {
+        let code = match self.header.get_code() {
             'T' => {
                 let field = self.decode_field(test_message_code());
                 let psuedo_message_code = convert_value_to_code(field.get());
@@ -50,7 +50,7 @@ impl Decoder {
             body.append(self.decode_fields(create_request_fields(n)).as_mut());
         }
 
-        BasicMessage::new(code, self.header, body)
+        BasicMessage::new(code, self.header.to_vec(), body)
     }
 
     fn decode_field(&mut self, definition: FieldDefinition) -> Field {
