@@ -1,4 +1,4 @@
-use crate::wf_field::{get_body_from_code, FieldDefinition};
+use crate::wf_field::{definitions::get_body_from_code_char, FieldDefinition};
 
 struct MessageType {
     pub message_code: char,
@@ -14,7 +14,7 @@ impl MessageType {
     pub fn from_code(code: &char) -> MessageType {
         MessageType {
             message_code: *code,
-            definitions: get_body_from_code(code),
+            definitions: get_body_from_code_char(code),
         }
     }
 }

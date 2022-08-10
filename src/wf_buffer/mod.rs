@@ -66,11 +66,11 @@ impl WhiteflagBuffer {
         let field_buffer: Vec<u8> =
             extract_bits(&self.data, self.bit_length, start_bit, bit_length);
 
-        definition.decode(field_buffer)
+        definition.decode(&field_buffer)
     }
 
-    pub fn crop(&self) -> Vec<u8> {
-        crop_bits(&self.data, self.bit_length as isize)
+    pub fn crop(&mut self) {
+        crop_bits(self.data.as_mut(), self.bit_length);
     }
 
     pub fn bit_length(&self) -> usize {
@@ -125,5 +125,11 @@ impl Default for WhiteflagBuffer {
             data: Default::default(),
             bit_length: Default::default(),
         }
+    }
+}
+
+impl From<WhiteflagBuffer> for Vec<u8> {
+    fn from(buffer: WhiteflagBuffer) -> Self {
+        buffer.data
     }
 }

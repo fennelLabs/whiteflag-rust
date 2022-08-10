@@ -31,7 +31,7 @@ fn utf_decoding() {
     let buffer = hex::decode("5746").unwrap();
     let result = "WF";
 
-    let actual: String = def.decode(buffer);
+    let actual: String = def.decode(&buffer);
 
     assert_eq!(result, actual, "UTF-8 field should be correctly decoded");
 }
@@ -64,7 +64,7 @@ fn bin_decoding_1() {
     let buffer = hex::decode("aa").unwrap();
     let result = "101010";
 
-    let actual: String = def.decode(buffer);
+    let actual: String = def.decode(&buffer);
 
     assert_eq!(result, actual, "Binary field should be correctly decoded");
 }
@@ -97,7 +97,7 @@ fn bin_decoding_2_a() {
     let buffer = hex::decode("80").unwrap();
     let result = "1";
 
-    let actual: String = def.decode(buffer);
+    let actual: String = def.decode(&buffer);
 
     assert_eq!(result, actual, "Binary field should be correctly decoded");
 }
@@ -108,14 +108,14 @@ fn bin_decoding_2_b() {
     let buffer = hex::decode("7f").unwrap();
     let result = "0";
 
-    let actual: String = def.decode(buffer);
+    let actual: String = def.decode(&buffer);
 
     assert_eq!(result, actual, "Binary field should be correctly decoded");
 }
 
 #[test]
 fn dec_encoding() {
-    let mut dec = FieldDefinition::new(FIELDNAME, None, DEC, 0, 3);
+    let dec = FieldDefinition::new(FIELDNAME, None, DEC, 0, 4);
     let field = dec.set("1230").unwrap();
 
     assert_eq!(
@@ -124,12 +124,12 @@ fn dec_encoding() {
         "Decimal field should be correctly binary encoded"
     );
     assert_eq!(
-        3,
+        4,
         field.byte_length(),
         "Unencoded Decimal field should be 3 bytes"
     );
     assert_eq!(
-        12,
+        16,
         field.bit_length(),
         "Encoded Decimal field should be 12 bits"
     );
@@ -141,7 +141,7 @@ fn dec_decoding() {
     let buffer = hex::decode("1234").unwrap();
     let result = "123";
 
-    let actual: String = def.decode(buffer);
+    let actual: String = def.decode(&buffer);
 
     assert_eq!(result, actual, "Decimal field should be correctly decoded");
 }
@@ -174,7 +174,7 @@ fn hex_decoding() {
     let buffer = crate::wf_buffer::decode_hex("0x3f").unwrap();
     let result = "3f";
 
-    let actual: String = def.decode(buffer);
+    let actual: String = def.decode(&buffer);
 
     assert_eq!(
         result, actual,
@@ -210,7 +210,7 @@ fn datetime_decoding() {
     let buffer = hex::decode("20200701214223").unwrap();
     let result = "2020-07-01T21:42:23Z";
 
-    let actual: String = def.decode(buffer);
+    let actual: String = def.decode(&buffer);
 
     assert_eq!(result, actual, "DateTime field should be correctly decoded");
 }
@@ -243,7 +243,7 @@ fn duration_decoding() {
     let buffer = hex::decode("241130").unwrap();
     let result = "P24D11H30M";
 
-    let actual: String = def.decode(buffer);
+    let actual: String = def.decode(&buffer);
 
     assert_eq!(result, actual, "Duration field should be correctly decoded");
 }
@@ -276,7 +276,7 @@ fn latitude_decoding() {
     let buffer = hex::decode("919a1220").unwrap();
     let result = "+23.34244";
 
-    let actual: String = def.decode(buffer);
+    let actual: String = def.decode(&buffer);
 
     assert_eq!(result, actual, "Latitude field should be correctly decoded");
 }
@@ -309,7 +309,7 @@ fn longitude_decoding_1() {
     let buffer = hex::decode("8b19a12380").unwrap();
     let result = "+163.34247";
 
-    let actual: String = def.decode(buffer);
+    let actual: String = def.decode(&buffer);
 
     assert_eq!(
         result, actual,
@@ -323,7 +323,7 @@ fn longitude_decoding_2() {
     let buffer = hex::decode("0319a12380").unwrap();
     let result = "-063.34247";
 
-    let actual: String = def.decode(buffer);
+    let actual: String = def.decode(&buffer);
 
     assert_eq!(
         result, actual,

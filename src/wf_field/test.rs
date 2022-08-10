@@ -177,13 +177,3 @@ fn test_add_field_date_time() {
         "Message field (hex) should be correctly encoded and added"
     );
 }
-
-#[test]
-fn test_extract_message_code() {
-    let def = definitions::message_code();
-    let buffer = WhiteflagBuffer::decode_from_hexadecimal("5746313020800000000000000000000000000000000000000000000000000000000000000000b43a3a38399d1797b7b933b0b734b9b0ba34b7b71734b73a17bbb434ba32b33630b380").unwrap();
-
-    let field = buffer.extract_message_value(&def, 33);
-
-    assert_eq!("A", field, "extracted message code should be A");
-}
