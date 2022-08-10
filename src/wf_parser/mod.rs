@@ -44,7 +44,7 @@ impl<'a> MessageHeaderOrder {
     }
 }
 
-pub trait Parser {
+pub trait FieldDefinitionParser {
     fn parse(&mut self, definition: &FieldDefinition) -> String;
 }
 
@@ -61,6 +61,7 @@ impl<'a, T: FieldValue> WhiteflagMessageBuilder<'a, T> {
     pub fn compile(mut self) -> BasicMessage {
         let defs = crate::wf_field::definitions::Header::DEFINITIONS;
         let header = self.convert_values_to_fields(defs.to_vec());
+
         let header = MessageHeaderFields::from_fields(header);
         let code = header.get_code();
         let body_defs =
@@ -92,9 +93,7 @@ impl<'a, T: FieldValue> WhiteflagMessageBuilder<'a, T> {
     }
 }
 
-// need to mut index for each field parsed...
-
-impl<'a, T: FieldValue> Parser for WhiteflagMessageBuilder<'a, T> {
+impl<'a, T: FieldValue> FieldDefinitionParser for WhiteflagMessageBuilder<'a, T> {
     fn parse(&mut self, definition: &FieldDefinition) -> String {
         let value = self.data[self.index].as_ref();
 
@@ -111,11 +110,3 @@ impl<'a, T: FieldValue> Parser for WhiteflagMessageBuilder<'a, T> {
         value.into()
     }
 }
-
-/* impl MessageHeaderFields {
-    pub fn from_values<T: FieldValue>(data: &[T]) -> (usize, Self) {
-        let defs = crate::wf_field::definitions::Header::DEFINITIONS;
-        let header = convert_values_to_fields(defs.to_vec(), data.as_ref(), 0);
-        (header.len(), MessageHeaderFields::from_fields(header))
-    }
-} */

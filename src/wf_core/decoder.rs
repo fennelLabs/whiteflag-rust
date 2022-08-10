@@ -5,7 +5,7 @@ use crate::wf_field::definitions::{
 };
 use crate::wf_field::{create_request_fields, Field, FieldDefinition};
 use crate::wf_parser::MessageHeaderFields;
-use crate::wf_parser::Parser;
+use crate::wf_parser::FieldDefinitionParser;
 
 pub struct Decoder {
     buffer: WhiteflagBuffer,
@@ -75,7 +75,7 @@ impl Decoder {
     }
 }
 
-impl Parser for Decoder {
+impl FieldDefinitionParser for Decoder {
     fn parse(&mut self, definition: &FieldDefinition) -> String {
         let value = self
             .buffer
