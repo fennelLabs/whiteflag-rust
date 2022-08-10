@@ -45,7 +45,7 @@ impl<'a> MessageHeaderOrder {
 }
 
 pub trait Parser {
-    fn parse(&mut self, i: usize, definition: &FieldDefinition) -> String;
+    fn parse(&mut self, definition: &FieldDefinition) -> String;
 }
 
 pub struct WhiteflagMessageBuilder<'a, T: FieldValue> {
@@ -85,7 +85,7 @@ impl<'a, T: FieldValue> WhiteflagMessageBuilder<'a, T> {
         field_defs
             .into_iter()
             .map(|f| {
-                let value = self.parse(0, &f);
+                let value = self.parse(&f);
                 Field::new(f, value)
             })
             .collect()
@@ -95,7 +95,7 @@ impl<'a, T: FieldValue> WhiteflagMessageBuilder<'a, T> {
 // need to mut index for each field parsed...
 
 impl<'a, T: FieldValue> Parser for WhiteflagMessageBuilder<'a, T> {
-    fn parse(&mut self, i: usize, definition: &FieldDefinition) -> String {
+    fn parse(&mut self, definition: &FieldDefinition) -> String {
         let value = self.data[self.index].as_ref();
 
         match definition.validate(value) {

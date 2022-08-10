@@ -76,7 +76,7 @@ impl Decoder {
 }
 
 impl Parser for Decoder {
-    fn parse(&mut self, i: usize, definition: &FieldDefinition) -> String {
+    fn parse(&mut self, definition: &FieldDefinition) -> String {
         let value = self
             .buffer
             .extract_message_value(definition, self.bit_cursor);
