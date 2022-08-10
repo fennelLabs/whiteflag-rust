@@ -66,7 +66,8 @@ impl<'a, T: FieldValue> WhiteflagMessageBuilder<'a, T> {
 
     pub fn compile(mut self) -> BasicMessage {
         let code = &self.header.get_code();
-        let body_defs = get_body_from_code_char(&code);
+        let body_defs =
+            MessageCodeParser::parse_for_encode(self.data).get_field_definitions_for_encode();
 
         let mut body = convert_values_to_fields(body_defs, self.data.as_ref(), self.index);
 

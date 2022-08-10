@@ -1,12 +1,8 @@
 use super::segment::MessageSegment;
 use super::FieldValue;
 use crate::wf_buffer::WhiteflagBuffer;
-use crate::wf_field::{
-    create_request_fields, generic_header_fields, get_field_value_from_array, Field,
-    FieldDefinition,
-};
-use crate::wf_parser::MessageCodeParser;
-use crate::wf_validation::Validation;
+use crate::wf_field::{get_field_value_from_array, Field};
+use crate::wf_parser::WhiteflagMessageBuilder;
 
 pub struct BasicMessage {
     message_code: char,
@@ -28,22 +24,7 @@ impl MessageSegment {
 
 impl BasicMessage {
     pub fn compile<T: FieldValue>(data: &[T]) -> Self {
-        let header = convert_values_to_fields(generic_header_fields().to_vec(), data.as_ref(), 0);
-
-        let body_start_index = header.len();
-
-        let parser = MessageCodeParser::parse_for_encode(data);
-
-        let mut defs = parser.get_field_definitions_for_encode();
-
-        if parser.code == 'Q' {
-            let n = (data.len() - (header.len() + defs.len())) / 2;
-            defs.append(create_request_fields(n).as_mut());
-        }
-
-        let body = convert_values_to_fields(defs, data.as_ref(), body_start_index);
-
-        BasicMessage::new(parser.code, header, body)
+        WhiteflagMessageBuilder::new(data).compile()
     }
 
     pub fn new(message_code: char, header: Vec<Field>, body: Vec<Field>) -> BasicMessage {
@@ -110,35 +91,4 @@ impl<T: FieldValue> From<&[T]> for BasicMessage {
     fn from(data: &[T]) -> Self {
         BasicMessage::compile(data)
     }
-}
-
-/// converts string values to their respective fields relative to their position and the corresponding field definition
-fn convert_values_to_fields<T: FieldValue>(
-    field_defs: Vec<FieldDefinition>,
-    data: &[T],
-    start_index: usize,
-) -> Vec<Field> {
-    if (data.len() - start_index) < field_defs.len() {
-        panic!("not enough field definitions to process given values\nvalues: {:#?}\ndefinitions: {:#?}", data, field_defs);
-    }
-
-    let mut index = start_index;
-    field_defs
-        .into_iter()
-        .map(|f| {
-            let value = data[index].as_ref();
-            match f.validate(value) {
-                Err(e) => panic!(
-                    "{} error while converting array of strings into fields\n{0:?}",
-                    e
-                ),
-                _ => (),
-            };
-
-            let field = Field::new(f, value.into());
-
-            index += 1;
-            field
-        })
-        .collect()
 }
