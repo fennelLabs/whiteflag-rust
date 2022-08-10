@@ -10,8 +10,8 @@ pub struct FieldDefinition {
 }
 
 impl FieldDefinition {
-    pub fn get_name(&self) -> Option<String> {
-        self.name.map(|f| f.to_string())
+    pub fn get_name(&self) -> Option<&'static str> {
+        self.name
     }
 
     pub fn new(

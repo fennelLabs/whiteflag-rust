@@ -25,6 +25,8 @@ pub trait Validation {
     fn validate(&self, value: &str) -> Result<(), ValidationError>;
 }
 
+const NULL_FIELD_NAME: &'static str = "NULL FIELD NAME";
+
 impl Validation for FieldDefinition {
     fn validate(&self, value: &str) -> Result<(), ValidationError> {
         match self.expected_byte_length() {
@@ -33,7 +35,7 @@ impl Validation for FieldDefinition {
                 expected_length: len,
                 specification_level: format!(
                     "== Field Definition Error for {} ==",
-                    self.get_name().unwrap_or(String::from("NULL FIELD NAME"))
+                    self.get_name().unwrap_or(NULL_FIELD_NAME)
                 ),
             }),
             _ => self.encoding.validate(value),

@@ -12,7 +12,7 @@ pub struct Field {
 impl Field {
     pub fn new(definition: FieldDefinition, value: String) -> Field {
         let name = definition.get_name().expect("must give Field a name");
-        Field::new_with_name(definition, value, name)
+        Field::new_with_name(definition, value, name.to_string())
     }
 
     pub fn new_with_name(definition: FieldDefinition, value: String, name: String) -> Field {
