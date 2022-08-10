@@ -1,21 +1,27 @@
+use super::{definitions::*, Field, FieldDefinition};
+use crate::wf_parser::Parser;
 use std::ops::Mul;
 
-use super::{definitions::*, FieldDefinition};
+const OBJECT_TYPE: FieldDefinition = Request::OBJECT_TYPE;
+const OBJECT_TYPE_QUANT: FieldDefinition = Request::OBJECT_TYPE_QUANT;
 
 // * Returns an array with additional Whiteflag sign/signal message body request fields
 // * @param n the number of request objects
 // * @return an array with the request message fields
 // * @wfver v1-draft.6
 // * @wfref 4.3.1.9 Object Request Fields
+pub fn create_request_fields<T: Parser>(n: usize, parser: &mut T) -> Vec<Field> {
+    let ot_size = OBJECT_TYPE
+        .expected_byte_length()
+        .expect("request::OBJECT_TYPE is misconfigured: must have a start and end byte");
+    let ot_quant_size = OBJECT_TYPE_QUANT
+        .expected_byte_length()
+        .expect("request::OBJECT_TYPE_QUANT is misconfigured: must have a start and end byte");
+    let name = OBJECT_TYPE
+        .get_name()
+        .expect("request::OBJECT_TYPE is misconfigured: should have a name");
 
-pub fn create_request_fields(n: usize) -> Vec<FieldDefinition> {
-    let object_type = Request::OBJECT_TYPE;
-    let object_type_quant = Request::OBJECT_TYPE_QUANT;
-
-    let ot_size = object_type.expected_byte_length().unwrap_or(0);
-    let ot_quant_size = object_type_quant.expected_byte_length().unwrap_or(0);
-
-    let mut start_byte = object_type.start_byte;
+    let mut start_byte = OBJECT_TYPE.start_byte;
 
     (0..(n.mul(2)))
         .step_by(2)
@@ -27,25 +33,27 @@ pub fn create_request_fields(n: usize) -> Vec<FieldDefinition> {
 
             start_byte = byte_end;
 
-            let n1 = object_type.namer(None, Some(n_field));
-            let n2 = n1.new_namer(None, Some(format!("{}{}", n_field, "Quant")));
+            let ot = FieldDefinition::new_without_name(
+                OBJECT_TYPE.encoding.kind.get_encoding(),
+                byte_start,
+                byte_split,
+            );
+
+            let oq = FieldDefinition::new_without_name(
+                OBJECT_TYPE_QUANT.encoding.kind.get_encoding(),
+                byte_split,
+                byte_end,
+            );
 
             [
-                FieldDefinition::new_from_namer(
-                    n1,
-                    object_type.encoding.kind.get_encoding(),
-                    byte_start,
-                    byte_split,
-                ),
-                FieldDefinition::new_from_namer(
-                    n2,
-                    object_type_quant.encoding.kind.get_encoding(),
-                    byte_split,
-                    byte_end,
+                Field::new_with_name(parser.parse(0, &ot), format!("{}{}", name, n_field), ot),
+                Field::new_with_name(
+                    parser.parse(0, &oq),
+                    format!("{}{}Quant", name, n_field),
+                    oq,
                 ),
             ]
         })
         .flatten()
-        .inspect(|f| println!("{:#?}", f))
         .collect()
 }

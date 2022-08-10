@@ -5,6 +5,7 @@ use crate::wf_field::definitions::{
 };
 use crate::wf_field::{create_request_fields, Field, FieldDefinition};
 use crate::wf_parser::MessageHeaderFields;
+use crate::wf_parser::Parser;
 
 pub struct Decoder {
     buffer: WhiteflagBuffer,
@@ -14,12 +15,12 @@ pub struct Decoder {
 
 impl Decoder {
     pub fn new<T: AsRef<str>>(message: T) -> Self {
-        let buffer = match WhiteflagBuffer::decode_from_hexadecimal(message) {
+        let mut buffer = match WhiteflagBuffer::decode_from_hexadecimal(message) {
             Ok(buffer) => buffer,
             Err(e) => panic!("{}", e),
         };
 
-        let (bit_cursor, header) = MessageHeaderFields::from_buffer(&buffer);
+        let (bit_cursor, header) = MessageHeaderFields::from_buffer(&mut buffer);
 
         Decoder {
             bit_cursor,
@@ -47,7 +48,7 @@ impl Decoder {
         if code == 'Q' {
             // one request object requires 2 fields of 8 bits
             let n = (self.buffer.bit_length() - self.bit_cursor) / 16;
-            body.append(self.decode_fields(create_request_fields(n)).as_mut());
+            body.append(create_request_fields(n, &mut self).as_mut());
         }
 
         BasicMessage::new(code, self.header.to_vec(), body)
@@ -71,5 +72,15 @@ impl Decoder {
         let (cursor, fields) = self.buffer.decode(defs, self.bit_cursor);
         self.bit_cursor = cursor;
         fields
+    }
+}
+
+impl Parser for Decoder {
+    fn parse(&mut self, i: usize, definition: &FieldDefinition) -> String {
+        let value = self
+            .buffer
+            .extract_message_value(definition, self.bit_cursor);
+        self.bit_cursor += definition.bit_length();
+        value
     }
 }

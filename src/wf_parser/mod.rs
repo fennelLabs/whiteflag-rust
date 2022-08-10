@@ -49,34 +49,46 @@ pub trait Parser {
 }
 
 pub struct WhiteflagMessageBuilder<'a, T: FieldValue> {
-    header: MessageHeaderFields,
     data: &'a [T],
     index: usize,
 }
 
 impl<'a, T: FieldValue> WhiteflagMessageBuilder<'a, T> {
     pub fn new(data: &'a [T]) -> Self {
-        let (index, header) = MessageHeaderFields::from_values(data);
-        WhiteflagMessageBuilder {
-            header,
-            data,
-            index,
-        }
+        WhiteflagMessageBuilder { data, index: 0 }
     }
 
     pub fn compile(mut self) -> BasicMessage {
-        let code = &self.header.get_code();
+        let defs = crate::wf_field::definitions::Header::DEFINITIONS;
+        let header = self.convert_values_to_fields(defs.to_vec());
+        let header = MessageHeaderFields::from_fields(header);
+        let code = header.get_code();
         let body_defs =
             MessageCodeParser::parse_for_encode(self.data).get_field_definitions_for_encode();
 
-        let mut body = convert_values_to_fields(body_defs, self.data.as_ref(), self.index);
+        let mut body = self.convert_values_to_fields(body_defs);
 
-        if code == &'Q' {
+        if code == 'Q' {
             let n = (self.data.len() - self.index) / 2;
             body.append(create_request_fields(n, &mut self).as_mut());
         }
 
-        BasicMessage::new(*code, self.header.to_vec(), body)
+        BasicMessage::new(code, header.to_vec(), body)
+    }
+
+    /// converts string values to their respective fields relative to their position and the corresponding field definition
+    fn convert_values_to_fields(&mut self, field_defs: Vec<FieldDefinition>) -> Vec<Field> {
+        if self.data.len() < field_defs.len() {
+            panic!("not enough field definitions to process given values\nvalues: {:#?}\ndefinitions: {:#?}", self.data, field_defs);
+        }
+
+        field_defs
+            .into_iter()
+            .map(|f| {
+                let value = self.parse(0, &f);
+                Field::new(f, value)
+            })
+            .collect()
     }
 }
 
@@ -84,7 +96,7 @@ impl<'a, T: FieldValue> WhiteflagMessageBuilder<'a, T> {
 
 impl<'a, T: FieldValue> Parser for WhiteflagMessageBuilder<'a, T> {
     fn parse(&mut self, i: usize, definition: &FieldDefinition) -> String {
-        let value = self.data[i].as_ref();
+        let value = self.data[self.index].as_ref();
 
         match definition.validate(value) {
             Err(e) => panic!(
@@ -100,41 +112,10 @@ impl<'a, T: FieldValue> Parser for WhiteflagMessageBuilder<'a, T> {
     }
 }
 
-impl MessageHeaderFields {
+/* impl MessageHeaderFields {
     pub fn from_values<T: FieldValue>(data: &[T]) -> (usize, Self) {
         let defs = crate::wf_field::definitions::Header::DEFINITIONS;
         let header = convert_values_to_fields(defs.to_vec(), data.as_ref(), 0);
         (header.len(), MessageHeaderFields::from_fields(header))
     }
-}
-
-/// converts string values to their respective fields relative to their position and the corresponding field definition
-pub fn convert_values_to_fields<T: FieldValue>(
-    field_defs: Vec<FieldDefinition>,
-    data: &[T],
-    start_index: usize,
-) -> Vec<Field> {
-    if (data.len() - start_index) < field_defs.len() {
-        panic!("not enough field definitions to process given values\nvalues: {:#?}\ndefinitions: {:#?}", data, field_defs);
-    }
-
-    let mut index = start_index;
-    field_defs
-        .into_iter()
-        .map(|f| {
-            let value = data[index].as_ref();
-            match f.validate(value) {
-                Err(e) => panic!(
-                    "{} error while converting array of strings into fields\n{0:?}",
-                    e
-                ),
-                _ => (),
-            };
-
-            let field = Field::new(f, value.into());
-
-            index += 1;
-            field
-        })
-        .collect()
-}
+} */
