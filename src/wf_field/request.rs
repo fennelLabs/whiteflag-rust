@@ -5,11 +5,10 @@ use std::ops::Mul;
 const OBJECT_TYPE: FieldDefinition = Request::OBJECT_TYPE;
 const OBJECT_TYPE_QUANT: FieldDefinition = Request::OBJECT_TYPE_QUANT;
 
-// * Returns an array with additional Whiteflag sign/signal message body request fields
-// * @param n the number of request objects
-// * @return an array with the request message fields
-// * @wfver v1-draft.6
-// * @wfref 4.3.1.9 Object Request Fields
+/// there can be any amount of request field pairs at the end of the message
+/// this function takes n number of request objects and parsers out the remaining request fields
+/// 
+/// wf spec 4.3.1.9 Object Request Fields
 pub fn create_request_fields<T: FieldDefinitionParser>(n: usize, parser: &mut T) -> Vec<Field> {
     let ot_size = OBJECT_TYPE
         .expected_byte_length()
