@@ -31,9 +31,7 @@ impl MessageHeaderFields {
         (cursor, Self::from_fields(header))
     }
 
-    pub fn from_values(values: &[&str]) {}
-
-    fn from_fields(mut fields: Vec<Field>) -> MessageHeaderFields {
+    pub fn from_fields(mut fields: Vec<Field>) -> MessageHeaderFields {
         MessageHeaderFields {
             prefix: fields.remove(0),
             version: fields.remove(0),
