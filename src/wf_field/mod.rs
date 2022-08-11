@@ -2,14 +2,19 @@
 mod codec_tests;
 mod test;
 
-mod definitions;
+#[allow(dead_code)]
+pub mod definitions;
 mod field;
 mod field_definition;
+mod request;
 
 use crate::wf_buffer::WhiteflagBuffer;
-pub use definitions::{generic_header_fields, get_body_from_code};
+pub use definitions::{generic_header_fields, get_body_from_code, message_code, test_message_code};
 pub use field::Field;
 pub use field_definition::FieldDefinition;
+pub use request::create_request_fields;
+
+use self::definitions::get_body_from_code_char;
 
 pub const FIELD_PREFIX: &'static str = "Prefix";
 pub const FIELD_VERSION: &'static str = "Version";
@@ -40,12 +45,20 @@ pub fn get_field_value_from_array<T: AsRef<str>>(
 ) -> Option<&String> {
     fields
         .iter()
-        .find(|f| f.definition.name == field_name.as_ref())
+        .find(|f| f.get_name() == field_name.as_ref())
         .map(|s| s.get())
 }
 
 pub fn get_message_code(fields: &[Field]) -> char {
-    match get_field_value_from_array(fields, &FIELD_MESSAGETYPE) {
+    get_message_code_base(fields, FIELD_MESSAGETYPE)
+}
+
+pub fn get_test_message_code(fields: &[Field]) -> char {
+    get_message_code_base(fields, FIELD_TESTMESSAGETYPE)
+}
+
+fn get_message_code_base(fields: &[Field], name: &'static str) -> char {
+    match get_field_value_from_array(fields, name) {
         Some(x) => x.chars().next(),
         _ => None,
     }
@@ -54,5 +67,7 @@ pub fn get_message_code(fields: &[Field]) -> char {
 
 pub fn get_message_body(fields: &[Field]) -> (Vec<FieldDefinition>, char) {
     let message_code = get_message_code(fields);
-    (get_body_from_code(&message_code), message_code)
+    let body = get_body_from_code_char(&message_code);
+
+    (body, message_code)
 }

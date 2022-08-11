@@ -6,11 +6,25 @@ use crate::wf_core::error::{WhiteflagError, WhiteflagResult};
 pub struct Field {
     pub definition: FieldDefinition,
     value: String,
+    name: String,
 }
 
 impl Field {
     pub fn new(definition: FieldDefinition, value: String) -> Field {
-        Field { definition, value }
+        let name = definition.get_name().expect("must give Field a name");
+        Field::new_with_name(value, name.to_string(), definition)
+    }
+
+    pub fn new_with_name(value: String, name: String, definition: FieldDefinition) -> Field {
+        Field {
+            definition,
+            value,
+            name,
+        }
+    }
+
+    pub fn get_name(&self) -> &str {
+        &self.name
     }
 
     /* pub fn get(&self, data: Vec<String>) -> WhiteflagResult<String> {
@@ -23,30 +37,8 @@ impl Field {
             .ok_or(WhiteflagError::InvalidLength)
     } */
 
-    /**
-     * Sets the value of the message field if not already set
-     * @param data the data representing the field value
-     * @return TRUE if field value is set, FALSE if field already set or data is invalid
-     */
-    pub fn set<T: AsRef<str> + Into<String>>(&mut self, data: T) -> WhiteflagResult<()> {
-        if !self.definition.is_valid(data.as_ref()) {
-            return Err(WhiteflagError::InvalidPattern);
-        }
-
-        self.value = data.into();
-        Ok(())
-    }
-
     pub fn get(&self) -> &String {
         &self.value
-    }
-
-    /**
-     * Checks if the message field value has been set. FieldDefinition is considered set if it contains a valid value.
-     * @return TRUE if the field has been set, else FALSE
-     */
-    pub fn is_set(&self) -> bool {
-        self.definition.is_valid(&self.value)
     }
 
     pub fn encode(&self) -> Vec<u8> {
@@ -57,7 +49,7 @@ impl Field {
         hex::encode(self.encode())
     }
 
-    pub fn decode(&mut self, data: Vec<u8>) -> String {
+    pub fn decode(&mut self, data: &[u8]) -> String {
         let s = self.definition.encoding.decode(data, self.bit_length());
         self.value = s.clone();
         s
@@ -68,11 +60,11 @@ impl Field {
      * @return the byte length of the unencoded field value
      */
     pub fn byte_length(&self) -> usize {
-        if self.definition.end_byte < 0 {
-            return self.value.len();
+        if let Some(len) = self.definition.expected_byte_length() {
+            return len;
         }
 
-        return self.definition.end_byte as usize - self.definition.start_byte;
+        self.value.len()
     }
 
     /**
@@ -80,7 +72,10 @@ impl Field {
      * @return the bit length of the compressed encoded field value
      */
     pub fn bit_length(&self) -> usize {
-        return self.definition.encoding.bit_length(self.byte_length());
+        return self
+            .definition
+            .encoding
+            .convert_to_bit_length(self.byte_length());
     }
 
     /**
@@ -111,7 +106,7 @@ impl Field {
             bit_length,
         );
 
-        self.decode(field_buffer)
+        self.decode(&field_buffer)
     }
 }
 

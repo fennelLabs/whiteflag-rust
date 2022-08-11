@@ -20,31 +20,29 @@ impl WhiteflagBuffer {
         }
 
         let mut bit_cursor = start_bit;
+
+        // the byte cursor only ensures definitions are in their proper order relative to each other
         let mut byte_cursor = field_defs[0].start_byte;
 
         let fields = field_defs
             .into_iter()
             .map(|f| {
                 if f.start_byte != byte_cursor {
-                    panic!("start byte should match byte cursor");
-                    //throw new WfCoreException("Invalid field order while decoding: did not expect field " + fields[index].debugInfo() + " at byte " + byteCursor, null);
+                    panic!(
+                        "\nstart byte should match byte cursor\n\tcursor: {}\n\tfield: {:#?}",
+                        byte_cursor, f
+                    );
                 }
-                /*
-                try {
-                    buffer.extractMessageField(fields[index], bitCursor);
-                } catch (WfCoreException e) {
-                    throw new WfCoreException("Could not decode field at bit " + bitCursor + " of buffer: " + buffer.toHexString(), e);
-                } */
 
                 let field = self.extract_message_field(f, bit_cursor);
 
                 bit_cursor += field.bit_length();
-                byte_cursor = field.definition.end_byte as usize;
+                byte_cursor = field.definition.end_byte.unwrap_or(0);
 
                 field
             })
             .collect();
 
-        (bit_cursor - start_bit, fields)
+        (bit_cursor, fields)
     }
 }

@@ -49,6 +49,11 @@ impl WhiteflagBuffer {
     }
 
     pub fn extract_message_field(&self, definition: FieldDefinition, start_bit: usize) -> Field {
+        let value = self.extract_message_value(&definition, start_bit);
+        Field::new(definition, value)
+    }
+
+    pub fn extract_message_value(&self, definition: &FieldDefinition, start_bit: usize) -> String {
         let field_bit_length = definition.bit_length();
         let bit_length = if field_bit_length >= 1 {
             field_bit_length
@@ -61,11 +66,11 @@ impl WhiteflagBuffer {
         let field_buffer: Vec<u8> =
             extract_bits(&self.data, self.bit_length, start_bit, bit_length);
 
-        definition.decode(field_buffer)
+        definition.decode(&field_buffer)
     }
 
-    pub fn crop(&self) -> Vec<u8> {
-        crop_bits(&self.data, self.bit_length as isize)
+    pub fn crop(&mut self) {
+        crop_bits(self.data.as_mut(), self.bit_length);
     }
 
     pub fn bit_length(&self) -> usize {
@@ -120,5 +125,11 @@ impl Default for WhiteflagBuffer {
             data: Default::default(),
             bit_length: Default::default(),
         }
+    }
+}
+
+impl From<WhiteflagBuffer> for Vec<u8> {
+    fn from(buffer: WhiteflagBuffer) -> Self {
+        buffer.data
     }
 }
