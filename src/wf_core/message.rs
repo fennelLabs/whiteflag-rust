@@ -8,7 +8,7 @@ use super::basic_message::BasicMessage;
     const METAKEY_RECIPIENT: &str = "recipientAddress";
     const FIELD_ENCRYPTIONINDICATOR: &str = "EncryptionIndicator";
 
-struct WhiteflagMessage {
+pub struct WhiteflagMessage {
     base: BasicMessage,
 
     metadata: HashMap<String, String>,
