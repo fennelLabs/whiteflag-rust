@@ -51,7 +51,7 @@ impl Decoder {
             body.append(create_request_fields(n, &mut self).as_mut());
         }
 
-        BasicMessage::new(code, self.header.to_vec(), body)
+        BasicMessage::new(code, self.header.to_vec(), body, None, None)
     }
 
     fn decode_field(&mut self, definition: FieldDefinition) -> Field {

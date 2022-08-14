@@ -31,6 +31,14 @@ impl WhiteflagBuffer {
         }
     }
 
+    pub fn extract_bits(&mut self, start: usize, end: usize) -> WhiteflagBuffer {
+
+    }
+
+    pub fn extract_bits_from(&mut self, start: usize) -> WhiteflagBuffer {
+        
+    }
+
     pub fn append_field(&mut self, field: &Field) {
         self.append(field.into(), None);
     }

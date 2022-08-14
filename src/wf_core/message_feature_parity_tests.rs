@@ -1,10 +1,8 @@
-use crate::{wf_account::{test_impl::WhiteflagAccount, account::WfAccount}, wf_crypto::{wf_encryption_key::{WhiteflagEncryptionKey, WfEncryptionKey}, ecdh_keypair::{WhiteflagECDHKeyPair, generate_wfkeypair, WfECDHKeyPair}}};
-
-use super::message::WhiteflagMessage;
+use crate::{wf_account::{test_impl::WhiteflagAccount, account::WfAccount}, wf_crypto::{wf_encryption_key::{WhiteflagEncryptionKey, WfEncryptionKey}, ecdh_keypair::{WhiteflagECDHKeyPair, generate_wfkeypair, WfECDHKeyPair}}, wf_core::basic_message::BasicMessage};
 
 #[test]
 fn testNewMessage() {
-    let mut message = WhiteflagMessage::new("S".to_string());
+    let mut message = BasicMessage::new("S".to_string());
 
     assert_eq!("S", message.message_type());
     assert!(!message.is_valid());
@@ -45,7 +43,7 @@ fn testCryptoMessageCompilation() {
         "11",
         "d426bbe111221675e333f30ef608b1aa6e60a47080dd33cb49e96395894ef42f",
     ];
-    let message = WhiteflagMessage::compile(fieldValues.clone()).unwrap();
+    let message = BasicMessage::compile(&fieldValues.clone()).unwrap();
 
     /* Verify message */
     assert_eq!("K", message.message_type());
@@ -75,7 +73,7 @@ fn testAuthMessageCompilation() {
         "1",
         "b01218a30dd3c23d050af254bfcce31a715fecdff6a23fd59609612e6e0ef263",
     ];
-    let message = WhiteflagMessage::compile(fieldValues.clone()).unwrap();
+    let message = BasicMessage::compile(fieldValues.clone()).unwrap();
 
     assert_eq!("A", message.message_type());
     assert_eq!(fieldValues[0], message.prefix());
@@ -104,7 +102,7 @@ fn testAuthMessageSerialization() {
         "2",
         "b01218a30dd3c23d050af254bfcce31a715fecdff6a23fd59609612e6e0ef263",
     ];
-    let message = WhiteflagMessage::compile(fieldValues.clone()).unwrap();
+    let message = BasicMessage::compile(fieldValues.clone()).unwrap();
 
     assert_eq!("A", message.message_type());
     assert_eq!(fieldValues[4], message.message_type());
@@ -116,7 +114,7 @@ fn testAuthMessageSerialization() {
 #[test]
 fn testAuthMessageDeserialization() {
     let messageSerialized = "WF100A000000000000000000000000000000000000000000000000000000000000000001https://organisation.int/whiteflag";
-    let message = WhiteflagMessage::deserialize(messageSerialized).unwrap();
+    let message = BasicMessage::deserialize(messageSerialized).unwrap();
 
     assert_eq!("A", message.message_type());
     assert_eq!(&messageSerialized[0..2], message.prefix());
@@ -144,7 +142,7 @@ fn testAuthMessageDecoding() {
         "1",
         "https://organisation.int/whiteflag",
     ];
-    let message = WhiteflagMessage::decode("5746313020800000000000000000000000000000000000000000000000000000000000000000b43a3a38399d1797b7b933b0b734b9b0ba34b7b71734b73a17bbb434ba32b33630b380").unwrap();
+    let message = BasicMessage::decode("5746313020800000000000000000000000000000000000000000000000000000000000000000b43a3a38399d1797b7b933b0b734b9b0ba34b7b71734b73a17bbb434ba32b33630b380").unwrap();
 
     assert_eq!("A", message.message_type());
     assert_eq!(fieldValues[0], message.prefix());
@@ -173,7 +171,7 @@ fn testInvalidMessage() {
         "1",
         "b01218a30dd3c23d050af254bfcce31a715fecdff6a23fd59609612e6e0ef263",
     ];
-    let message = WhiteflagMessage::compile(fieldValues).unwrap();
+    let message = BasicMessage::compile(fieldValues).unwrap();
 }
 
 #[test]
@@ -197,7 +195,7 @@ fn testSignSignalMessageEncoding() {
         "3210",
         "042",
     ];
-    let mut message = WhiteflagMessage::compile(fieldValues).unwrap();
+    let mut message = BasicMessage::compile(fieldValues).unwrap();
 
     assert_eq!(None, message.set_transaction_hash("a1b2c3".to_string()));
     assert_eq!(
@@ -233,7 +231,7 @@ fn testSignSignalMessageDecoding() {
         "3210",
         "042",
     ];
-    let message = WhiteflagMessage::decode(messageEncoded).unwrap();
+    let message = BasicMessage::decode(messageEncoded).unwrap();
 
     assert_eq!("M", message.message_type());
     assert_eq!(fieldValues[0], message.prefix());
@@ -277,9 +275,9 @@ fn testTestMessage() {
         "3210",
         "042",
     ];
-    let mut message = WhiteflagMessage::compile(fieldValues.clone()).unwrap();
+    let mut message = BasicMessage::compile(fieldValues.clone()).unwrap();
     let messageEncoded = &message.encode().as_hex();
-    let mut messageDecoded = WhiteflagMessage::decode(messageEncoded).unwrap();
+    let mut messageDecoded = BasicMessage::decode(messageEncoded).unwrap();
 
     assert_eq!(None, message.get_transaction_hash());
     assert_eq!("T", message.message_type());
@@ -352,9 +350,9 @@ fn testRequestMessage() {
         "20",
         "03",
     ];
-    let message = WhiteflagMessage::compile(fieldValues.clone()).unwrap();
+    let message = BasicMessage::compile(fieldValues.clone()).unwrap();
     let messageEncoded = &message.encode().as_hex();
-    let messageDecoded = WhiteflagMessage::decode(messageEncoded).unwrap();
+    let messageDecoded = BasicMessage::decode(messageEncoded).unwrap();
 
     assert_eq!("Q", message.message_type());
     assert_eq!("Q", messageDecoded.message_type());
@@ -386,8 +384,8 @@ fn testRequestMessage() {
 
 #[test]
 fn testFreeTextMessage() {
-    let mut message1 = WhiteflagMessage::deserialize("WF100F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!").unwrap();
-    let message2 = WhiteflagMessage::decode("57463130232fb60f0f6c4a8589bddcf076e790ac9eb1601d3fd9ced67eaaa62c9fb9644a16fabb434ba32b33630b3903a32b9ba1036b2b9b9b0b3b2908").unwrap();
+    let mut message1 = BasicMessage::deserialize("WF100F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!").unwrap();
+    let message2 = BasicMessage::decode("57463130232fb60f0f6c4a8589bddcf076e790ac9eb1601d3fd9ced67eaaa62c9fb9644a16fabb434ba32b33630b3903a32b9ba1036b2b9b9b0b3b2908").unwrap();
 
     assert_eq!("F", message1.message_type());
     assert_eq!("F", message2.message_type());
@@ -413,9 +411,9 @@ fn testFreeTextMessage() {
 
 #[test]
 fn testJsonSerialization() {
-    let mut message1 = WhiteflagMessage::deserialize("WF100F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!").unwrap();
+    let mut message1 = BasicMessage::deserialize("WF100F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!").unwrap();
     let jsonMessageStr: String = message1.to_json();
-    let message2 = WhiteflagMessage::deserializeJson(jsonMessageStr).unwrap();
+    let message2 = BasicMessage::deserializeJson(jsonMessageStr).unwrap();
 
     assert_eq!(message1.message_type(), message2.message_type());
     assert_eq!(message1.prefix(), message2.prefix());
@@ -442,7 +440,7 @@ fn testJsonSerialization() {
 fn testJsonDeserialization() {
     let messageStr = "WF100F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!";
     let jsonMessageStr = "{\"MetaHeader\":{},\"MessageHeader\":{\"Prefix\":\"WF\",\"Version\":\"1\",\"EncryptionIndicator\":\"0\",\"DuressIndicator\":\"0\",\"MessageCode\":\"F\",\"ReferenceIndicator\":\"5\",\"ReferencedMessage\":\"f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942df\"},\"MessageBody\":{\"Text\":\"Whiteflag test message!\"}}";
-    let message = WhiteflagMessage::deserializeJson(jsonMessageStr.to_string()).unwrap();
+    let message = BasicMessage::deserializeJson(jsonMessageStr.to_string()).unwrap();
 
     assert_eq!(None, message.get_transaction_hash());
     assert_eq!("WF", message.prefix());
@@ -463,7 +461,7 @@ fn testMessageEncryption1() {
         "32676187ba7badda85ea63a69870a7133909f1999774abb2eed251073616a6e7".to_string(),
     ));
 
-    let message = WhiteflagMessage::decode(encodedMsg).unwrap();
+    let message = BasicMessage::decode(encodedMsg).unwrap();
     message.set_originator(originator.clone());
     message.set_recipient(recipient.clone());
     message.set_init_vector("40aa85015d24e4601448c1ba8d7bf1aa");
@@ -483,13 +481,13 @@ fn testMessageEncryption2() {
     ));
 
     let messageStr = "WF120F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!";
-    let message1 = WhiteflagMessage::deserialize(messageStr).unwrap();
+    let message1 = BasicMessage::deserialize(messageStr).unwrap();
     message1.set_originator(originator.clone());
     message1.set_recipient(recipient.clone());
 
     let encryptedMsg = message1.encode();
     let initVector = message1.get_init_vector();
-    let message2 = WhiteflagMessage::decrypt(encryptedMsg, originator, recipient, initVector);
+    let message2 = BasicMessage::decrypt(encryptedMsg, originator, recipient, initVector);
 
     assert_eq!(messageStr, message2.serialize());
     assert_eq!(message1.referenced_message(), message2.referenced_message());
@@ -505,13 +503,13 @@ fn testMessageEncryption3() {
     recipient.set_ecdh_keypair(generate_wfkeypair());
 
     let messageStr = "WF111Q13efb4e0cfa83122b242634254c1920a769d615dfcc4c670bb53eb6f12843c3ae802013-08-31T04:29:15ZP01D00H00M22+31.79658-033.826028799321000010022003";
-    let message1 = WhiteflagMessage::deserialize(messageStr).unwrap();
+    let message1 = BasicMessage::deserialize(messageStr).unwrap();
     message1.set_originator(originator.clone());
     message1.set_recipient(recipient.clone());
 
     let encryptedMsg = message1.encrypt();
     let initVector = message1.get_init_vector();
-    let message2 = WhiteflagMessage::decrypt(encryptedMsg, originator, recipient, initVector);
+    let message2 = BasicMessage::decrypt(encryptedMsg, originator, recipient, initVector);
 
     assert_eq!(messageStr, message2.serialize());
     assert_eq!(message1.referenced_message(), message2.referenced_message());
@@ -526,7 +524,7 @@ fn testMessageEncryption4() {
     originator.set_address("b77b1cdb02efe1acccf0e277021cb303117bd83c689ea8a64fc549229dba".to_string());
     recipient.set_ecdh_keypair(generate_wfkeypair());
 
-    let message = WhiteflagMessage::deserialize("WF111Q13efb4e0cfa83122b242634254c1920a769d615dfcc4c670bb53eb6f12843c3ae802013-08-31T04:29:15ZP01D00H00M22+31.79658-033.826028799321000010022003").unwrap();
+    let message = BasicMessage::deserialize("WF111Q13efb4e0cfa83122b242634254c1920a769d615dfcc4c670bb53eb6f12843c3ae802013-08-31T04:29:15ZP01D00H00M22+31.79658-033.826028799321000010022003").unwrap();
     message.set_originator(originator);
     message.set_recipient(recipient);
 

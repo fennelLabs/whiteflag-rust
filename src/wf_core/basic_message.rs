@@ -8,7 +8,7 @@ use crate::wf_crypto::cipher::{WhiteflagCipher, WfCipher};
 use crate::wf_crypto::encryption_method::{
     encryption_method_from_field_value, WhiteflagEncryptionMethod,
 };
-use crate::wf_crypto::wf_encryption_key::{WfEncryptionKey, WhiteflagEncryptionKey};
+use crate::wf_crypto::wf_encryption_key::{WhiteflagEncryptionKey};
 use crate::wf_field::{get_field_value_from_array, Field};
 use crate::wf_parser::WhiteflagMessageBuilder;
 
@@ -21,8 +21,8 @@ pub struct BasicMessage {
     header: MessageSegment,
     body: MessageSegment,
 
-    originator: WhiteflagAccount,
-    recipient: WhiteflagAccount,
+    originator: Option<WhiteflagAccount>,
+    recipient: Option<WhiteflagAccount>,
 }
 
 impl MessageSegment {
@@ -46,7 +46,7 @@ impl BasicMessage {
         WhiteflagMessageBuilder::new(data).compile()
     }
 
-    pub fn new(message_code: char, header: Vec<Field>, body: Vec<Field>, originator: WhiteflagAccount, recipient: WhiteflagAccount) -> BasicMessage {
+    pub fn new(message_code: char, header: Vec<Field>, body: Vec<Field>, originator: Option<WhiteflagAccount>, recipient: Option<WhiteflagAccount>) -> BasicMessage {
         BasicMessage {
             message_code,
             header: header.into(),
@@ -80,14 +80,12 @@ impl BasicMessage {
         {
             return encoded_message;
         }
-        let cipher = self.create_cipher(method, self.originator, self.recipient);
+        let cipher = self.create_cipher(method, self.originator.unwrap(), self.recipient.unwrap());
         let unencrypted_bit_position = self.header.bit_length_of_field(FIELD_ENCRYPTIONINDICATOR);
         let encrypted_message = WhiteflagBuffer::new(vec![], 0);
 
-        // TODO Make `append` operate on `self`
-        // TODO Write extract_bits functions used below.
-        encrypted_message.append(encrypted_message, encoded_message.extract_bits_range(0, unencrypted_bit_position));
-        encrypted_message.append(encrypted_message, cipher.encrypt(encoded_message.extract_bits_from(unencrypted_bit_position)));
+        encrypted_message.append(encoded_message.extract_bits(0, unencrypted_bit_position), None);
+        encrypted_message.append(encoded_message.extract_bits_from(unencrypted_bit_position), None);
         encrypted_message
     }
 
@@ -105,14 +103,12 @@ impl BasicMessage {
         {
             return message;
         }
-        let cipher = self.create_cipher(method, self.originator, self.recipient);
+        let cipher = self.create_cipher(method, self.originator.unwrap(), self.recipient.unwrap());
         let unencrypted_bit_position = self.header.bit_length_of_field(FIELD_ENCRYPTIONINDICATOR);
         let encoded_message = WhiteflagBuffer::new(vec![], 0);
         
-        // TODO Make `append` operate on `self`
-        // TODO Write extract_bits functions used below.
-        encoded_message.append(encoded_message, message.extract_bits_range(0, unencrypted_bit_position));
-        encoded_message.append(encoded_message, cipher.encrypt(message.extract_bits_from(unencrypted_bit_position)));
+        encoded_message.append(message.extract_bits(0, unencrypted_bit_position), None);
+        encoded_message.append(message.extract_bits_from(unencrypted_bit_position), None);
         encoded_message
     }
 

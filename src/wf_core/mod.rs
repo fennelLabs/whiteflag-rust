@@ -10,7 +10,6 @@ mod edge_case_test;
 pub mod basic_message;
 mod decoder;
 pub mod error;
-pub mod message;
 mod segment;
 mod types;
 
