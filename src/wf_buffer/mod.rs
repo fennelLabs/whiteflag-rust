@@ -32,11 +32,17 @@ impl WhiteflagBuffer {
     }
 
     pub fn extract_bits(&mut self, start: usize, end: usize) -> WhiteflagBuffer {
-
+        WhiteflagBuffer::new(
+            extract_bits(&self.data, self.bit_length, start, end),
+            end - start,
+        )
     }
 
     pub fn extract_bits_from(&mut self, start: usize) -> WhiteflagBuffer {
-        
+        WhiteflagBuffer::new(
+            extract_bits(&self.data, self.bit_length, start, self.bit_length),
+            self.bit_length - start,
+        )
     }
 
     pub fn append_field(&mut self, field: &Field) {

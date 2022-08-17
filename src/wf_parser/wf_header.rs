@@ -1,4 +1,4 @@
-use crate::wf_field::definitions::convert_value_to_code;
+use crate::wf_field::definitions::{convert_value_to_code, get_body_from_code};
 use crate::wf_field::Field;
 use crate::{wf_buffer::WhiteflagBuffer, wf_field::FieldDefinition};
 
@@ -7,9 +7,41 @@ pub struct MessageHeader {
     version: String,
     encryption_indicator: String,
     duress_indicator: String,
-    message_code: char,
+    message_code: String,
     reference_indicator: String,
     referenced_message: String,
+}
+
+impl MessageHeader {
+    pub fn from_serialized(serialized: &str) -> MessageHeader {
+        let fields: Vec<String> = super::from_serialized(serialized, crate::wf_field::definitions::Header::DEFINITIONS);
+
+        MessageHeader {
+            prefix: fields.remove(0),
+            version: fields.remove(0),
+            encryption_indicator: fields.remove(0),
+            duress_indicator: fields.remove(0),
+            message_code: fields.remove(0),
+            reference_indicator: fields.remove(0),
+            referenced_message: fields.remove(0),
+        }
+    }
+
+    pub fn get_body_field_definitions(&self) -> Vec<FieldDefinition> {
+        get_body_from_code(&self.message_code)
+    }
+
+    pub fn to_vec(self) -> Vec<String> {
+        vec![
+            self.prefix,
+            self.version,
+            self.encryption_indicator,
+            self.duress_indicator,
+            self.message_code,
+            self.reference_indicator,
+            self.referenced_message,
+        ]
+    }
 }
 
 pub struct MessageHeaderFields {

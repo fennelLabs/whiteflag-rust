@@ -60,36 +60,16 @@ fn test_auth_message_serialization() {
     test(&field_values);
 }
 
-/*
-
-
-
-
-
-/*
-
-
-
-
-
 #[test]
 fn testAuthMessageDeserialization() {
-    let messageSerialized = "WF100A000000000000000000000000000000000000000000000000000000000000000001https://organisation.int/whiteflag";
-    let message = BasicMessage::deserialize(messageSerialized).unwrap();
+    let message_serialized = "WF100A000000000000000000000000000000000000000000000000000000000000000001https://organisation.int/whiteflag".to_string();
+    let message = BasicMessage::deserialize(message_serialized);
+    let message_reserialized = message.serialize();
 
-    assert_eq!("A", message.message_type());
-    assert_eq!(&messageSerialized[0..2], message.prefix());
-    assert_eq!(&messageSerialized[2..3], message.version());
-    assert_eq!(&messageSerialized[3..4], message.encryption_indicator());
-    assert_eq!(&messageSerialized[4..5], message.duress_indictor());
-    assert_eq!(&messageSerialized[5..6], message.message_code());
-    assert_eq!(&messageSerialized[6..7], message.reference_indicator());
-    assert_eq!(&messageSerialized[7..71], message.referenced_message());
-    assert_eq!(&messageSerialized[71..72], message.verification_method());
-    assert_eq!(&messageSerialized[72..], message.verification_data());
-    assert!(message.is_valid());
+    assert_eq!(message_serialized, message_reserialized);
 }
 
+/*
 #[test]
 fn testAuthMessageDecoding() {
     let fieldValues = vec![
