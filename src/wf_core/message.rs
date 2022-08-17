@@ -4,9 +4,9 @@ use crate::{wf_account::test_impl::WhiteflagAccount, wf_buffer::WhiteflagBuffer}
 
 use super::basic_message::BasicMessage;
 
-    const METAKEY_ORIGINATOR: &str = "originatorAddress";
-    const METAKEY_RECIPIENT: &str = "recipientAddress";
-    const FIELD_ENCRYPTIONINDICATOR: &str = "EncryptionIndicator";
+const METAKEY_ORIGINATOR: &str = "originatorAddress";
+const METAKEY_RECIPIENT: &str = "recipientAddress";
+const FIELD_ENCRYPTIONINDICATOR: &str = "EncryptionIndicator";
 
 struct WhiteflagMessage {
     base: BasicMessage,
@@ -22,7 +22,7 @@ struct WhiteflagMessage {
     cachedMsgStr: Option<String>,
 }
 
-impl WhiteflagMessage {    
+/* impl WhiteflagMessage {
     fn new(base: BasicMessage) -> WhiteflagMessage {
         WhiteflagMessage { base: base, metadata: HashMap::new(), originator: None, recipient: None, initVector: vec![], cachedMsg: None, cachedMsgStr: None }
     }
@@ -197,7 +197,7 @@ impl WhiteflagMessage {
     }
 
     String toString() {
-        return base.toString(); 
+        return base.toString();
     }
 
     String serialize() {
@@ -369,3 +369,4 @@ impl WhiteflagMessage {
     }
 }
 
+ */
