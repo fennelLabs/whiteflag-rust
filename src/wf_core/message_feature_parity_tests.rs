@@ -67,10 +67,9 @@ fn test_auth_message_deserialization() {
     assert_eq!(message_serialized, message.serialize());
 }
 
-/*
 #[test]
-fn testAuthMessageDecoding() {
-    let fieldValues = vec![
+fn test_auth_message_decoding() {
+    let field_values = vec![
         "WF",
         "1",
         "0",
@@ -81,20 +80,12 @@ fn testAuthMessageDecoding() {
         "1",
         "https://organisation.int/whiteflag",
     ];
-    let message = BasicMessage::decode("5746313020800000000000000000000000000000000000000000000000000000000000000000b43a3a38399d1797b7b933b0b734b9b0ba34b7b71734b73a17bbb434ba32b33630b380").unwrap();
-
-    assert_eq!("A", message.message_type());
-    assert_eq!(fieldValues[0], message.prefix());
-    assert_eq!(fieldValues[1], message.version());
-    assert_eq!(fieldValues[2], message.encryption_indicator());
-    assert_eq!(fieldValues[3], message.duress_indictor());
-    assert_eq!(fieldValues[4], message.message_code());
-    assert_eq!(fieldValues[5], message.reference_indicator());
-    assert_eq!(fieldValues[6], message.referenced_message());
-    assert_eq!(fieldValues[7], message.verification_method());
-    assert_eq!(fieldValues[8], message.verification_data());
-    assert!(message.is_valid());
+    let message = BasicMessage::decode("5746313020800000000000000000000000000000000000000000000000000000000000000000b43a3a38399d1797b7b933b0b734b9b0ba34b7b71734b73a17bbb434ba32b33630b380");
+    assert_eq!(field_values.concat(), message.serialize());
 }
+
+
+/*
 
 #[test]
 #[should_panic(expected = "WhiteflagError")]

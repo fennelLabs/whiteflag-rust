@@ -1,3 +1,4 @@
+use super::decoder::Decoder;
 use super::error::{WhiteflagError, WhiteflagResult};
 use super::segment::MessageSegment;
 use super::FieldValue;
@@ -197,6 +198,11 @@ impl BasicMessage {
 
     pub fn encode_as_hex(&mut self) -> String {
         hex::encode(self.encode())
+    }
+
+    /// decode a hexadecimal encoded whiteflag message
+    pub fn decode<T: AsRef<str>>(message: T) -> Self {
+        Decoder::new(message).decode()
     }
 
     /**
