@@ -45,7 +45,7 @@ fn auth_message_compilation() {
 }
 
 #[test]
-fn test_auth_message_serialization() {
+fn auth_message_serialization() {
     let field_values = vec![
         "WF",
         "1",
@@ -61,14 +61,14 @@ fn test_auth_message_serialization() {
 }
 
 #[test]
-fn test_auth_message_deserialization() {
+fn auth_message_deserialization() {
     let message_serialized = "WF100A000000000000000000000000000000000000000000000000000000000000000001https://organisation.int/whiteflag";
     let message = BasicMessage::deserialize(message_serialized);
     assert_eq!(message_serialized, message.serialize());
 }
 
 #[test]
-fn test_auth_message_decoding() {
+fn auth_message_decoding() {
     let field_values = vec![
         "WF",
         "1",
@@ -84,13 +84,10 @@ fn test_auth_message_decoding() {
     assert_eq!(field_values.concat(), message.serialize());
 }
 
-
-/*
-
-#[test]
+/* #[test]
 #[should_panic(expected = "WhiteflagError")]
 fn testInvalidMessage() {
-    let fieldValues = vec![
+    let field_values = vec![
         "WF",
         "1",
         "0",
@@ -101,13 +98,13 @@ fn testInvalidMessage() {
         "1",
         "b01218a30dd3c23d050af254bfcce31a715fecdff6a23fd59609612e6e0ef263",
     ];
-    let message = BasicMessage::compile(fieldValues).unwrap();
-}
+    BasicMessage::compile(&field_values);
+} */
 
 #[test]
-fn testSignSignalMessageEncoding() {
-    let messageEncoded = "57463130a6a1f7da7067d41891592131a12a60c9053b4eb0aefe6263385da9f5b789421e1d7401009841882148a800000114c1e596006f04c050eca6420084";
-    let fieldValues = vec![
+fn sign_signal_message_encoding() {
+    let message_encoded = "57463130a6a1f7da7067d41891592131a12a60c9053b4eb0aefe6263385da9f5b789421e1d7401009841882148a800000114c1e596006f04c050eca6420084";
+    let field_values = vec![
         "WF",
         "1",
         "0",
@@ -125,20 +122,15 @@ fn testSignSignalMessageEncoding() {
         "3210",
         "042",
     ];
-    let mut message = BasicMessage::compile(fieldValues).unwrap();
-
-    assert_eq!(None, message.set_transaction_hash("a1b2c3".to_string()));
-    assert_eq!(
-        "a1b2c3",
-        message.set_transaction_hash("d4e5f6".to_string()).unwrap()
-    );
-    assert_eq!(None, message.set_originator_address("abc123".to_string()));
-    assert_eq!("abc123", message.get_originator_address());
-    assert_eq!("M", message.message_type());
-    assert_eq!(messageEncoded, &message.encode().as_hex());
-    assert_eq!(messageEncoded, &message.encode().as_hex());
-    assert!(message.is_valid());
+    let mut message = BasicMessage::compile(&field_values);
+    assert_eq!(message_encoded, message.encode_as_hex());
 }
+
+/*
+
+
+
+
 
 #[test]
 fn testSignSignalMessageDecoding() {
