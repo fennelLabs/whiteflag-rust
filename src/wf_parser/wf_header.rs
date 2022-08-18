@@ -14,7 +14,10 @@ pub struct MessageHeader {
 
 impl MessageHeader {
     pub fn from_serialized(serialized: &str) -> MessageHeader {
-        let fields: Vec<String> = super::from_serialized(serialized, crate::wf_field::definitions::Header::DEFINITIONS);
+        let mut fields: Vec<String> = super::from_serialized(
+            serialized,
+            crate::wf_field::definitions::Header::DEFINITIONS,
+        );
 
         MessageHeader {
             prefix: fields.remove(0),

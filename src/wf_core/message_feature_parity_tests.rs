@@ -61,12 +61,10 @@ fn test_auth_message_serialization() {
 }
 
 #[test]
-fn testAuthMessageDeserialization() {
-    let message_serialized = "WF100A000000000000000000000000000000000000000000000000000000000000000001https://organisation.int/whiteflag".to_string();
+fn test_auth_message_deserialization() {
+    let message_serialized = "WF100A000000000000000000000000000000000000000000000000000000000000000001https://organisation.int/whiteflag";
     let message = BasicMessage::deserialize(message_serialized);
-    let message_reserialized = message.serialize();
-
-    assert_eq!(message_serialized, message_reserialized);
+    assert_eq!(message_serialized, message.serialize());
 }
 
 /*

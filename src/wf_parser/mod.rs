@@ -8,7 +8,7 @@ mod wf_header;
 
 pub use message_code_parser::MessageCodeParser;
 pub use message_header_parser::MessageHeaderParser;
-pub use wf_header::{MessageHeaderFields, MessageHeader};
+pub use wf_header::{MessageHeader, MessageHeaderFields};
 
 use crate::{
     wf_core::{basic_message::BasicMessage, FieldValue},
@@ -112,11 +112,14 @@ impl<'a, T: FieldValue> FieldDefinitionParser for WhiteflagMessageBuilder<'a, T>
 }
 
 pub fn from_serialized(serialized: &str, definitions: &[FieldDefinition]) -> Vec<String> {
-    definitions.iter().map(|d| {
-        if let Some(end) = d.end_byte {
-            serialized[d.start_byte..end].to_owned()
-        } else {
-            serialized[d.start_byte..].to_owned()
-        }
-    }).collect()
+    definitions
+        .iter()
+        .map(|d| {
+            if let Some(end) = d.end_byte {
+                serialized[d.start_byte..end].to_owned()
+            } else {
+                serialized[d.start_byte..].to_owned()
+            }
+        })
+        .collect()
 }

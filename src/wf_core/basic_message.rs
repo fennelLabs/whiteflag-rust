@@ -4,13 +4,13 @@ use super::FieldValue;
 use crate::wf_account::account::WfAccount;
 use crate::wf_account::test_impl::WhiteflagAccount;
 use crate::wf_buffer::WhiteflagBuffer;
-use crate::wf_crypto::cipher::{WhiteflagCipher, WfCipher};
+use crate::wf_crypto::cipher::{WfCipher, WhiteflagCipher};
 use crate::wf_crypto::encryption_method::{
     encryption_method_from_field_value, WhiteflagEncryptionMethod,
 };
-use crate::wf_crypto::wf_encryption_key::{WhiteflagEncryptionKey};
+use crate::wf_crypto::wf_encryption_key::WhiteflagEncryptionKey;
 use crate::wf_field::{get_field_value_from_array, Field};
-use crate::wf_parser::{WhiteflagMessageBuilder, from_serialized, MessageHeader};
+use crate::wf_parser::{from_serialized, MessageHeader, WhiteflagMessageBuilder};
 
 const METAKEY_ORIGINATOR: &str = "originatorAddress";
 const METAKEY_RECIPIENT: &str = "recipientAddress";
@@ -42,7 +42,13 @@ impl BasicMessage {
         WhiteflagMessageBuilder::new(data).compile()
     }
 
-    pub fn new(message_code: char, header: Vec<Field>, body: Vec<Field>, originator: Option<WhiteflagAccount>, recipient: Option<WhiteflagAccount>) -> BasicMessage {
+    pub fn new(
+        message_code: char,
+        header: Vec<Field>,
+        body: Vec<Field>,
+        originator: Option<WhiteflagAccount>,
+        recipient: Option<WhiteflagAccount>,
+    ) -> BasicMessage {
         BasicMessage {
             message_code,
             header: header.into(),
@@ -60,18 +66,19 @@ impl BasicMessage {
         serial
     }
 
-    pub fn deserialize(message: String) -> BasicMessage {
-        let header = crate::wf_parser::MessageHeader::from_serialized(&message);
-        let mut body = from_serialized(&message, &header.get_body_field_definitions());
+    pub fn deserialize(message: &str) -> BasicMessage {
+        let header = crate::wf_parser::MessageHeader::from_serialized(message);
+        let mut body = from_serialized(message, &header.get_body_field_definitions());
 
-        let field_values = header.to_vec();
+        let mut field_values = header.to_vec();
         field_values.append(body.as_mut());
 
         Self::compile(field_values.as_ref())
     }
 
-    pub fn encrypt(&self, encoded_message: WhiteflagBuffer) -> WhiteflagBuffer {
-        let method = BasicMessage::get_encryption_method(self.header.get(FIELD_ENCRYPTIONINDICATOR));
+    /* pub fn encrypt(&self, encoded_message: WhiteflagBuffer) -> WhiteflagBuffer {
+        let method =
+            BasicMessage::get_encryption_method(self.header.get(FIELD_ENCRYPTIONINDICATOR));
         if method
             == (WhiteflagEncryptionMethod::NoEncryption {
                 field_value: "0".to_string(),
@@ -88,13 +95,20 @@ impl BasicMessage {
         let unencrypted_bit_position = self.header.bit_length_of_field(FIELD_ENCRYPTIONINDICATOR);
         let encrypted_message = WhiteflagBuffer::new(vec![], 0);
 
-        encrypted_message.append(encoded_message.extract_bits(0, unencrypted_bit_position), None);
-        encrypted_message.append(encoded_message.extract_bits_from(unencrypted_bit_position), None);
+        encrypted_message.append(
+            encoded_message.extract_bits(0, unencrypted_bit_position),
+            None,
+        );
+        encrypted_message.append(
+            encoded_message.extract_bits_from(unencrypted_bit_position),
+            None,
+        );
         encrypted_message
     }
 
     pub fn decrypt(&self, message: WhiteflagBuffer) -> BasicMessage {
-        let method = BasicMessage::get_encryption_method(self.header.get(FIELD_ENCRYPTIONINDICATOR));
+        let method =
+            BasicMessage::get_encryption_method(self.header.get(FIELD_ENCRYPTIONINDICATOR));
         if method
             == (WhiteflagEncryptionMethod::NoEncryption {
                 field_value: "0".to_string(),
@@ -108,11 +122,10 @@ impl BasicMessage {
             return message;
         }
 
-        
         let cipher = self.create_cipher(method, self.originator.unwrap(), self.recipient.unwrap());
         let unencrypted_bit_position = self.header.bit_length_of_field(FIELD_ENCRYPTIONINDICATOR);
         let encoded_message = WhiteflagBuffer::new(vec![], 0);
-        
+
         encoded_message.append(message.extract_bits(0, unencrypted_bit_position), None);
         encoded_message.append(message.extract_bits_from(unencrypted_bit_position), None);
         encoded_message
@@ -170,7 +183,7 @@ impl BasicMessage {
         originator: WhiteflagAccount,
         recipient: WhiteflagAccount,
     ) -> WhiteflagEncryptionKey {
-    }
+    } */
 
     pub fn encode(&mut self) -> Vec<u8> {
         let mut buffer = WhiteflagBuffer::default();
