@@ -126,16 +126,10 @@ fn sign_signal_message_encoding() {
     assert_eq!(message_encoded, message.encode_as_hex());
 }
 
-/*
-
-
-
-
-
 #[test]
-fn testSignSignalMessageDecoding() {
-    let messageEncoded = "57463130a6a1f7da7067d41891592131a12a60c9053b4eb0aefe6263385da9f5b789421e1d7401009841882148a800000114c1e596006f04c050eca6420084";
-    let fieldValues = vec![
+fn sign_signal_message_decoding() {
+    let message_encoded = "57463130a6a1f7da7067d41891592131a12a60c9053b4eb0aefe6263385da9f5b789421e1d7401009841882148a800000114c1e596006f04c050eca6420084";
+    let field_values = vec![
         "WF",
         "1",
         "0",
@@ -153,27 +147,12 @@ fn testSignSignalMessageDecoding() {
         "3210",
         "042",
     ];
-    let message = BasicMessage::decode(messageEncoded).unwrap();
+    let message = BasicMessage::decode(message_encoded);
 
-    assert_eq!("M", message.message_type());
-    assert_eq!(fieldValues[0], message.prefix());
-    assert_eq!(fieldValues[1], message.version());
-    assert_eq!(fieldValues[2], message.encryption_indicator());
-    assert_eq!(fieldValues[3], message.duress_indictor());
-    assert_eq!(fieldValues[4], message.message_code());
-    assert_eq!(fieldValues[5], message.reference_indicator());
-    assert_eq!(fieldValues[6], message.referenced_message());
-    assert_eq!(fieldValues[7], message.get_subject_code());
-    assert_eq!(fieldValues[8], message.datetime());
-    assert_eq!(fieldValues[9], message.duration());
-    assert_eq!(fieldValues[10], message.get_object_type());
-    assert_eq!(fieldValues[11], message.object_latitude());
-    assert_eq!(fieldValues[12], message.object_longitude());
-    assert_eq!(fieldValues[13], message.object_size_dim_one());
-    assert_eq!(fieldValues[14], message.object_size_dim_two());
-    assert_eq!(fieldValues[15], message.object_orientation());
-    assert!(message.is_valid());
+    assert_eq!(field_values.concat(), message.serialize());
 }
+
+/*
 
 #[test]
 fn testTestMessage() {
