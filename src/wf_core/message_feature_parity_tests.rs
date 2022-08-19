@@ -122,7 +122,7 @@ fn sign_signal_message_encoding() {
         "3210",
         "042",
     ];
-    let mut message = BasicMessage::compile(&field_values);
+    let message = BasicMessage::compile(&field_values);
     assert_eq!(message_encoded, message.encode_as_hex());
 }
 
@@ -148,16 +148,13 @@ fn sign_signal_message_decoding() {
         "042",
     ];
     let message = BasicMessage::decode(message_encoded);
-
     assert_eq!(field_values.concat(), message.serialize());
 }
 
-/*
-
 #[test]
-fn testTestMessage() {
-    let messageSerialized = "WF101T33efb4e0cfa83122b242634254c1920a769d615dfcc4c670bb53eb6f12843c3aeM802013-08-31T04:29:15ZP00D00H00M22+30.79658-037.8260287653210042";
-    let fieldValues = vec![
+fn test_message() {
+    let message_serialized = "WF101T33efb4e0cfa83122b242634254c1920a769d615dfcc4c670bb53eb6f12843c3aeM802013-08-31T04:29:15ZP00D00H00M22+30.79658-037.8260287653210042";
+    let field_values = vec![
         "WF",
         "1",
         "0",
@@ -176,60 +173,18 @@ fn testTestMessage() {
         "3210",
         "042",
     ];
-    let mut message = BasicMessage::compile(fieldValues.clone()).unwrap();
-    let messageEncoded = &message.encode().as_hex();
-    let mut messageDecoded = BasicMessage::decode(messageEncoded).unwrap();
+    let message = BasicMessage::compile(&field_values);
+    let message_encoded = message.encode_as_hex();
+    let message_decoded = BasicMessage::decode(message_encoded);
 
-    assert_eq!(None, message.get_transaction_hash());
-    assert_eq!("T", message.message_type());
-    assert_eq!("T", messageDecoded.message_type());
-    assert_eq!(messageSerialized, message.serialize());
-    assert_eq!(messageSerialized, message.serialize());
-    assert_eq!(messageSerialized, messageDecoded.serialize());
-    assert_eq!(fieldValues[0], message.prefix());
-    assert_eq!(fieldValues[0], messageDecoded.prefix());
-    assert_eq!(fieldValues[1], message.version());
-    assert_eq!(fieldValues[2], message.encryption_indicator());
-    assert_eq!(fieldValues[3], message.duress_indictor());
-    assert_eq!(fieldValues[4], message.message_code());
-    assert_eq!(fieldValues[5], message.reference_indicator());
-    assert!(!message.set_reference_indicator("6"));
-    assert_eq!(fieldValues[6], message.referenced_message());
-    assert_eq!(fieldValues[6], messageDecoded.referenced_message());
-    assert_eq!(fieldValues[7], message.pseudo_message_code());
-    assert_eq!(fieldValues[7], messageDecoded.pseudo_message_code());
-    assert_eq!(fieldValues[8], message.get_subject_code());
-    assert_eq!(fieldValues[9], message.datetime());
-    assert_eq!(fieldValues[10], message.duration());
-    assert_eq!(fieldValues[11], message.get_object_type());
-    assert_eq!(fieldValues[12], message.object_latitude());
-    assert_eq!(fieldValues[13], message.object_longitude());
-    assert_eq!(fieldValues[14], message.object_size_dim_one());
-    assert_eq!(fieldValues[15], message.object_size_dim_two());
-    assert_eq!(fieldValues[16], messageDecoded.object_orientation());
-    assert!(message.is_valid());
-    assert!(messageDecoded.is_valid());
-    assert_eq!(
-        None,
-        messageDecoded.set_transaction_hash("a1b2c3".to_string())
-    );
-    assert_eq!(
-        "a1b2c3",
-        messageDecoded
-            .set_transaction_hash("d4e5f6".to_string())
-            .unwrap()
-    );
-    assert_eq!(
-        None,
-        messageDecoded.set_originator_address("abc123".to_string())
-    );
-    assert_eq!("abc123", messageDecoded.get_originator_address());
+    assert_eq!(message_serialized, message.serialize());
+    assert_eq!(message_serialized, message_decoded.serialize());
 }
 
 #[test]
-fn testRequestMessage() {
-    let messageSerialized = "WF101Q13efb4e0cfa83122b242634254c1920a769d615dfcc4c670bb53eb6f12843c3ae802013-08-31T04:29:15ZP01D00H00M22+31.79658-033.826028799321000010022003";
-    let fieldValues = vec![
+fn request_message() {
+    let message_serialized = "WF101Q13efb4e0cfa83122b242634254c1920a769d615dfcc4c670bb53eb6f12843c3ae802013-08-31T04:29:15ZP01D00H00M22+31.79658-033.826028799321000010022003";
+    let field_values = vec![
         "WF",
         "1",
         "0",
@@ -251,64 +206,23 @@ fn testRequestMessage() {
         "20",
         "03",
     ];
-    let message = BasicMessage::compile(fieldValues.clone()).unwrap();
-    let messageEncoded = &message.encode().as_hex();
-    let messageDecoded = BasicMessage::decode(messageEncoded).unwrap();
+    let message = BasicMessage::compile(&field_values);
+    let message_encoded = message.encode_as_hex();
+    let message_decoded = BasicMessage::decode(message_encoded);
 
-    assert_eq!("Q", message.message_type());
-    assert_eq!("Q", messageDecoded.message_type());
-    assert_eq!(messageSerialized, message.serialize());
-    assert_eq!(messageDecoded.serialize(), message.serialize());
-    assert_eq!(fieldValues[0], message.prefix());
-    assert_eq!(fieldValues[1], message.version());
-    assert_eq!(fieldValues[2], message.encryption_indicator());
-    assert_eq!(fieldValues[3], message.duress_indictor());
-    assert_eq!(fieldValues[4], message.message_code());
-    assert_eq!(fieldValues[5], message.reference_indicator());
-    assert_eq!(fieldValues[6], message.referenced_message());
-    assert_eq!(fieldValues[7], message.get_subject_code());
-    assert_eq!(fieldValues[8], message.datetime());
-    assert_eq!(fieldValues[9], message.duration());
-    assert_eq!(fieldValues[10], message.get_object_type());
-    assert_eq!(fieldValues[11], message.object_latitude());
-    assert_eq!(fieldValues[12], message.object_longitude());
-    assert_eq!(fieldValues[13], message.object_size_dim_one());
-    assert_eq!(fieldValues[14], message.object_size_dim_two());
-    assert_eq!(fieldValues[15], message.object_orientation());
-    assert_eq!(fieldValues[16], message.object_type_one());
-    assert_eq!(fieldValues[17], message.object_type_one_quantity());
-    assert_eq!(fieldValues[18], message.object_type_two());
-    assert_eq!(fieldValues[19], message.object_type_two_quantity());
-    assert!(message.is_valid());
-    assert!(messageDecoded.is_valid());
+    assert_eq!(message_serialized, message.serialize());
+    assert_eq!(message_serialized, message_decoded.serialize());
 }
 
 #[test]
-fn testFreeTextMessage() {
-    let mut message1 = BasicMessage::deserialize("WF100F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!").unwrap();
-    let message2 = BasicMessage::decode("57463130232fb60f0f6c4a8589bddcf076e790ac9eb1601d3fd9ced67eaaa62c9fb9644a16fabb434ba32b33630b3903a32b9ba1036b2b9b9b0b3b2908").unwrap();
+fn free_text_message() {
+    let message1 = BasicMessage::deserialize("WF100F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!");
+    let message2 = BasicMessage::decode("57463130232fb60f0f6c4a8589bddcf076e790ac9eb1601d3fd9ced67eaaa62c9fb9644a16fabb434ba32b33630b3903a32b9ba1036b2b9b9b0b3b2908");
 
-    assert_eq!("F", message1.message_type());
-    assert_eq!("F", message2.message_type());
-    assert_eq!(message1.prefix(), message2.prefix());
-    assert_eq!(message1.version(), message2.version());
-    assert!(!message1.set_encryption_indicator("2".to_string()));
-    assert_eq!(
-        message1.encryption_indicator(),
-        message2.encryption_indicator()
-    );
-    assert_eq!(message1.duress_indictor(), message2.duress_indictor());
-    assert_eq!(message1.message_code(), message2.message_code());
-    assert_eq!(
-        message1.reference_indicator(),
-        message2.reference_indicator()
-    );
-    assert_eq!(message1.referenced_message(), message2.referenced_message());
-    assert!(!message2.set_text("alternate text"));
-    assert_eq!(message1.text(), message2.text());
-    assert!(message1.is_valid());
-    assert!(message2.is_valid());
+    assert_eq!(message1.serialize(), message2.serialize());
 }
+
+/*
 
 #[test]
 fn testJsonSerialization() {
