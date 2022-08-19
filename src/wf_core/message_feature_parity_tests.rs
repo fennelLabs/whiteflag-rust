@@ -224,45 +224,7 @@ fn free_text_message() {
 
 /*
 
-#[test]
-fn testJsonSerialization() {
-    let mut message1 = BasicMessage::deserialize("WF100F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!").unwrap();
-    let jsonMessageStr: String = message1.to_json();
-    let message2 = BasicMessage::deserializeJson(jsonMessageStr).unwrap();
 
-    assert_eq!(message1.message_type(), message2.message_type());
-    assert_eq!(message1.prefix(), message2.prefix());
-    assert_eq!(message1.version(), message2.version());
-    assert!(!message1.set_encryption_indicator("2".to_string()));
-    assert_eq!(
-        message1.encryption_indicator(),
-        message2.encryption_indicator()
-    );
-    assert_eq!(message1.duress_indictor(), message2.duress_indictor());
-    assert_eq!(message1.message_code(), message2.message_code());
-    assert_eq!(
-        message1.reference_indicator(),
-        message2.reference_indicator()
-    );
-    assert_eq!(message1.referenced_message(), message2.referenced_message());
-    assert!(!message2.set_text("alternate text"));
-    assert_eq!(message1.text(), message2.text());
-    assert!(message1.is_valid());
-    assert!(message2.is_valid());
-}
-
-#[test]
-fn testJsonDeserialization() {
-    let messageStr = "WF100F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!";
-    let jsonMessageStr = "{\"MetaHeader\":{},\"MessageHeader\":{\"Prefix\":\"WF\",\"Version\":\"1\",\"EncryptionIndicator\":\"0\",\"DuressIndicator\":\"0\",\"MessageCode\":\"F\",\"ReferenceIndicator\":\"5\",\"ReferencedMessage\":\"f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942df\"},\"MessageBody\":{\"Text\":\"Whiteflag test message!\"}}";
-    let message = BasicMessage::deserializeJson(jsonMessageStr.to_string()).unwrap();
-
-    assert_eq!(None, message.get_transaction_hash());
-    assert_eq!("WF", message.prefix());
-    assert_eq!("Whiteflag test message!", message.text());
-    assert!(!message.set_text("alternate text"));
-    assert_eq!(messageStr, message.to_string());
-}
 
 #[test]
 fn testMessageEncryption1() {
