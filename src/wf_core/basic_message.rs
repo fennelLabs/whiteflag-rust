@@ -186,17 +186,17 @@ impl BasicMessage {
     ) -> WhiteflagEncryptionKey {
     } */
 
-    pub fn encode(&mut self) -> Vec<u8> {
+    pub fn encode(&self) -> Vec<u8> {
         let mut buffer = WhiteflagBuffer::default();
 
-        buffer.encode(&mut self.header);
-        buffer.encode(&mut self.body);
+        buffer.encode(&self.header);
+        buffer.encode(&self.body);
 
         buffer.crop();
         buffer.into()
     }
 
-    pub fn encode_as_hex(&mut self) -> String {
+    pub fn encode_as_hex(&self) -> String {
         hex::encode(self.encode())
     }
 
