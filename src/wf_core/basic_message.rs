@@ -5,7 +5,6 @@ use super::FieldValue;
 use crate::wf_account::account::WfAccount;
 use crate::wf_account::test_impl::WhiteflagAccount;
 use crate::wf_buffer::WhiteflagBuffer;
-use crate::wf_crypto::cipher::{WfCipher, WhiteflagCipher};
 use crate::wf_crypto::encryption_method::WhiteflagEncryptionMethod;
 use crate::wf_crypto::wf_encryption_key::WhiteflagEncryptionKey;
 use crate::wf_field::{get_field_value_from_array, Field};

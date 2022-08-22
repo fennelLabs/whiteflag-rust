@@ -2,10 +2,8 @@ use self::{
     common::{append_bits, crop_bits, extract_bits, remove_hexadecimal_prefix},
     constants::BYTE,
 };
-use crate::{
-    wf_crypto::cipher::{WfCipher, WhiteflagCipher},
-    wf_field::{Field, FieldDefinition},
-};
+use crate::wf_field::{Field, FieldDefinition};
+use fennel_lib::Cipher;
 
 #[cfg(test)]
 mod tests;
@@ -34,15 +32,14 @@ impl WhiteflagBuffer {
         }
     }
 
-    pub fn encrypt(&self, cipher: WhiteflagCipher, position: usize) -> WhiteflagBuffer {
-        /* final int unencryptedBitPosition = base.header.bitLength(FIELD_ENCRYPTIONINDICATOR);*/
+    pub fn encrypt<T: Cipher>(&self, cipher: T, position: usize) -> WhiteflagBuffer {
         let mut buffer = WhiteflagBuffer::default();
         // add unencrypted part
         buffer.append(self.extract_bits(0, position), None);
 
         let second_half = self.extract_bits_from(position);
         // add encrypted part
-        buffer.append(cipher.encrypt_as_bytes(second_half).into(), None);
+        buffer.append(cipher.encrypt(second_half).into(), None);
 
         buffer
     }

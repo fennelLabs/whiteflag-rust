@@ -9,7 +9,6 @@ mod crypto_util_tests;
 #[cfg(test)]
 mod cipher_tests;
 
-pub mod cipher;
 mod crypto_util;
 pub mod ecdh_keypair;
 pub mod encryption_method;

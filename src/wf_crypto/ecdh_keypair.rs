@@ -1,10 +1,6 @@
 use fennel_lib::dh_tools::{get_session_public_key, get_session_secret, get_shared_secret};
-use x25519_dalek::{PublicKey, StaticSecret};
-
-use super::{
-    cipher::{WfCipher, WhiteflagCipher},
-    wf_encryption_key::WhiteflagEncryptionKey,
-};
+use fennel_lib::AESCipher;
+use x25519_dalek::{PublicKey, SharedSecret, StaticSecret};
 
 /// Whiteflag ECDH Key Pair class
 ///
@@ -16,7 +12,6 @@ use super::{
 /// Whiteflag Specification 5.2.2 Key Agreement
 #[derive(Clone)]
 pub struct WhiteflagECDHKeyPair {
-    /// Main key pair properties
     session_secret: StaticSecret,
     public_key: PublicKey,
 }
@@ -44,13 +39,17 @@ impl WhiteflagECDHKeyPair {
 
     /// Calculates the negotiated shared key with an originator
     pub fn negotiate(&self, other: &PublicKey) -> Vec<u8> {
-        let secret = get_shared_secret(self.session_secret.clone(), other);
-        secret.to_bytes().to_vec()
+        self.negotiate_as_shared_secret(other).to_bytes().to_vec()
     }
 
-    pub fn create_cipher(&self, public_key: &PublicKey) -> WhiteflagCipher {
-        let key = WhiteflagEncryptionKey::from_ecdh_key(public_key, &self);
-        WhiteflagCipher::from_key(key)
+    /// Calculates the negotiated shared key with an originator
+    pub fn negotiate_as_shared_secret(&self, other: &PublicKey) -> SharedSecret {
+        let secret = get_shared_secret(self.session_secret.clone(), other);
+        secret
+    }
+
+    pub fn create_aes_cipher(&self, public_key: &PublicKey) -> AESCipher {
+        AESCipher::new_from_shared_secret(self.negotiate_as_shared_secret(public_key).as_bytes())
     }
 }
 

@@ -15,7 +15,7 @@ fn assert_array_eq<T: PartialEq + std::fmt::Debug>(l: &[T], r: &[T], msg: Option
 fn test_generate_keypair_from_key() {
     let static_secret = get_session_secret();
     let public_key = get_session_public_key(&static_secret);
-    let keypair = WhiteflagECDHKeyPair::from_secret(static_secret); // generate_wfkeypair_from_key(hex::encode(static_secret.to_bytes()));
+    let keypair = WhiteflagECDHKeyPair::from_secret(static_secret);
     assert_eq!(public_key.as_bytes(), keypair.as_ref().as_bytes());
 }
 
@@ -27,7 +27,7 @@ fn test_negotiate_key() {
     let public_key_two = get_session_public_key(&static_secret_two);
     let shared_secret = get_shared_secret(static_secret.clone(), &public_key_two.clone());
 
-    let pair = WhiteflagECDHKeyPair::from_secret(static_secret); // generate_wfkeypair_from_key(hex::encode(static_secret.to_bytes()));
+    let pair = WhiteflagECDHKeyPair::from_secret(static_secret);
     let result = pair.negotiate(WhiteflagECDHKeyPair::from_secret(static_secret_two).as_ref());
 
     assert_eq!(shared_secret.to_bytes().to_vec(), result)
