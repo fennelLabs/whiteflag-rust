@@ -2,7 +2,10 @@ use self::{
     common::{append_bits, crop_bits, extract_bits, remove_hexadecimal_prefix},
     constants::BYTE,
 };
-use crate::wf_field::{Field, FieldDefinition};
+use crate::{
+    wf_crypto::cipher::{WfCipher, WhiteflagCipher},
+    wf_field::{Field, FieldDefinition},
+};
 
 #[cfg(test)]
 mod tests;
@@ -31,14 +34,27 @@ impl WhiteflagBuffer {
         }
     }
 
-    pub fn extract_bits(&mut self, start: usize, end: usize) -> WhiteflagBuffer {
+    pub fn encrypt(&self, cipher: WhiteflagCipher, position: usize) -> WhiteflagBuffer {
+        /* final int unencryptedBitPosition = base.header.bitLength(FIELD_ENCRYPTIONINDICATOR);*/
+        let mut buffer = WhiteflagBuffer::default();
+        // add unencrypted part
+        buffer.append(self.extract_bits(0, position), None);
+
+        let second_half = self.extract_bits_from(position);
+        // add encrypted part
+        buffer.append(cipher.encrypt_as_bytes(second_half).into(), None);
+
+        buffer
+    }
+
+    pub fn extract_bits(&self, start: usize, end: usize) -> WhiteflagBuffer {
         WhiteflagBuffer::new(
             extract_bits(&self.data, self.bit_length, start, end),
             end - start,
         )
     }
 
-    pub fn extract_bits_from(&mut self, start: usize) -> WhiteflagBuffer {
+    pub fn extract_bits_from(&self, start: usize) -> WhiteflagBuffer {
         WhiteflagBuffer::new(
             extract_bits(&self.data, self.bit_length, start, self.bit_length),
             self.bit_length - start,
@@ -119,6 +135,12 @@ impl From<WhiteflagBuffer> for (Vec<u8>, usize) {
 
 impl AsRef<Vec<u8>> for WhiteflagBuffer {
     fn as_ref(&self) -> &Vec<u8> {
+        &self.data
+    }
+}
+
+impl AsRef<[u8]> for WhiteflagBuffer {
+    fn as_ref(&self) -> &[u8] {
         &self.data
     }
 }
