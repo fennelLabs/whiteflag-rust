@@ -1,6 +1,6 @@
 use crate::wf_crypto::{
     cipher::{WfCipher, WhiteflagCipher},
-    ecdh_keypair::{WfECDHKeyPair, WhiteflagECDHKeyPair},
+    ecdh_keypair::WhiteflagECDHKeyPair,
     wf_encryption_key::WfEncryptionKey,
 };
 
@@ -30,18 +30,14 @@ fn test_cipher_1() {
 #[test]
 fn test_cipher_2() {
     let plaintext1 = "aa1bb2cc3dd4ee5ff6007008009000";
-    let keypair1 = WhiteflagECDHKeyPair::create_keypair();
-    let pubkey1 = hex::encode(keypair1.get_raw_public_key());
 
-    let keypair2 = WhiteflagECDHKeyPair::create_keypair();
-    let pubkey2 = hex::encode(keypair2.get_raw_public_key());
+    let keypair1 = WhiteflagECDHKeyPair::default();
+    let keypair2 = WhiteflagECDHKeyPair::default();
 
-    let key1 = WfEncryptionKey::new_key_from_ecdh_key(pubkey2, keypair1);
-    let cipher1: WhiteflagCipher = WfCipher::from_key(key1);
+    let cipher1: WhiteflagCipher = keypair1.create_cipher(keypair2.as_ref());
     let ciphertext = cipher1.encrypt(plaintext1.to_string());
 
-    let key2 = WfEncryptionKey::new_key_from_ecdh_key(pubkey1, keypair2);
-    let cipher2: WhiteflagCipher = WfCipher::from_key(key2);
+    let cipher2: WhiteflagCipher = keypair2.create_cipher(keypair1.as_ref());
     let plaintext2 = cipher2.decrypt(ciphertext.to_string());
 
     assert_eq!(plaintext1, plaintext2);

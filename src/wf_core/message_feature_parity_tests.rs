@@ -2,7 +2,7 @@ use crate::{
     wf_account::{account::WfAccount, test_impl::WhiteflagAccount},
     wf_core::basic_message::BasicMessage,
     wf_crypto::{
-        ecdh_keypair::{WfECDHKeyPair, WhiteflagECDHKeyPair},
+        ecdh_keypair::WhiteflagECDHKeyPair,
         wf_encryption_key::{WfEncryptionKey, WhiteflagEncryptionKey},
     },
 };

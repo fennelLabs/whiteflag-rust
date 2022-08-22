@@ -1,6 +1,7 @@
 use fennel_lib::aes_tools::AESCipher;
+use x25519_dalek::PublicKey;
 //use super::encryption_method::{WhiteflagEncryptionMethod::*};
-use super::ecdh_keypair::{generate_wfkeypair_from_key, WfECDHKeyPair, WhiteflagECDHKeyPair};
+use super::ecdh_keypair::WhiteflagECDHKeyPair;
 use super::encryption_method::WhiteflagEncryptionMethod;
 
 ///This class represents a Whiteflag encryption key. Instances of this
@@ -20,9 +21,18 @@ pub struct WhiteflagEncryptionKey {
     rawkey: Vec<u8>,
 }
 
+impl WhiteflagEncryptionKey {
+    ///Constructs a new Whiteflag encryption key through ECDH key negotiation
+    pub fn from_ecdh_key(public_key: &PublicKey, ecdh_key_pair: &WhiteflagECDHKeyPair) -> Self {
+        WhiteflagEncryptionKey {
+            rawkey: ecdh_key_pair.negotiate(public_key),
+            method: WhiteflagEncryptionMethod::from_number(3).unwrap(),
+        }
+    }
+}
+
 pub trait WfEncryptionKey {
     fn new(raw_pre_shared_key: String) -> Self;
-    fn new_key_from_ecdh_key(raw_public_key: String, ecdh_key_pair: WhiteflagECDHKeyPair) -> Self;
 
     //TOFIX fn new_key_from_raw_pre_shared_key_str(raw_pre_shared_key: String) -> WhiteflagEncryptionKey;
 
@@ -66,19 +76,6 @@ impl WfEncryptionKey for WhiteflagEncryptionKey {
     //TOFIX     }
     //TOFIX }
 
-    ///Constructs a new Whiteflag encryption key through ECDH key negotiation
-    fn new_key_from_ecdh_key(
-        raw_public_key: String,
-        mut ecdh_key_pair: WhiteflagECDHKeyPair,
-    ) -> Self {
-        let pk = WhiteflagECDHKeyPair::create_public_key_from_raw(
-            hex::decode(raw_public_key).unwrap().try_into().unwrap(),
-        );
-        WhiteflagEncryptionKey {
-            rawkey: ecdh_key_pair.negotiate(&pk),
-            method: WhiteflagEncryptionMethod::from_number(3).unwrap(),
-        }
-    }
     //TOFIX fn new_key_from_ecdh_str(raw_public_key: Vec<u8>, ecdh_key_pair: WfECDHKeyPair) -> Self {
     //this(convertToByteArray(rawPublicKey), ecdhKeyPair); //<- how to rustify?
     //TOFIX }
