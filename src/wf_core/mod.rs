@@ -21,7 +21,7 @@ use decoder::Decoder;
 
 /// encode an array of values, ordered according to the WF specification, into a hexadecimal string
 pub fn encode<T: FieldValue>(fields: &[T]) -> String {
-    let mut basic_message: BasicMessage = fields.into();
+    let basic_message: BasicMessage = fields.into();
     let message_encoded = basic_message.encode();
     hex::encode(message_encoded)
 }

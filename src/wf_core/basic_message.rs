@@ -205,28 +205,6 @@ impl BasicMessage {
         Decoder::new(message).decode()
     }
 
-    /**
-     * Gets the value of the specified field
-     * @param fieldname the name of the requested field
-     * @return the field value, or NULL if field does not exist
-     */
-    pub fn get<T: AsRef<str>>(&self, fieldname: T) -> String {
-        self.get_option(fieldname)
-            .expect("no value found")
-            .to_string()
-    }
-
-    /**
-     * Gets the value of the specified field
-     * @param fieldname the name of the requested field
-     * @return the field value, or NULL if field does not exist
-     */
-    fn get_option<T: AsRef<str>>(&self, fieldname: T) -> Option<&String> {
-        get_field_value_from_array(&self.header, fieldname.as_ref())
-            .or(get_field_value_from_array(&self.body, fieldname.as_ref()))
-            .or(None)
-    }
-
     pub fn get_fields(&self) -> Vec<&Field> {
         let mut fields: Vec<&Field> = vec![];
         fields.extend(self.header.iter());
