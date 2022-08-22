@@ -3,7 +3,7 @@ use fennel_lib::aes_tools::AESCipher;
 use super::ecdh_keypair::{
     generate_wfkeypair, generate_wfkeypair_from_key, WfECDHKeyPair, WhiteflagECDHKeyPair,
 };
-use super::encryption_method::{encryption_method_from_field_value, WhiteflagEncryptionMethod};
+use super::encryption_method::WhiteflagEncryptionMethod;
 
 ///This class represents a Whiteflag encryption key. Instances of this
 ///class represent the raw key, either pre-shared or negotiated, from which
@@ -45,7 +45,7 @@ impl WfEncryptionKey for WhiteflagEncryptionKey {
     fn new(raw_pre_shared_key: String) -> Self {
         WhiteflagEncryptionKey {
             rawkey: hex::decode(raw_pre_shared_key).unwrap(),
-            method: encryption_method_from_field_value("4".to_string()).unwrap(),
+            method: WhiteflagEncryptionMethod::from_number(4).unwrap(),
         }
     }
 
@@ -76,7 +76,7 @@ impl WfEncryptionKey for WhiteflagEncryptionKey {
         WhiteflagEncryptionKey {
             rawkey: ecdh_key_pair
                 .negotiate_key_from_bytes(hex::decode(raw_public_key).unwrap().try_into().unwrap()),
-            method: encryption_method_from_field_value("3".to_string()).unwrap(),
+            method: WhiteflagEncryptionMethod::from_number(3).unwrap(),
         }
     }
     //TOFIX fn new_key_from_ecdh_str(raw_public_key: Vec<u8>, ecdh_key_pair: WfECDHKeyPair) -> Self {

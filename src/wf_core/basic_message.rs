@@ -6,9 +6,7 @@ use crate::wf_account::account::WfAccount;
 use crate::wf_account::test_impl::WhiteflagAccount;
 use crate::wf_buffer::WhiteflagBuffer;
 use crate::wf_crypto::cipher::{WfCipher, WhiteflagCipher};
-use crate::wf_crypto::encryption_method::{
-    encryption_method_from_field_value, WhiteflagEncryptionMethod,
-};
+use crate::wf_crypto::encryption_method::WhiteflagEncryptionMethod;
 use crate::wf_crypto::wf_encryption_key::WhiteflagEncryptionKey;
 use crate::wf_field::{get_field_value_from_array, Field};
 use crate::wf_parser::{from_serialized, MessageHeader, WhiteflagMessageBuilder};
