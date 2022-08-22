@@ -16,12 +16,6 @@ pub trait WfECDHKeyPair {
     /// Returns the raw public key of the ECDH key pair
     fn get_raw_public_key(&self) -> [u8; 32];
 
-    /// Calculates the negotiated shared key with an originator from bytes
-    fn negotiate_key_from_bytes(&mut self, public_key: [u8; 32]) -> Vec<u8>;
-
-    /// Calculates the negotiated shared key with an originator
-    fn negotiate_key(&mut self, public_key: PublicKey) -> Vec<u8>;
-
     /// Creates a new random ECDH key with the curve specified for Whiteflag key negotiation
     fn create_keypair() -> WhiteflagECDHKeyPair;
 
@@ -45,9 +39,29 @@ pub struct WhiteflagECDHKeyPair {
     public_key: PublicKey,
 }
 
-/// Constructs a new Whiteflag ECDH key pair
-pub fn generate_wfkeypair() -> WhiteflagECDHKeyPair {
-    WhiteflagECDHKeyPair::create_keypair()
+impl AsRef<PublicKey> for WhiteflagECDHKeyPair {
+    fn as_ref(&self) -> &PublicKey {
+        &self.public_key
+    }
+}
+
+impl WhiteflagECDHKeyPair {
+    pub fn negotiate(&self, other: &PublicKey) -> Vec<u8> {
+        let secret = get_shared_secret(self.session_secret.clone(), other);
+        secret.to_bytes().to_vec()
+    }
+
+    /// Calculates the negotiated shared key with an originator from bytes
+    fn negotiate_key_from_bytes(&mut self, public_key: [u8; 32]) -> Vec<u8> {
+        let secret = get_shared_secret(self.session_secret.clone(), &PublicKey::from(public_key));
+        secret.to_bytes().to_vec()
+    }
+
+    /// Calculates the negotiated shared key with an originator
+    fn negotiate_key(&mut self, public_key: PublicKey) -> Vec<u8> {
+        let secret = get_shared_secret(self.session_secret.clone(), &public_key);
+        secret.to_bytes().to_vec()
+    }
 }
 
 /// Constructs a new Whiteflag ECDH key pair from an existing private key
@@ -65,18 +79,6 @@ impl WfECDHKeyPair for WhiteflagECDHKeyPair {
     /// Returns the raw public key of the ECDH key pair
     fn get_raw_public_key(&self) -> [u8; 32] {
         *self.get_public_key().as_bytes()
-    }
-
-    /// Calculates the negotiated shared key with an originator from bytes
-    fn negotiate_key_from_bytes(&mut self, public_key: [u8; 32]) -> Vec<u8> {
-        let secret = get_shared_secret(self.session_secret.clone(), &PublicKey::from(public_key));
-        secret.to_bytes().to_vec()
-    }
-
-    /// Calculates the negotiated shared key with an originator
-    fn negotiate_key(&mut self, public_key: PublicKey) -> Vec<u8> {
-        let secret = get_shared_secret(self.session_secret.clone(), &public_key);
-        secret.to_bytes().to_vec()
     }
 
     /// Creates a new random ECDH key with the curve specified for Whiteflag key negotiation

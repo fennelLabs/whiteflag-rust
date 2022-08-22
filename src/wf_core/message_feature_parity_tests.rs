@@ -2,7 +2,7 @@ use crate::{
     wf_account::{account::WfAccount, test_impl::WhiteflagAccount},
     wf_core::basic_message::BasicMessage,
     wf_crypto::{
-        ecdh_keypair::{generate_wfkeypair, WfECDHKeyPair, WhiteflagECDHKeyPair},
+        ecdh_keypair::{WfECDHKeyPair, WhiteflagECDHKeyPair},
         wf_encryption_key::{WfEncryptionKey, WhiteflagEncryptionKey},
     },
 };
@@ -222,14 +222,10 @@ fn free_text_message() {
     assert_eq!(message1.serialize(), message2.serialize());
 }
 
-/*
-
-
-
-#[test]
+/* #[test]
 fn testMessageEncryption1() {
-    let encodedMsg = "5746313223000000000088888889111111119999999a22222222aaaaaaab33333333bbbbbbbb0983098309830983118b118b118b118b1993199319931993219b219b219b219b29a329a329a329a331ab31ab31ab31a9b1b9b1b9b1b9b1b9c1c9c1c9c1c9c1c8";
-    let encryptedMsg = "574631326d7658e7d17479677a0de95076989fcd7825b709349b143f2b17644e5cb2c8ded5c7f18d77447cf9dc2115e0c1c81d717b57fadaeedf27bfef8926448ff666d3d9a65168827c94b393974ebbe6b7f0599e184bfd1ace3569117c23ae17c5640f2f2d";
+    let encoded_msg = "5746313223000000000088888889111111119999999a22222222aaaaaaab33333333bbbbbbbb0983098309830983118b118b118b118b1993199319931993219b219b219b219b29a329a329a329a331ab31ab31ab31a9b1b9b1b9b1b9b1b9c1c9c1c9c1c9c1c8";
+    let encrypted_msg = "574631326d7658e7d17479677a0de95076989fcd7825b709349b143f2b17644e5cb2c8ded5c7f18d77447cf9dc2115e0c1c81d717b57fadaeedf27bfef8926448ff666d3d9a65168827c94b393974ebbe6b7f0599e184bfd1ace3569117c23ae17c5640f2f2d";
 
     let mut originator = WhiteflagAccount::new(true);
     let mut recipient = WhiteflagAccount::new(false);
@@ -238,15 +234,17 @@ fn testMessageEncryption1() {
         "32676187ba7badda85ea63a69870a7133909f1999774abb2eed251073616a6e7".to_string(),
     ));
 
-    let message = BasicMessage::decode(encodedMsg).unwrap();
-    message.set_originator(originator.clone());
+    let message = BasicMessage::decode(encoded_msg);
+    /* message.set_originator(originator.clone());
     message.set_recipient(recipient.clone());
-    message.set_init_vector("40aa85015d24e4601448c1ba8d7bf1aa");
+    message.set_init_vector("40aa85015d24e4601448c1ba8d7bf1aa"); */
 
     assert!(originator.is_owned());
     assert!(!recipient.is_owned());
-    assert_eq!(encryptedMsg, message.encode().as_hex());
-}
+    assert_eq!(encrypted_msg, message.encode().as_hex());
+} */
+
+/*
 
 #[test]
 fn testMessageEncryption2() {

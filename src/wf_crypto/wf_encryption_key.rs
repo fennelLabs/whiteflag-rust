@@ -1,8 +1,6 @@
 use fennel_lib::aes_tools::AESCipher;
 //use super::encryption_method::{WhiteflagEncryptionMethod::*};
-use super::ecdh_keypair::{
-    generate_wfkeypair, generate_wfkeypair_from_key, WfECDHKeyPair, WhiteflagECDHKeyPair,
-};
+use super::ecdh_keypair::{generate_wfkeypair_from_key, WfECDHKeyPair, WhiteflagECDHKeyPair};
 use super::encryption_method::WhiteflagEncryptionMethod;
 
 ///This class represents a Whiteflag encryption key. Instances of this
@@ -73,9 +71,11 @@ impl WfEncryptionKey for WhiteflagEncryptionKey {
         raw_public_key: String,
         mut ecdh_key_pair: WhiteflagECDHKeyPair,
     ) -> Self {
+        let pk = WhiteflagECDHKeyPair::create_public_key_from_raw(
+            hex::decode(raw_public_key).unwrap().try_into().unwrap(),
+        );
         WhiteflagEncryptionKey {
-            rawkey: ecdh_key_pair
-                .negotiate_key_from_bytes(hex::decode(raw_public_key).unwrap().try_into().unwrap()),
+            rawkey: ecdh_key_pair.negotiate(&pk),
             method: WhiteflagEncryptionMethod::from_number(3).unwrap(),
         }
     }

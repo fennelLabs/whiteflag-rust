@@ -1,6 +1,6 @@
 use crate::wf_crypto::{
     cipher::{WfCipher, WhiteflagCipher},
-    ecdh_keypair::{generate_wfkeypair, WfECDHKeyPair},
+    ecdh_keypair::{WfECDHKeyPair, WhiteflagECDHKeyPair},
     wf_encryption_key::WfEncryptionKey,
 };
 
@@ -30,10 +30,10 @@ fn test_cipher_1() {
 #[test]
 fn test_cipher_2() {
     let plaintext1 = "aa1bb2cc3dd4ee5ff6007008009000";
-    let keypair1 = generate_wfkeypair();
+    let keypair1 = WhiteflagECDHKeyPair::create_keypair();
     let pubkey1 = hex::encode(keypair1.get_raw_public_key());
 
-    let keypair2 = generate_wfkeypair();
+    let keypair2 = WhiteflagECDHKeyPair::create_keypair();
     let pubkey2 = hex::encode(keypair2.get_raw_public_key());
 
     let key1 = WfEncryptionKey::new_key_from_ecdh_key(pubkey2, keypair1);
