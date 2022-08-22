@@ -1,4 +1,7 @@
-use crate::{decode_from_hex, wf_json::deserialize::WhiteflagFieldValues, wf_core::basic_message::BasicMessage};
+use crate::{
+    decode_from_hex, wf_core::basic_message::BasicMessage,
+    wf_json::deserialize::WhiteflagFieldValues,
+};
 use serde_json::json;
 
 #[test]
@@ -70,13 +73,13 @@ fn test_json(actual: &str, expected: &str) {
     assert_eq!(a, e);
 }
 
-#[test]
+/* #[test]
 fn json_deserialization() {
     let message_str = "WF100F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!";
-    let json = json!({ 
+    let json = json!({
         "MetaHeader": {},
         "MessageHeader": {
-            "Prefix": "WF", 
+            "Prefix": "WF",
             "Version":"1",
             "EncryptionIndicator":"0",
             "DuressIndicator": "0",
@@ -87,10 +90,11 @@ fn json_deserialization() {
         "MessageBody": {
             "Text": "Whiteflag test message!"
         }
-    }).to_string();
+    })
+    .to_string();
     let message = BasicMessage::deserialize_from_json(json).unwrap();
     assert_eq!(message_str, message.serialize());
-}
+} */
 
 /*
 #[test]
