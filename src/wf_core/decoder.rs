@@ -14,13 +14,21 @@ pub struct Decoder {
 }
 
 impl Decoder {
-    pub fn new<T: AsRef<str>>(message: T) -> Self {
-        let mut buffer = match WhiteflagBuffer::decode_from_hexadecimal(message) {
+    pub fn from_hexadecimal<T: AsRef<str>>(message: T) -> Self {
+        let buffer = match WhiteflagBuffer::decode_from_hexadecimal(message) {
             Ok(buffer) => buffer,
             Err(e) => panic!("{}", e),
         };
 
-        let (bit_cursor, header) = MessageHeaderFields::from_buffer(&mut buffer);
+        Decoder::from_whiteflag_buffer(buffer)
+    }
+
+    pub fn new<T: AsRef<[u8]>>(message: Vec<u8>) -> Self {
+        Self::from_whiteflag_buffer(message.into())
+    }
+
+    pub fn from_whiteflag_buffer(buffer: WhiteflagBuffer) -> Self {
+        let (bit_cursor, header) = MessageHeaderFields::from_buffer(&buffer);
 
         Decoder {
             bit_cursor,

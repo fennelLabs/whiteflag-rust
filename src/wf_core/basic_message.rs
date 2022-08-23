@@ -2,7 +2,7 @@ use super::decoder::Decoder;
 use super::segment::MessageSegment;
 use super::FieldValue;
 use crate::wf_account::test_impl::WhiteflagAccount;
-use crate::wf_buffer::WhiteflagBuffer;
+use crate::wf_buffer::{CryptMode, WhiteflagBuffer};
 use crate::wf_crypto::encryption_method::WhiteflagEncryptionMethod;
 use crate::wf_field::Field;
 use crate::wf_parser::{from_serialized, WhiteflagMessageBuilder};
@@ -72,25 +72,23 @@ impl BasicMessage {
         Self::compile(field_values.as_ref())
     }
 
-    pub fn encode_and_encrypt<T: FennelCipher>(&self, cipher: T) -> Vec<u8> {
+    pub fn encode_and_crypt<T: FennelCipher>(&self, cipher: T, mode: CryptMode) -> WhiteflagBuffer {
         let encryption_indicator_index = 2_usize;
         let encryption_indicator = &self.header[encryption_indicator_index]; // the encryption indicator is the 3rd index in the header
 
         let method = WhiteflagEncryptionMethod::from_str(&encryption_indicator.get()).unwrap();
-        let encoded = self.encode();
+        let encoded: WhiteflagBuffer = self.encode().into();
 
         match method {
             WhiteflagEncryptionMethod::NoEncryption => return encoded,
             _ => (),
         };
 
-        let buffer_encoded: WhiteflagBuffer = encoded.into();
-
         let position = self
             .header
             .bit_length_of_field(encryption_indicator_index as isize);
 
-        buffer_encoded.encrypt(cipher, position).into()
+        encoded.crypt(cipher, mode, position)
     }
 
     pub fn encode(&self) -> Vec<u8> {
@@ -108,8 +106,13 @@ impl BasicMessage {
     }
 
     /// decode a hexadecimal encoded whiteflag message
-    pub fn decode<T: AsRef<str>>(message: T) -> Self {
-        Decoder::new(message).decode()
+    pub fn decode_from_hexadecimal<T: AsRef<str>>(message: T) -> Self {
+        Decoder::from_hexadecimal(message).decode()
+    }
+
+    /// decode a hexadecimal encoded whiteflag message
+    pub fn decode(message: WhiteflagBuffer) -> Self {
+        Decoder::from_whiteflag_buffer(message).decode()
     }
 
     pub fn get_fields(&self) -> Vec<&Field> {

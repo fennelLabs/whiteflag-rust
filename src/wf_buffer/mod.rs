@@ -24,7 +24,20 @@ pub struct WhiteflagBuffer {
     bit_length: usize,
 }
 
+pub enum CryptMode {
+    Encrypt,
+    Decrypt,
+}
+
 impl WhiteflagBuffer {
+    pub fn from(buffer: Vec<u8>) -> Self {
+        let bit_length = buffer.len() * BYTE;
+        WhiteflagBuffer {
+            data: buffer,
+            bit_length,
+        }
+    }
+
     pub fn new(buffer: Vec<u8>, bit_length: usize) -> Self {
         WhiteflagBuffer {
             data: buffer,
@@ -32,15 +45,25 @@ impl WhiteflagBuffer {
         }
     }
 
-    pub fn encrypt<T: FennelCipher>(&self, cipher: T, position: usize) -> WhiteflagBuffer {
+    pub fn crypt<T: FennelCipher>(
+        &self,
+        cipher: T,
+        mode: CryptMode,
+        position: usize,
+    ) -> WhiteflagBuffer {
         let mut buffer = WhiteflagBuffer::default();
         // add unencrypted part
         buffer.append(self.extract_bits(0, position), None);
 
         let second_half = self.extract_bits_from(position);
-        // add encrypted part
-        buffer.append(cipher.encrypt(second_half).into(), None);
 
+        let crypted_half = match mode {
+            CryptMode::Encrypt => cipher.encrypt(second_half),
+            CryptMode::Decrypt => cipher.decrypt(second_half),
+        };
+
+        // add decrypted/encrypted part
+        buffer.append(crypted_half.into(), None);
         buffer
     }
 
@@ -151,11 +174,7 @@ impl AsRef<[u8]> for WhiteflagBuffer {
 
 impl From<Vec<u8>> for WhiteflagBuffer {
     fn from(buffer: Vec<u8>) -> Self {
-        let bit_length = buffer.len() * BYTE;
-        WhiteflagBuffer {
-            data: buffer,
-            bit_length,
-        }
+        WhiteflagBuffer::from(buffer)
     }
 }
 

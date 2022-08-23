@@ -28,5 +28,5 @@ pub fn encode<T: FieldValue>(fields: &[T]) -> String {
 
 /// decode a hexadecimal encoded whiteflag message
 pub fn decode<T: AsRef<str>>(message: T) -> BasicMessage {
-    Decoder::new(message).decode()
+    Decoder::from_hexadecimal(message).decode()
 }
