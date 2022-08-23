@@ -61,10 +61,6 @@ where
         }
     }
 
-    pub fn prk(self) -> Vec<u8> {
-        self.prk
-    }
-
     /// Performs RFC 5869 HKDF Step 2: expand
     pub fn expand(&self, info: &[u8], key_length: usize) -> WhiteflagResult<Vec<u8>> {
         let mut okm: Vec<u8> = vec![0; key_length];
