@@ -1,8 +1,7 @@
 use crate::wf_crypto::{
     ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey,
 };
-
-use fennel_lib::Cipher;
+use fennel_lib::FennelCipher;
 
 /**
  * Whiteflag cipher test class
@@ -15,7 +14,7 @@ use fennel_lib::Cipher;
 fn test_cipher_1() {
     let plaintext = "23000000000088888889111111119999999a22222222aaaaaaab33333333bbbbbbbb0983098309830983118b118b118b118b1993199319931993219b219b219b219b29a329a329a329a331ab31ab31ab31a9b1b9b1b9b1b9b1b9c1c9c1c9c1c9c1c8";
     let key = WhiteflagEncryptionKey::from_preshared_key(
-        "32676187ba7badda85ea63a69870a7133909f1999774abb2eed251073616a6e7".to_string(),
+        "32676187ba7badda85ea63a69870a7133909f1999774abb2eed251073616a6e7",
     );
 
     let cipher = key.aes_cipher();

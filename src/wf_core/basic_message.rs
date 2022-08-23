@@ -1,14 +1,12 @@
 use super::decoder::Decoder;
-use super::error::{WhiteflagError, WhiteflagResult};
 use super::segment::MessageSegment;
 use super::FieldValue;
-use crate::wf_account::account::WfAccount;
 use crate::wf_account::test_impl::WhiteflagAccount;
 use crate::wf_buffer::WhiteflagBuffer;
 use crate::wf_crypto::encryption_method::WhiteflagEncryptionMethod;
-use crate::wf_crypto::wf_encryption_key::WhiteflagEncryptionKey;
-use crate::wf_field::{get_field_value_from_array, Field};
-use crate::wf_parser::{from_serialized, MessageHeader, WhiteflagMessageBuilder};
+use crate::wf_field::Field;
+use crate::wf_parser::{from_serialized, WhiteflagMessageBuilder};
+use fennel_lib::FennelCipher;
 
 const METAKEY_ORIGINATOR: &str = "originatorAddress";
 const METAKEY_RECIPIENT: &str = "recipientAddress";
@@ -74,114 +72,26 @@ impl BasicMessage {
         Self::compile(field_values.as_ref())
     }
 
-    /* pub fn encrypt(&self, encoded_message: WhiteflagBuffer) -> WhiteflagBuffer {
-        let method =
-            BasicMessage::get_encryption_method(self.header.get(FIELD_ENCRYPTIONINDICATOR));
-        if method
-            == (WhiteflagEncryptionMethod::NoEncryption {
-                field_value: "0".to_string(),
-                algorithm_name: "NONE".to_string(),
-                operation_mode: "NONE".to_string(),
-                padding_scheme: "NoPadding".to_string(),
-                key_length: 0,
-                hkdf_salt: "".to_string(),
-            })
-        {
-            return encoded_message;
-        }
-        let cipher = self.create_cipher(method, self.originator.unwrap(), self.recipient.unwrap());
-        let unencrypted_bit_position = self.header.bit_length_of_field(FIELD_ENCRYPTIONINDICATOR);
-        let encrypted_message = WhiteflagBuffer::new(vec![], 0);
+    pub fn encode_and_encrypt<T: FennelCipher>(&self, cipher: T) -> Vec<u8> {
+        let encryption_indicator_index = 2_usize;
+        let encryption_indicator = &self.header[encryption_indicator_index]; // the encryption indicator is the 3rd index in the header
 
-        encrypted_message.append(
-            encoded_message.extract_bits(0, unencrypted_bit_position),
-            None,
-        );
-        encrypted_message.append(
-            encoded_message.extract_bits_from(unencrypted_bit_position),
-            None,
-        );
-        encrypted_message
-    }
+        let method = WhiteflagEncryptionMethod::from_str(&encryption_indicator.get()).unwrap();
+        let encoded = self.encode();
 
-    pub fn decrypt(&self, message: WhiteflagBuffer) -> BasicMessage {
-        let method =
-            BasicMessage::get_encryption_method(self.header.get(FIELD_ENCRYPTIONINDICATOR));
-        if method
-            == (WhiteflagEncryptionMethod::NoEncryption {
-                field_value: "0".to_string(),
-                algorithm_name: "NONE".to_string(),
-                operation_mode: "NONE".to_string(),
-                padding_scheme: "NoPadding".to_string(),
-                key_length: 0,
-                hkdf_salt: "".to_string(),
-            })
-        {
-            return message;
-        }
-
-        let cipher = self.create_cipher(method, self.originator.unwrap(), self.recipient.unwrap());
-        let unencrypted_bit_position = self.header.bit_length_of_field(FIELD_ENCRYPTIONINDICATOR);
-        let encoded_message = WhiteflagBuffer::new(vec![], 0);
-
-        encoded_message.append(message.extract_bits(0, unencrypted_bit_position), None);
-        encoded_message.append(message.extract_bits_from(unencrypted_bit_position), None);
-        encoded_message
-    }
-
-    pub fn get_encryption_method(indicator: String) -> WhiteflagEncryptionMethod {
-        encryption_method_from_field_value(indicator).unwrap()
-    }
-
-    pub fn create_cipher(
-        &self,
-        method: WhiteflagEncryptionMethod,
-        originator: WhiteflagAccount,
-        recipient: WhiteflagAccount,
-    ) -> WhiteflagCipher {
-        let key = self.get_encryption_key(method, originator, recipient);
-        let cipher = WhiteflagCipher::from_key(key.unwrap());
-        let address = originator.get_binary_address();
-        cipher.set_context(hex::encode(address));
-        cipher
-    }
-
-    pub fn get_encryption_key(
-        &self,
-        method: WhiteflagEncryptionMethod,
-        originator: WhiteflagAccount,
-        recipient: WhiteflagAccount,
-    ) -> WhiteflagResult<WhiteflagEncryptionKey> {
         match method {
-            WhiteflagEncryptionMethod::Aes512IegEcdh {
-                field_value,
-                algorithm_name,
-                operation_mode,
-                padding_scheme,
-                key_length,
-                hkdf_salt,
-            } => Ok(self.generated_negotiated_key(originator, recipient)),
-            WhiteflagEncryptionMethod::Aes512IegPsk {
-                field_value,
-                algorithm_name,
-                operation_mode,
-                padding_scheme,
-                key_length,
-                hkdf_salt,
-            } => Ok(self.get_shared_key(recipient)),
-            _ => Err(WhiteflagError::CannotRetrieveKey),
-        }
-    }
+            WhiteflagEncryptionMethod::NoEncryption => return encoded,
+            _ => (),
+        };
 
-    pub fn get_shared_key(recipient: WhiteflagAccount) -> WhiteflagEncryptionKey {
-        recipient.get_shared_key().unwrap()
-    }
+        let buffer_encoded: WhiteflagBuffer = encoded.into();
 
-    pub fn generate_negotiated_key(
-        originator: WhiteflagAccount,
-        recipient: WhiteflagAccount,
-    ) -> WhiteflagEncryptionKey {
-    } */
+        let position = self
+            .header
+            .bit_length_of_field(encryption_indicator_index as isize);
+
+        buffer_encoded.encrypt(cipher, position).into()
+    }
 
     pub fn encode(&self) -> Vec<u8> {
         let mut buffer = WhiteflagBuffer::default();

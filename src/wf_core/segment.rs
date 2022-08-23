@@ -44,7 +44,7 @@ impl MessageSegment {
 
         /* Calculate segment bit length */
         let mut bit_length = 0;
-        for index in 0..selected_field_index {
+        for index in 0..=selected_field_index {
             bit_length += self[index].bit_length();
         }
 

@@ -3,7 +3,7 @@ use self::{
     constants::BYTE,
 };
 use crate::wf_field::{Field, FieldDefinition};
-use fennel_lib::Cipher;
+use fennel_lib::FennelCipher;
 
 #[cfg(test)]
 mod tests;
@@ -32,7 +32,7 @@ impl WhiteflagBuffer {
         }
     }
 
-    pub fn encrypt<T: Cipher>(&self, cipher: T, position: usize) -> WhiteflagBuffer {
+    pub fn encrypt<T: FennelCipher>(&self, cipher: T, position: usize) -> WhiteflagBuffer {
         let mut buffer = WhiteflagBuffer::default();
         // add unencrypted part
         buffer.append(self.extract_bits(0, position), None);
@@ -67,7 +67,7 @@ impl WhiteflagBuffer {
         let (buffer, length) = append_bits(
             &self.data,
             self.bit_length,
-            &buffer.data,
+            &buffer.to_byte_array(),
             bit_length_to_extract,
         );
 
@@ -115,6 +115,13 @@ impl WhiteflagBuffer {
     pub fn decode_from_hexadecimal<T: AsRef<str>>(hex: T) -> Result<WhiteflagBuffer, FromHexError> {
         let buffer = decode_hex(hex)?;
         Ok(buffer.into())
+    }
+
+    /// Returns the Whiteflag encoded message as a byte array
+    /// @return a byte array with an encoded message
+    pub fn to_byte_array(mut self) -> Vec<u8> {
+        crop_bits(self.data.as_mut(), self.bit_length);
+        self.into()
     }
 }
 

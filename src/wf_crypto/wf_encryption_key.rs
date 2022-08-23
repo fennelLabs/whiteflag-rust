@@ -1,6 +1,6 @@
 use super::ecdh_keypair::WhiteflagECDHKeyPair;
 use super::encryption_method::WhiteflagEncryptionMethod;
-use fennel_lib::AESCipher;
+use fennel_lib::{AESCipher, AES256CTR};
 use x25519_dalek::PublicKey;
 
 ///This class represents a Whiteflag encryption key. Instances of this
@@ -17,35 +17,46 @@ pub struct WhiteflagEncryptionKey {
      */
     method: WhiteflagEncryptionMethod,
     /* The raw key materials */
-    rawkey: Vec<u8>,
+    secret_key: Vec<u8>,
 }
 
 impl WhiteflagEncryptionKey {
     ///Constructs a new Whiteflag encryption key through ECDH key negotiation
     pub fn from_ecdh_key(public_key: &PublicKey, ecdh_key_pair: &WhiteflagECDHKeyPair) -> Self {
         WhiteflagEncryptionKey {
-            rawkey: ecdh_key_pair.negotiate(public_key),
+            secret_key: ecdh_key_pair.negotiate(public_key),
             method: WhiteflagEncryptionMethod::from_number(3).unwrap(),
         }
     }
 
     /// Constructs a new Whiteflag encryption key from a raw pre-shared key
-    /// @param rawPreSharedKey a hexadecimal string with the raw pre-shared encryption key
-    pub fn from_preshared_key(raw_pre_shared_key: String) -> Self {
+    /// @param raw_pre_shared_key a hexadecimal string with the raw pre-shared encryption key
+    pub fn from_preshared_key(raw_pre_shared_key: &str) -> Self {
+        let rawkey = hex::decode(raw_pre_shared_key).unwrap();
         WhiteflagEncryptionKey {
-            rawkey: hex::decode(raw_pre_shared_key).unwrap(),
-            method: WhiteflagEncryptionMethod::from_number(4).unwrap(),
+            secret_key: rawkey,
+            method: WhiteflagEncryptionMethod::from_number(2).unwrap(),
         }
+    }
+
+    /// @param context is the originators address
+    pub fn set_context(&mut self, context: &[u8]) {
+        let method = self.method.alg();
+        self.secret_key = method.derive_secret_key(&self.secret_key, context);
     }
 
     pub fn fixed_raw_secret(&self) -> [u8; 32] {
         let mut init: [u8; 32] = Default::default();
-        init.copy_from_slice(&self.rawkey);
+        init.copy_from_slice(&self.secret_key);
         init
     }
 
     pub fn aes_cipher(&self) -> AESCipher {
         AESCipher::new_from_shared_secret(&self.fixed_raw_secret())
+    }
+
+    pub fn aes_256_ctr_cipher<'a>(&'a self, iv: &'a [u8]) -> AES256CTR {
+        AES256CTR::new(&self.secret_key, Some(iv))
     }
 }
 

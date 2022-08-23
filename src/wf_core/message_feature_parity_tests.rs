@@ -1,8 +1,10 @@
 use crate::{
     wf_account::{account::WfAccount, test_impl::WhiteflagAccount},
+    wf_buffer::WhiteflagBuffer,
     wf_core::basic_message::BasicMessage,
-    wf_crypto::ecdh_keypair::WhiteflagECDHKeyPair,
+    wf_crypto::{ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey},
 };
+use fennel_lib::FennelCipher;
 
 fn test(values: &[&str]) {
     let message = BasicMessage::compile(values);
@@ -219,27 +221,33 @@ fn free_text_message() {
     assert_eq!(message1.serialize(), message2.serialize());
 }
 
-/* #[test]
-fn testMessageEncryption1() {
+#[test]
+fn message_encryption_1() {
     let encoded_msg = "5746313223000000000088888889111111119999999a22222222aaaaaaab33333333bbbbbbbb0983098309830983118b118b118b118b1993199319931993219b219b219b219b29a329a329a329a331ab31ab31ab31a9b1b9b1b9b1b9b1b9c1c9c1c9c1c9c1c8";
     let encrypted_msg = "574631326d7658e7d17479677a0de95076989fcd7825b709349b143f2b17644e5cb2c8ded5c7f18d77447cf9dc2115e0c1c81d717b57fadaeedf27bfef8926448ff666d3d9a65168827c94b393974ebbe6b7f0599e184bfd1ace3569117c23ae17c5640f2f2d";
 
-    let mut originator = WhiteflagAccount::new(true);
-    let mut recipient = WhiteflagAccount::new(false);
-    originator.set_address("007a0baf6f84f0fa7402ea972686e56d50b707c9b67b108866".to_string());
-    recipient.set_shared_key(WhiteflagEncryptionKey::new(
-        "32676187ba7badda85ea63a69870a7133909f1999774abb2eed251073616a6e7".to_string(),
-    ));
+    let mut key = WhiteflagEncryptionKey::from_preshared_key(
+        "32676187ba7badda85ea63a69870a7133909f1999774abb2eed251073616a6e7",
+    );
+
+    let address = WhiteflagBuffer::decode_from_hexadecimal(
+        "007a0baf6f84f0fa7402ea972686e56d50b707c9b67b108866",
+    )
+    .unwrap()
+    .to_byte_array();
+
+    key.set_context(&address);
+
+    let iv = hex::decode("40aa85015d24e4601448c1ba8d7bf1aa").unwrap();
+    let cipher = key.aes_256_ctr_cipher(&iv);
 
     let message = BasicMessage::decode(encoded_msg);
-    /* message.set_originator(originator.clone());
-    message.set_recipient(recipient.clone());
-    message.set_init_vector("40aa85015d24e4601448c1ba8d7bf1aa"); */
 
-    assert!(originator.is_owned());
-    assert!(!recipient.is_owned());
-    assert_eq!(encrypted_msg, message.encode().as_hex());
-} */
+    assert_eq!(
+        encrypted_msg,
+        hex::encode(message.encode_and_encrypt(cipher))
+    );
+}
 
 /*
 

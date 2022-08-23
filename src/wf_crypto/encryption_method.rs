@@ -1,4 +1,5 @@
 use super::error::{WhiteflagCryptoError, WhiteflagCryptoResult};
+use crate::wf_crypto::crypto_util::Hkdf;
 
 pub struct EncryptionAlgorithm {
     field_value: usize,
@@ -7,6 +8,15 @@ pub struct EncryptionAlgorithm {
     padding_scheme: &'static str,
     key_length: usize,
     hkdf_salt: &'static str,
+}
+
+impl EncryptionAlgorithm {
+    pub fn derive_secret_key(&self, psk: &[u8], context: &[u8]) -> Vec<u8> {
+        let salt = hex::decode(self.hkdf_salt).unwrap();
+        Hkdf::extract(psk, &salt)
+            .expand(context, self.key_length)
+            .unwrap()
+    }
 }
 
 /// Whiteflag encryption parameters enum class
@@ -28,6 +38,11 @@ pub enum WhiteflagEncryptionMethod {
 }
 
 impl WhiteflagEncryptionMethod {
+    pub fn from_str(number: &str) -> WhiteflagCryptoResult<Self> {
+        let n = number.parse::<usize>().unwrap();
+        Self::from_number(n)
+    }
+
     pub fn from_number(number: usize) -> WhiteflagCryptoResult<Self> {
         let method = match number {
             0 => Self::NoEncryption,
