@@ -1,5 +1,6 @@
 use crate::{
     wf_buffer::WhiteflagBuffer,
+    wf_core::FieldValue,
     wf_field::{definitions, FieldDefinition},
 };
 
@@ -7,7 +8,7 @@ pub struct ParsedFieldDefinition {
     definition: &'static FieldDefinition,
     start_bit: usize,
     end_bit: usize,
-    //index: usize,
+    index: usize,
 }
 
 impl std::ops::Deref for ParsedFieldDefinition {
@@ -27,25 +28,26 @@ impl From<ParsedFieldDefinition> for &'static FieldDefinition {
 impl ParsedFieldDefinition {
     /// creates the `ParsedFieldDefinition` that is ordered after this one
     pub fn next(&self, next: &'static FieldDefinition) -> Self {
-        ParsedFieldDefinition::new(self.end_bit, next)
+        ParsedFieldDefinition::new(self.index, self.end_bit, next)
     }
 
-    pub fn new(previous: usize, current: &'static FieldDefinition) -> Self {
-        let start_bit = previous;
+    pub fn new(index: usize, previous_end_bit: usize, current: &'static FieldDefinition) -> Self {
+        let start_bit = previous_end_bit;
         let end_bit = start_bit + current.bit_length();
         ParsedFieldDefinition {
             definition: current,
             start_bit,
             end_bit,
-            //index: current.index + 1,
+            index,
         }
     }
 
     pub fn parse(defs: &'static [FieldDefinition], start: usize) -> Vec<ParsedFieldDefinition> {
         let mut previous = start;
         defs.iter()
-            .map(|d| {
-                let p = ParsedFieldDefinition::new(previous, d);
+            .enumerate()
+            .map(|(i, d)| {
+                let p = ParsedFieldDefinition::new(i, previous, d);
                 previous = p.end_bit;
                 p
             })
@@ -56,7 +58,13 @@ impl ParsedFieldDefinition {
         Self::parse(definitions::Header::DEFINITIONS, 0)
     }
 
+    /// used in the decoding process
     pub fn extract(&self, buffer: &WhiteflagBuffer) -> String {
         buffer.extract_message_value(&self.definition, self.start_bit)
+    }
+
+    /// used in the compiling process
+    pub fn read<'a, T: FieldValue>(&self, values: &'a [T]) -> &'a str {
+        values[self.index].as_ref()
     }
 }
