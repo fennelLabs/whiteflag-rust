@@ -18,8 +18,26 @@ pub fn zeroise(byte_array: &mut [u8]) {
     } // Zero it all out.
 }
 
+#[derive(Clone)]
+pub struct Hkdf {
+    hkdf: SimpleWhiteflagHkdf<sha2::Sha256>,
+}
+
+impl Hkdf {
+    pub fn extract(ikm: &[u8], salt: &[u8]) -> Self {
+        Hkdf {
+            hkdf: SimpleWhiteflagHkdf::<sha2::Sha256>::new(ikm, salt),
+        }
+    }
+
+    pub fn expand(&self, info: &[u8], key_length: usize) -> WhiteflagResult<Vec<u8>> {
+        self.hkdf.expand(info, key_length)
+    }
+}
+
 pub type SimpleWhiteflagHkdf<H> = WhiteflagHkdf<H, Hmac<H>>;
 
+#[derive(Clone)]
 pub struct WhiteflagHkdf<H, I>
 where
     H: hkdf::hmac::digest::OutputSizeUser,
@@ -41,6 +59,10 @@ where
             hk,
             prk: prk.to_vec(),
         }
+    }
+
+    pub fn prk(self) -> Vec<u8> {
+        self.prk
     }
 
     /// Performs RFC 5869 HKDF Step 2: expand

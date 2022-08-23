@@ -16,5 +16,5 @@ mod error;
 pub mod wf_encryption_key;
 
 pub fn hkdf(ikm: &[u8], salt: &[u8], info: &[u8], length: usize) -> WhiteflagResult<Vec<u8>> {
-    crypto_util::SimpleWhiteflagHkdf::<sha2::Sha256>::new(ikm, salt).expand(info, length)
+    crypto_util::Hkdf::extract(ikm, salt).expand(info, length)
 }
