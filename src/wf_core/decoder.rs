@@ -62,22 +62,22 @@ impl Decoder {
         BasicMessage::new(code, self.header.to_vec(), body, None, None)
     }
 
-    fn decode_field(&mut self, definition: FieldDefinition) -> Field {
+    fn decode_field(&mut self, definition: &FieldDefinition) -> Field {
         // extract field
         let psuedo_message_code = self
             .buffer
-            .extract_message_value(&definition, self.bit_cursor);
+            .extract_message_value(definition, self.bit_cursor);
 
         // if this is a test message, then the pseudo message code data needs to be ignored
         // in order to achieve this, the bit cursor needs to be shifted
         // shift the bit the bit cursor instructs the program where the data extraction should begin
         self.bit_cursor += definition.bit_length();
 
-        Field::new(definition, psuedo_message_code)
+        Field::new(definition.clone(), psuedo_message_code)
     }
 
     fn decode_fields(&mut self, defs: Vec<FieldDefinition>) -> Vec<Field> {
-        let (cursor, fields) = self.buffer.decode(defs, self.bit_cursor);
+        let (cursor, fields) = self.buffer.decode(&defs, self.bit_cursor);
         self.bit_cursor = cursor;
         fields
     }

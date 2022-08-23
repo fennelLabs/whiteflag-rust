@@ -1,14 +1,9 @@
 use super::parsed_field_definition::ParsedFieldDefinition;
 use super::MessageHeaderOrder;
 use crate::wf_buffer::WhiteflagBuffer;
-use crate::wf_codec::encoding::*;
-use crate::wf_field::definitions::convert_value_to_code;
-use crate::wf_field::{
-    definitions::{message_code, test_message_code},
-    FieldDefinition,
-};
-use crate::wf_field::{generic_header_fields, Field};
-use regex::Regex;
+use crate::wf_field::definitions::{self, convert_value_to_code};
+use crate::wf_field::Field;
+use crate::wf_field::{definitions::test_message_code, FieldDefinition};
 
 pub struct MessageHeaderParser {
     prefix: ParsedFieldDefinition,
@@ -91,7 +86,7 @@ impl MessageHeaderFields {
 
 impl MessageHeaderParser {
     pub fn new(defs: &[FieldDefinition]) -> Self {
-        let mut parsed_defs = ParsedFieldDefinition::parse(defs.to_vec());
+        let mut parsed_defs = ParsedFieldDefinition::header();
 
         MessageHeaderParser {
             prefix: parsed_defs.remove(0),
@@ -105,7 +100,7 @@ impl MessageHeaderParser {
     }
 
     pub fn parse(buffer: &WhiteflagBuffer) -> MessageHeaderFields {
-        let (bit_cursor, header) = buffer.decode(Self::default().to_vec(), 0);
+        let (bit_cursor, header) = buffer.decode(&Self::default().to_vec(), 0);
         let code = MessageHeaderOrder::MessageCode.get(&header);
 
         MessageHeaderFields::new(header)
@@ -124,7 +119,7 @@ impl MessageHeaderParser {
     }
 
     pub fn to_fields(self, buffer: &WhiteflagBuffer) -> Vec<Field> {
-        buffer.decode(self.to_vec(), 0).1
+        buffer.decode(self.to_vec().as_slice(), 0).1
         //self.to_vec().into_iter().map(|f| )
     }
 
@@ -141,7 +136,7 @@ impl MessageHeaderParser {
     }
 
     pub fn to_vec(self) -> Vec<FieldDefinition> {
-        vec![
+        let defs: Vec<&'static FieldDefinition> = vec![
             self.prefix.into(),
             self.version.into(),
             self.encryption_indicator.into(),
@@ -149,13 +144,15 @@ impl MessageHeaderParser {
             self.message_code.into(),
             self.reference_indicator.into(),
             self.referenced_message.into(),
-        ]
+        ];
+
+        defs.into_iter().map(|f| f.to_owned()).collect()
     }
 }
 
 impl Default for MessageHeaderParser {
     fn default() -> Self {
-        MessageHeaderParser::new(generic_header_fields())
+        MessageHeaderParser::new(definitions::Header::DEFINITIONS)
     }
 }
 

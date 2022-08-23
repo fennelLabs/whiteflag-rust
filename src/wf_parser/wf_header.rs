@@ -59,10 +59,7 @@ pub struct MessageHeaderFields {
 
 impl MessageHeaderFields {
     pub fn from_buffer(buffer: &WhiteflagBuffer) -> (usize, MessageHeaderFields) {
-        let (cursor, header) = buffer.decode(
-            crate::wf_field::definitions::Header::DEFINITIONS.to_vec(),
-            0,
-        );
+        let (cursor, header) = buffer.decode(crate::wf_field::definitions::Header::DEFINITIONS, 0);
         (cursor, Self::from_fields(header))
     }
 

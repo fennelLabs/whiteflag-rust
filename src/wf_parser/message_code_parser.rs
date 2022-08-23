@@ -6,6 +6,8 @@ use crate::{
     },
 };
 
+use super::MessageHeaderOrder;
+
 #[derive(Debug)]
 pub struct MessageCodeParser {
     pub code: char,
@@ -24,7 +26,8 @@ impl MessageCodeParser {
             );
         }
 
-        let code: char = convert_value_to_code(data[4].as_ref());
+        let code: char =
+            convert_value_to_code(data[MessageHeaderOrder::MessageCode.as_usize()].as_ref());
         let test_code = if code == 'T' {
             data.iter()
                 .nth(7)

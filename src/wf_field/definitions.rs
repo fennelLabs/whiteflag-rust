@@ -29,12 +29,12 @@ pub fn generic_header_fields() -> &'static [FieldDefinition] {
     Header::DEFINITIONS
 }
 
-pub fn message_code() -> FieldDefinition {
-    Header::MESSAGE_CODE
+pub fn message_code() -> &'static FieldDefinition {
+    &Header::MESSAGE_CODE
 }
 
-pub fn test_message_code() -> FieldDefinition {
-    Test::PSEUDO_MESSAGE_CODE
+pub fn test_message_code() -> &'static FieldDefinition {
+    &Test::PSEUDO_MESSAGE_CODE
 }
 
 pub enum FieldKind {
