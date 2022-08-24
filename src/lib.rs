@@ -3,9 +3,6 @@ extern crate lazy_static;
 
 use error::WhiteflagError;
 
-#[cfg(test)]
-mod tests;
-
 mod error;
 mod wf_account;
 mod wf_auth;

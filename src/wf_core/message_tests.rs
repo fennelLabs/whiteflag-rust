@@ -58,54 +58,7 @@ fn decode_sign_signal_message() {
 
     let message = decode(encoding_result);
 
-    //assert_eq!(message.set("Version", "2"), "Should not be able to change version field");
-    assert_message_headers_are_valid(&field_values, &message);
-
-    assert_eq!(
-        field_values[7],
-        message.get("SubjectCode"),
-        "Subject code should be correctly set"
-    );
-    assert_eq!(
-        field_values[8],
-        message.get("DateTime"),
-        "DateTime should be correctly set"
-    );
-    assert_eq!(
-        field_values[9],
-        message.get("Duration"),
-        "Duration should be correctly set"
-    );
-    assert_eq!(
-        field_values[10],
-        message.get("ObjectType"),
-        "Object code  should be correctly set"
-    );
-    assert_eq!(
-        field_values[11],
-        message.get("ObjectLatitude"),
-        "Latitude should be correctly set"
-    );
-    assert_eq!(
-        field_values[12],
-        message.get("ObjectLongitude"),
-        "Longitude should be correctly set"
-    );
-    assert_eq!(
-        field_values[13],
-        message.get("ObjectSizeDim1"),
-        "Size dimention 1 should be correctly set"
-    );
-    assert_eq!(
-        field_values[14],
-        message.get("ObjectSizeDim2"),
-        "Size dimention 2 should be correctly set"
-    );
-    assert_eq!(
-        field_values[15],
-        message.get("ObjectOrientation"),
-        "Orientation should be correctly set"
-    );
+    assert_eq!(field_values.concat(), message.serialize());
 }
 
 #[test]
@@ -148,61 +101,5 @@ fn decode_auth_message() {
 
     let message = decode("5746313020800000000000000000000000000000000000000000000000000000000000000000b43a3a38399d1797b7b933b0b734b9b0ba34b7b71734b73a17bbb434ba32b33630b380");
 
-    /* Verify */
-    //assert_eq!("Message type should be correct", A, message.getType());
-    //assert_eq!(fieldValues.length, message.getNoFields(), "Number of fields should be equal to number of provided fields");
-    //assert_eq!(message.getFieldNames().size(), message.getNoFields(), "Number of fields should be equal to number of field names in set");
-
-    assert_message_headers_are_valid(&field_values, &message);
-
-    assert_eq!(
-        field_values[7],
-        message.get("VerificationMethod"),
-        "Verification method should be correctly set"
-    );
-
-    assert_eq!(
-        field_values[8],
-        message.get("VerificationData"),
-        "Verification data should be correctly set"
-    );
-    //assertTrue("Message should be valid", message.isValid());
-}
-
-fn assert_message_headers_are_valid(data: &[&str], message: &BasicMessage) {
-    assert_eq!(
-        data[0],
-        message.get("Prefix"),
-        "Prefix should be correctly set"
-    );
-    assert_eq!(
-        data[1],
-        message.get("Version"),
-        "Version number should be correctly set"
-    );
-    assert_eq!(
-        data[2],
-        message.get("EncryptionIndicator"),
-        "Encryption indicator should be correctly set"
-    );
-    assert_eq!(
-        data[3],
-        message.get("DuressIndicator"),
-        "Duress indicator should be correctly set"
-    );
-    assert_eq!(
-        data[4],
-        message.get("MessageCode"),
-        "Message code should be correctly set"
-    );
-    assert_eq!(
-        data[5],
-        message.get("ReferenceIndicator"),
-        "Reference indicator should be correctly set"
-    );
-    assert_eq!(
-        data[6],
-        message.get("ReferencedMessage"),
-        "Referenced message should be correctly set"
-    );
+    assert_eq!(field_values.concat(), message.serialize());
 }

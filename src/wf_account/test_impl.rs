@@ -2,10 +2,7 @@ use x25519_dalek::PublicKey;
 
 use crate::{
     wf_auth::WhiteflagAuthToken,
-    wf_crypto::{
-        ecdh_keypair::{WfECDHKeyPair, WhiteflagECDHKeyPair},
-        wf_encryption_key::WhiteflagEncryptionKey,
-    },
+    wf_crypto::{ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey},
 };
 
 use super::{
@@ -13,7 +10,8 @@ use super::{
     error::{WhiteflagAccountError, WhiteflagAccountResult},
 };
 
-struct WhiteflagAccount {
+#[derive(Clone)]
+pub struct WhiteflagAccount {
     owned: bool,
     address: Option<Vec<u8>>,
     auth_url: Option<String>,
@@ -96,7 +94,7 @@ impl WfAccount for WhiteflagAccount {
             Err(WhiteflagAccountError::CantSetECDHPair)
         } else {
             self.ecdh_keypair = Some(ecdh_keypair.clone());
-            self.ecdh_public_key = Some(ecdh_keypair.get_public_key());
+            self.ecdh_public_key = Some(ecdh_keypair.as_ref().clone());
             Ok(())
         }
     }

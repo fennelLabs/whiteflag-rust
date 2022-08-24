@@ -5,7 +5,7 @@ use crate::wf_field::definitions::{
 };
 use crate::wf_field::{create_request_fields, Field, FieldDefinition};
 use crate::wf_parser::MessageHeaderFields;
-use crate::wf_parser::FieldDefinitionParser;
+use crate::wf_parser::{FieldDefinitionParser, MessageCodeParser};
 
 pub struct Decoder {
     buffer: WhiteflagBuffer,
@@ -14,13 +14,21 @@ pub struct Decoder {
 }
 
 impl Decoder {
-    pub fn new<T: AsRef<str>>(message: T) -> Self {
-        let mut buffer = match WhiteflagBuffer::decode_from_hexadecimal(message) {
+    pub fn from_hexadecimal<T: AsRef<str>>(message: T) -> Self {
+        let buffer = match WhiteflagBuffer::decode_from_hexadecimal(message) {
             Ok(buffer) => buffer,
             Err(e) => panic!("{}", e),
         };
 
-        let (bit_cursor, header) = MessageHeaderFields::from_buffer(&mut buffer);
+        Decoder::from_whiteflag_buffer(buffer)
+    }
+
+    pub fn new<T: AsRef<[u8]>>(message: Vec<u8>) -> Self {
+        Self::from_whiteflag_buffer(message.into())
+    }
+
+    pub fn from_whiteflag_buffer(buffer: WhiteflagBuffer) -> Self {
+        let (bit_cursor, header) = MessageHeaderFields::from_buffer(&buffer);
 
         Decoder {
             bit_cursor,
@@ -47,29 +55,28 @@ impl Decoder {
 
         if code == 'Q' {
             // one request object requires 2 fields of 8 bits
-            let n = (self.buffer.bit_length() - self.bit_cursor) / 16;
-            body.append(create_request_fields(n, &mut self).as_mut());
+            body.append(create_request_fields(&mut self).as_mut());
         }
 
-        BasicMessage::new(code, self.header.to_vec(), body)
+        BasicMessage::new(code, self.header.to_vec(), body, None, None)
     }
 
-    fn decode_field(&mut self, definition: FieldDefinition) -> Field {
+    fn decode_field(&mut self, definition: &FieldDefinition) -> Field {
         // extract field
         let psuedo_message_code = self
             .buffer
-            .extract_message_value(&definition, self.bit_cursor);
+            .extract_message_value(definition, self.bit_cursor);
 
         // if this is a test message, then the pseudo message code data needs to be ignored
         // in order to achieve this, the bit cursor needs to be shifted
         // shift the bit the bit cursor instructs the program where the data extraction should begin
         self.bit_cursor += definition.bit_length();
 
-        Field::new(definition, psuedo_message_code)
+        Field::new(definition.clone(), psuedo_message_code)
     }
 
     fn decode_fields(&mut self, defs: Vec<FieldDefinition>) -> Vec<Field> {
-        let (cursor, fields) = self.buffer.decode(defs, self.bit_cursor);
+        let (cursor, fields) = self.buffer.decode(&defs, self.bit_cursor);
         self.bit_cursor = cursor;
         fields
     }
@@ -82,5 +89,13 @@ impl FieldDefinitionParser for Decoder {
             .extract_message_value(definition, self.bit_cursor);
         self.bit_cursor += definition.bit_length();
         value
+    }
+
+    fn remaining(&self) -> usize {
+        (self.buffer.bit_length() - self.bit_cursor) / 16
+    }
+
+    fn body_field_definitions(&self) -> MessageCodeParser {
+        todo!()
     }
 }

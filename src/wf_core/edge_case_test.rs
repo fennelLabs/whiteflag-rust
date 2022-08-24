@@ -81,9 +81,9 @@ fn test_q_message() {
 }
 
 fn test(serialized: &'static str, values: &'static [&'static str]) {
-    let mut message: BasicMessage = values.into();
+    let message: BasicMessage = values.into();
     let encoded_message = super::encode(values);
-    let mut decoded_message = super::decode(&encoded_message);
+    let decoded_message = super::decode(&encoded_message);
 
     assert_eq!(
         serialized,

@@ -1,13 +1,24 @@
+use super::decoder::Decoder;
 use super::segment::MessageSegment;
 use super::FieldValue;
-use crate::wf_buffer::WhiteflagBuffer;
-use crate::wf_field::{get_field_value_from_array, Field};
-use crate::wf_parser::WhiteflagMessageBuilder;
+use crate::wf_account::test_impl::WhiteflagAccount;
+use crate::wf_buffer::{CryptMode, CryptedBuffer, WhiteflagBuffer};
+use crate::wf_crypto::encryption_method::WhiteflagEncryptionMethod;
+use crate::wf_field::Field;
+use crate::wf_parser::{builder_from_field_values, builder_from_serialized};
+use fennel_lib::FennelCipher;
+
+const METAKEY_ORIGINATOR: &str = "originatorAddress";
+const METAKEY_RECIPIENT: &str = "recipientAddress";
+const FIELD_ENCRYPTIONINDICATOR: &str = "EncryptionIndicator";
 
 pub struct BasicMessage {
     message_code: char,
     header: MessageSegment,
     body: MessageSegment,
+
+    originator: Option<WhiteflagAccount>,
+    recipient: Option<WhiteflagAccount>,
 }
 
 impl MessageSegment {
@@ -24,14 +35,22 @@ impl MessageSegment {
 
 impl BasicMessage {
     pub fn compile<T: FieldValue>(data: &[T]) -> Self {
-        WhiteflagMessageBuilder::new(data).compile()
+        builder_from_field_values(data).compile()
     }
 
-    pub fn new(message_code: char, header: Vec<Field>, body: Vec<Field>) -> BasicMessage {
+    pub fn new(
+        message_code: char,
+        header: Vec<Field>,
+        body: Vec<Field>,
+        originator: Option<WhiteflagAccount>,
+        recipient: Option<WhiteflagAccount>,
+    ) -> BasicMessage {
         BasicMessage {
             message_code,
             header: header.into(),
             body: body.into(),
+            originator,
+            recipient,
         }
     }
 
@@ -43,40 +62,61 @@ impl BasicMessage {
         serial
     }
 
-    pub fn encode(&mut self) -> Vec<u8> {
+    pub fn deserialize(message: &str) -> BasicMessage {
+        builder_from_serialized(message).compile()
+    }
+
+    pub fn encode_and_crypt<T: FennelCipher>(
+        &self,
+        cipher: &T,
+        mode: CryptMode,
+    ) -> WhiteflagBuffer {
+        let encryption_indicator_index = 2_usize;
+        let encryption_indicator = &self.header[encryption_indicator_index]; // the encryption indicator is the 3rd index in the header
+
+        let method = WhiteflagEncryptionMethod::from_str(&encryption_indicator.get()).unwrap();
+        let encoded: WhiteflagBuffer = self.encode().into();
+
+        match method {
+            WhiteflagEncryptionMethod::NoEncryption => return encoded,
+            _ => (),
+        };
+
+        let position = self
+            .header
+            .bit_length_of_field(encryption_indicator_index as isize);
+
+        encoded.crypt(cipher, mode, position)
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
         let mut buffer = WhiteflagBuffer::default();
 
-        buffer.encode(&mut self.header);
-        buffer.encode(&mut self.body);
+        buffer.encode(&self.header);
+        buffer.encode(&self.body);
 
         buffer.crop();
         buffer.into()
     }
 
-    pub fn encode_as_hex(&mut self) -> String {
+    pub fn encode_as_hex(&self) -> String {
         hex::encode(self.encode())
     }
 
-    /**
-     * Gets the value of the specified field
-     * @param fieldname the name of the requested field
-     * @return the field value, or NULL if field does not exist
-     */
-    pub fn get<T: AsRef<str>>(&self, fieldname: T) -> String {
-        self.get_option(fieldname)
-            .expect("no value found")
-            .to_string()
+    /// decode a hexadecimal encoded whiteflag message
+    pub fn decode_from_hexadecimal<T: AsRef<str>>(message: T) -> Self {
+        Decoder::from_hexadecimal(message).decode()
     }
 
-    /**
-     * Gets the value of the specified field
-     * @param fieldname the name of the requested field
-     * @return the field value, or NULL if field does not exist
-     */
-    fn get_option<T: AsRef<str>>(&self, fieldname: T) -> Option<&String> {
-        get_field_value_from_array(&self.header, fieldname.as_ref())
-            .or(get_field_value_from_array(&self.body, fieldname.as_ref()))
-            .or(None)
+    /// decode a hexadecimal encoded whiteflag message
+    pub fn decode(message: WhiteflagBuffer) -> Self {
+        Decoder::from_whiteflag_buffer(message).decode()
+    }
+
+    /// decode a hexadecimal encoded whiteflag message
+    pub fn decode_and_crypt<T: FennelCipher>(message: WhiteflagBuffer, cipher: &T) -> Self {
+        let buffer = CryptedBuffer::new(message).crypt(cipher, CryptMode::Decrypt);
+        Decoder::from_whiteflag_buffer(buffer).decode()
     }
 
     pub fn get_fields(&self) -> Vec<&Field> {

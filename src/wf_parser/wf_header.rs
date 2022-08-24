@@ -1,15 +1,75 @@
-use crate::wf_field::definitions::convert_value_to_code;
+use crate::wf_field::definitions::{convert_value_to_code, get_body_from_code};
 use crate::wf_field::Field;
 use crate::{wf_buffer::WhiteflagBuffer, wf_field::FieldDefinition};
 
-pub struct MessageHeader {
-    prefix: String,
-    version: String,
-    encryption_indicator: String,
-    duress_indicator: String,
-    message_code: char,
-    reference_indicator: String,
-    referenced_message: String,
+use super::{MessageHeader, MessageHeaderOrder};
+
+pub struct MessageHeaderValues {
+    values: Vec<String>,
+}
+
+pub fn from_serialized(serialized: &str, definitions: &[FieldDefinition]) -> Vec<String> {
+    definitions
+        .iter()
+        .map(|d| {
+            if let Some(end) = d.end_byte {
+                serialized[d.start_byte..end].to_owned()
+            } else {
+                serialized[d.start_byte..].to_owned()
+            }
+        })
+        .collect()
+}
+
+impl MessageHeader for MessageHeaderValues {
+    type Target = str;
+
+    fn prefix(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::Prefix.as_usize()]
+    }
+
+    fn version(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::Version.as_usize()]
+    }
+
+    fn encryption_indicator(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::EncryptionIndicator.as_usize()]
+    }
+
+    fn duress_indicator(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::DuressIndicator.as_usize()]
+    }
+
+    fn message_code(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::MessageCode.as_usize()]
+    }
+
+    fn reference_indicator(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::ReferenceIndicator.as_usize()]
+    }
+
+    fn referenced_message(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::ReferencedMessage.as_usize()]
+    }
+}
+
+impl MessageHeaderValues {
+    pub fn from_serialized(serialized: &str) -> MessageHeaderValues {
+        let fields: Vec<String> = from_serialized(
+            serialized,
+            crate::wf_field::definitions::Header::DEFINITIONS,
+        );
+
+        MessageHeaderValues { values: fields }
+    }
+
+    pub fn get_body_field_definitions(&self) -> Vec<FieldDefinition> {
+        get_body_from_code(&self.message_code())
+    }
+
+    pub fn to_vec(self) -> Vec<String> {
+        self.values
+    }
 }
 
 pub struct MessageHeaderFields {
@@ -24,10 +84,7 @@ pub struct MessageHeaderFields {
 
 impl MessageHeaderFields {
     pub fn from_buffer(buffer: &WhiteflagBuffer) -> (usize, MessageHeaderFields) {
-        let (cursor, header) = buffer.decode(
-            crate::wf_field::definitions::Header::DEFINITIONS.to_vec(),
-            0,
-        );
+        let (cursor, header) = buffer.decode(crate::wf_field::definitions::Header::DEFINITIONS, 0);
         (cursor, Self::from_fields(header))
     }
 
@@ -60,13 +117,19 @@ impl MessageHeaderFields {
     }
 }
 
-pub fn convert_header_definitions<F>(convert: F) -> Vec<Field>
+pub fn convert_definitions<F>(
+    defs: &'static [FieldDefinition],
+    convert: F,
+) -> impl Iterator<Item = Field>
 where
-    F: Fn((usize, &FieldDefinition)) -> Field,
+    F: Fn((usize, &'static FieldDefinition)) -> Field,
 {
-    crate::wf_field::definitions::Header::DEFINITIONS
-        .iter()
-        .enumerate()
-        .map(convert)
-        .collect()
+    defs.iter().enumerate().map(convert)
+}
+
+pub fn convert_header_definitions<F>(convert: F) -> impl Iterator<Item = Field>
+where
+    F: Fn((usize, &'static FieldDefinition)) -> Field,
+{
+    convert_definitions(crate::wf_field::definitions::Header::DEFINITIONS, convert)
 }
