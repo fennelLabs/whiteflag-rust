@@ -8,13 +8,25 @@ mod wf_header;
 
 pub use message_code_parser::MessageCodeParser;
 pub use message_header_parser::MessageHeaderParser;
-pub use wf_header::{MessageHeader, MessageHeaderFields};
+pub use wf_header::{MessageHeaderFields, MessageHeaderValues};
 
 use crate::{
     wf_core::{basic_message::BasicMessage, FieldValue},
     wf_field::{create_request_fields, definitions::convert_value_to_code, Field, FieldDefinition},
     wf_validation::Validation,
 };
+
+pub trait MessageHeader {
+    type Target: ?Sized;
+
+    fn prefix(&self) -> &Self::Target;
+    fn version(&self) -> &Self::Target;
+    fn encryption_indicator(&self) -> &Self::Target;
+    fn duress_indicator(&self) -> &Self::Target;
+    fn message_code(&self) -> &Self::Target;
+    fn reference_indicator(&self) -> &Self::Target;
+    fn referenced_message(&self) -> &Self::Target;
+}
 
 #[repr(usize)]
 #[derive(Copy, Clone)]

@@ -2,48 +2,60 @@ use crate::wf_field::definitions::{convert_value_to_code, get_body_from_code};
 use crate::wf_field::Field;
 use crate::{wf_buffer::WhiteflagBuffer, wf_field::FieldDefinition};
 
-pub struct MessageHeader {
-    prefix: String,
-    version: String,
-    encryption_indicator: String,
-    duress_indicator: String,
-    message_code: String,
-    reference_indicator: String,
-    referenced_message: String,
+use super::{MessageHeader, MessageHeaderOrder};
+
+pub struct MessageHeaderValues {
+    values: Vec<String>,
 }
 
-impl MessageHeader {
-    pub fn from_serialized(serialized: &str) -> MessageHeader {
-        let mut fields: Vec<String> = super::from_serialized(
+impl MessageHeader for MessageHeaderValues {
+    type Target = str;
+
+    fn prefix(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::Prefix.as_usize()]
+    }
+
+    fn version(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::Version.as_usize()]
+    }
+
+    fn encryption_indicator(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::EncryptionIndicator.as_usize()]
+    }
+
+    fn duress_indicator(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::DuressIndicator.as_usize()]
+    }
+
+    fn message_code(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::MessageCode.as_usize()]
+    }
+
+    fn reference_indicator(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::ReferenceIndicator.as_usize()]
+    }
+
+    fn referenced_message(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::ReferencedMessage.as_usize()]
+    }
+}
+
+impl MessageHeaderValues {
+    pub fn from_serialized(serialized: &str) -> MessageHeaderValues {
+        let fields: Vec<String> = super::from_serialized(
             serialized,
             crate::wf_field::definitions::Header::DEFINITIONS,
         );
 
-        MessageHeader {
-            prefix: fields.remove(0),
-            version: fields.remove(0),
-            encryption_indicator: fields.remove(0),
-            duress_indicator: fields.remove(0),
-            message_code: fields.remove(0),
-            reference_indicator: fields.remove(0),
-            referenced_message: fields.remove(0),
-        }
+        MessageHeaderValues { values: fields }
     }
 
     pub fn get_body_field_definitions(&self) -> Vec<FieldDefinition> {
-        get_body_from_code(&self.message_code)
+        get_body_from_code(&self.message_code())
     }
 
     pub fn to_vec(self) -> Vec<String> {
-        vec![
-            self.prefix,
-            self.version,
-            self.encryption_indicator,
-            self.duress_indicator,
-            self.message_code,
-            self.reference_indicator,
-            self.referenced_message,
-        ]
+        self.values
     }
 }
 
@@ -92,13 +104,19 @@ impl MessageHeaderFields {
     }
 }
 
-pub fn convert_header_definitions<F>(convert: F) -> Vec<Field>
+pub fn convert_definitions<F>(
+    defs: &'static [FieldDefinition],
+    convert: F,
+) -> impl Iterator<Item = Field>
 where
-    F: Fn((usize, &FieldDefinition)) -> Field,
+    F: Fn((usize, &'static FieldDefinition)) -> Field,
 {
-    crate::wf_field::definitions::Header::DEFINITIONS
-        .iter()
-        .enumerate()
-        .map(convert)
-        .collect()
+    defs.iter().enumerate().map(convert)
+}
+
+pub fn convert_header_definitions<F>(convert: F) -> impl Iterator<Item = Field>
+where
+    F: Fn((usize, &'static FieldDefinition)) -> Field,
+{
+    convert_definitions(crate::wf_field::definitions::Header::DEFINITIONS, convert)
 }

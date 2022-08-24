@@ -63,7 +63,7 @@ impl BasicMessage {
     }
 
     pub fn deserialize(message: &str) -> BasicMessage {
-        let header = crate::wf_parser::MessageHeader::from_serialized(message);
+        let header = crate::wf_parser::MessageHeaderValues::from_serialized(message);
         let mut body = from_serialized(message, &header.get_body_field_definitions());
 
         let mut field_values = header.to_vec();

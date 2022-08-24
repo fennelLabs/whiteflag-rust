@@ -67,4 +67,8 @@ impl ParsedFieldDefinition {
     pub fn read<'a, T: FieldValue>(&self, values: &'a [T]) -> &'a str {
         values[self.index].as_ref()
     }
+
+    pub fn to_definition(self) -> FieldDefinition {
+        self.definition.to_owned()
+    }
 }
