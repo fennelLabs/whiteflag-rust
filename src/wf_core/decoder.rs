@@ -4,8 +4,8 @@ use crate::wf_field::definitions::{
     convert_value_to_code, get_body_from_code_char, test_message_code,
 };
 use crate::wf_field::{create_request_fields, Field, FieldDefinition};
-use crate::wf_parser::FieldDefinitionParser;
 use crate::wf_parser::MessageHeaderFields;
+use crate::wf_parser::{FieldDefinitionParser, MessageCodeParser};
 
 pub struct Decoder {
     buffer: WhiteflagBuffer,
@@ -55,8 +55,7 @@ impl Decoder {
 
         if code == 'Q' {
             // one request object requires 2 fields of 8 bits
-            let n = (self.buffer.bit_length() - self.bit_cursor) / 16;
-            body.append(create_request_fields(n, &mut self).as_mut());
+            body.append(create_request_fields(&mut self).as_mut());
         }
 
         BasicMessage::new(code, self.header.to_vec(), body, None, None)
@@ -90,5 +89,13 @@ impl FieldDefinitionParser for Decoder {
             .extract_message_value(definition, self.bit_cursor);
         self.bit_cursor += definition.bit_length();
         value
+    }
+
+    fn remaining(&self) -> usize {
+        (self.buffer.bit_length() - self.bit_cursor) / 16
+    }
+
+    fn body_field_definitions(&self) -> MessageCodeParser {
+        todo!()
     }
 }

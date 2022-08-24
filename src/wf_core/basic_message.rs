@@ -5,7 +5,7 @@ use crate::wf_account::test_impl::WhiteflagAccount;
 use crate::wf_buffer::{CryptMode, CryptedBuffer, WhiteflagBuffer};
 use crate::wf_crypto::encryption_method::WhiteflagEncryptionMethod;
 use crate::wf_field::Field;
-use crate::wf_parser::{from_serialized, WhiteflagMessageBuilder};
+use crate::wf_parser::{from_field_values, from_serialized, WhiteflagMessageBuilder};
 use fennel_lib::FennelCipher;
 
 const METAKEY_ORIGINATOR: &str = "originatorAddress";
@@ -35,7 +35,7 @@ impl MessageSegment {
 
 impl BasicMessage {
     pub fn compile<T: FieldValue>(data: &[T]) -> Self {
-        WhiteflagMessageBuilder::new(data).compile()
+        from_field_values(data).compile()
     }
 
     pub fn new(
