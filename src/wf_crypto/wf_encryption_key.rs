@@ -25,7 +25,7 @@ impl WhiteflagEncryptionKey {
     pub fn from_ecdh_key(public_key: &PublicKey, ecdh_key_pair: &WhiteflagECDHKeyPair) -> Self {
         WhiteflagEncryptionKey {
             secret_key: ecdh_key_pair.negotiate(public_key),
-            method: WhiteflagEncryptionMethod::from_number(3).unwrap(),
+            method: WhiteflagEncryptionMethod::from_number(1).unwrap(),
         }
     }
 
