@@ -5,7 +5,7 @@ use crate::wf_account::test_impl::WhiteflagAccount;
 use crate::wf_buffer::{CryptMode, CryptedBuffer, WhiteflagBuffer};
 use crate::wf_crypto::encryption_method::WhiteflagEncryptionMethod;
 use crate::wf_field::Field;
-use crate::wf_parser::{from_field_values, from_serialized, WhiteflagMessageBuilder};
+use crate::wf_parser::{builder_from_field_values, builder_from_serialized};
 use fennel_lib::FennelCipher;
 
 const METAKEY_ORIGINATOR: &str = "originatorAddress";
@@ -35,7 +35,7 @@ impl MessageSegment {
 
 impl BasicMessage {
     pub fn compile<T: FieldValue>(data: &[T]) -> Self {
-        from_field_values(data).compile()
+        builder_from_field_values(data).compile()
     }
 
     pub fn new(
@@ -63,13 +63,7 @@ impl BasicMessage {
     }
 
     pub fn deserialize(message: &str) -> BasicMessage {
-        let header = crate::wf_parser::MessageHeaderValues::from_serialized(message);
-        let mut body = from_serialized(message, &header.get_body_field_definitions());
-
-        let mut field_values = header.to_vec();
-        field_values.append(body.as_mut());
-
-        Self::compile(field_values.as_ref())
+        builder_from_serialized(message).compile()
     }
 
     pub fn encode_and_crypt<T: FennelCipher>(

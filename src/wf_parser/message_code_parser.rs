@@ -6,7 +6,7 @@ use crate::{
     },
 };
 
-use super::MessageHeaderOrder;
+use super::{MessageHeader, MessageHeaderOrder, MessageHeaderParser};
 
 #[derive(Debug)]
 pub struct MessageCodeParser {
@@ -15,6 +15,21 @@ pub struct MessageCodeParser {
 }
 
 impl MessageCodeParser {
+    pub fn parse_from_serialized(message: &str) -> MessageCodeParser {
+        let header = MessageHeaderParser::default();
+
+        let code = convert_value_to_code(header.message_code().read_from_serialized(message));
+        let test_code = if code == 'T' {
+            Some(convert_value_to_code(
+                header.test_message_code().read_from_serialized(message),
+            ))
+        } else {
+            None
+        };
+
+        MessageCodeParser { code, test_code }
+    }
+
     /// extracts message code type from array of message values
     /// the 4th position is where the message code type resides
     /// if this is a test message (code = T) then there should be a psuedo message code to be extracted

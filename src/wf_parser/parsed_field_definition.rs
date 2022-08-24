@@ -64,8 +64,15 @@ impl ParsedFieldDefinition {
     }
 
     /// used in the compiling process
-    pub fn read<'a, T: FieldValue>(&self, values: &'a [T]) -> &'a str {
+    pub fn read_from_values<'a, T: FieldValue>(&self, values: &'a [T]) -> &'a str {
         values[self.index].as_ref()
+    }
+
+    pub fn read_from_serialized<'a>(&self, message: &'a str) -> &'a str {
+        match self.end_byte {
+            Some(e) => &message[self.start_byte..e],
+            None => &message[self.start_byte..],
+        }
     }
 
     pub fn to_definition(self) -> FieldDefinition {

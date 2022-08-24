@@ -6,6 +6,8 @@ mod message_header_parser;
 mod parsed_field_definition;
 mod wf_header;
 
+use std::ops::Div;
+
 pub use message_code_parser::MessageCodeParser;
 pub use message_header_parser::MessageHeaderParser;
 pub use parsed_field_definition::ParsedFieldDefinition;
@@ -64,25 +66,28 @@ pub trait FieldDefinitionParser {
     fn remaining(&self) -> usize;
 }
 
-pub struct SerializedMessageParser {
-    message: String,
+pub struct SerializedMessageParser<'a> {
+    message: &'a str,
+    last_byte: usize,
 }
 
-impl FieldDefinitionParser for SerializedMessageParser {
+impl FieldDefinitionParser for SerializedMessageParser<'_> {
     fn parse(&mut self, definition: &FieldDefinition) -> String {
         if let Some(end) = definition.end_byte {
+            self.last_byte = end;
             self.message[definition.start_byte..end].to_owned()
         } else {
+            self.last_byte = self.message.len();
             self.message[definition.start_byte..].to_owned()
         }
     }
 
     fn remaining(&self) -> usize {
-        todo!()
+        (self.message.len() - self.last_byte).div(4)
     }
 
     fn body_field_definitions(&self) -> MessageCodeParser {
-        todo!()
+        MessageCodeParser::parse_from_serialized(&self.message)
     }
 }
 
@@ -121,10 +126,20 @@ pub struct WhiteflagMessageBuilder<F: FieldDefinitionParser> {
     parser: F,
 }
 
-pub fn from_field_values<T: FieldValue>(
+pub fn builder_from_field_values<T: FieldValue>(
     data: &[T],
 ) -> WhiteflagMessageBuilder<FieldValuesParser<T>> {
     let parser = FieldValuesParser { data, index: 0 };
+    WhiteflagMessageBuilder { parser }
+}
+
+pub fn builder_from_serialized<'a>(
+    message: &'a str,
+) -> WhiteflagMessageBuilder<SerializedMessageParser<'a>> {
+    let parser = SerializedMessageParser {
+        message,
+        last_byte: 0,
+    };
     WhiteflagMessageBuilder { parser }
 }
 
