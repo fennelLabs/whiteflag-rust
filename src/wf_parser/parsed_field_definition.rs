@@ -6,8 +6,8 @@ use crate::{
 
 pub struct ParsedFieldDefinition {
     definition: &'static FieldDefinition,
-    start_bit: usize,
-    end_bit: usize,
+    pub start_bit: usize,
+    pub end_bit: usize,
     index: usize,
 }
 

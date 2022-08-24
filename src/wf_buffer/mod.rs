@@ -10,10 +10,13 @@ mod tests;
 
 pub mod common;
 pub mod constants;
+mod crypted_buffer;
 mod decode;
 mod encode;
 
 use hex::FromHexError;
+
+pub use crypted_buffer::{CryptMode, CryptedBuffer};
 
 pub fn decode_hex<T: AsRef<str>>(value: T) -> Result<Vec<u8>, FromHexError> {
     hex::decode(remove_hexadecimal_prefix(value.as_ref()))
@@ -22,11 +25,6 @@ pub fn decode_hex<T: AsRef<str>>(value: T) -> Result<Vec<u8>, FromHexError> {
 pub struct WhiteflagBuffer {
     data: Vec<u8>,
     bit_length: usize,
-}
-
-pub enum CryptMode {
-    Encrypt,
-    Decrypt,
 }
 
 impl WhiteflagBuffer {
@@ -47,7 +45,7 @@ impl WhiteflagBuffer {
 
     pub fn crypt<T: FennelCipher>(
         &self,
-        cipher: T,
+        cipher: &T,
         mode: CryptMode,
         position: usize,
     ) -> WhiteflagBuffer {
@@ -85,12 +83,12 @@ impl WhiteflagBuffer {
         self.append(field.into(), None);
     }
 
-    pub fn append(&mut self, buffer: WhiteflagBuffer, bits: Option<usize>) {
+    pub fn append(&mut self, mut buffer: WhiteflagBuffer, bits: Option<usize>) {
         let bit_length_to_extract = bits.unwrap_or_else(|| buffer.bit_length);
         let (buffer, length) = append_bits(
             &self.data,
             self.bit_length,
-            &buffer.to_byte_array(),
+            buffer.to_byte_array(),
             bit_length_to_extract,
         );
 
@@ -142,9 +140,9 @@ impl WhiteflagBuffer {
 
     /// Returns the Whiteflag encoded message as a byte array
     /// @return a byte array with an encoded message
-    pub fn to_byte_array(mut self) -> Vec<u8> {
+    pub fn to_byte_array<'a>(&'a mut self) -> &'a [u8] {
         crop_bits(self.data.as_mut(), self.bit_length);
-        self.into()
+        &self.data
     }
 }
 

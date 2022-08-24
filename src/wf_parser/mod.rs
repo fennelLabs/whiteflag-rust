@@ -8,6 +8,7 @@ mod wf_header;
 
 pub use message_code_parser::MessageCodeParser;
 pub use message_header_parser::MessageHeaderParser;
+pub use parsed_field_definition::ParsedFieldDefinition;
 pub use wf_header::{MessageHeaderFields, MessageHeaderValues};
 
 use crate::{

@@ -230,65 +230,53 @@ fn message_encryption_1() {
         "32676187ba7badda85ea63a69870a7133909f1999774abb2eed251073616a6e7",
     );
 
-    let address = WhiteflagBuffer::decode_from_hexadecimal(
+    let mut buffer = WhiteflagBuffer::decode_from_hexadecimal(
         "007a0baf6f84f0fa7402ea972686e56d50b707c9b67b108866",
     )
-    .unwrap()
-    .to_byte_array();
+    .unwrap();
+
+    let address = buffer.to_byte_array();
 
     key.set_context(&address);
 
-    let iv = hex::decode("40aa85015d24e4601448c1ba8d7bf1aa").unwrap();
+    //40aa85015d24e4601448c1ba8d7bf1aa
+    let iv = vec![
+        64, 170, 133, 1, 93, 36, 228, 96, 20, 72, 193, 186, 141, 123, 241, 170,
+    ];
     let cipher = key.aes_256_ctr_cipher(&iv);
 
     let message = BasicMessage::decode_from_hexadecimal(encoded_msg);
 
     assert_eq!(
         encrypted_msg,
-        hex::encode(message.encode_and_crypt(cipher, CryptMode::Encrypt))
+        hex::encode(message.encode_and_crypt(&cipher, CryptMode::Encrypt))
     );
 }
 
-/* #[test]
+#[test]
 fn message_encryption_2() {
-    /*
-    let mut originator = WhiteflagAccount::new(true);
-    let mut recipient = WhiteflagAccount::new(false);
-    originator.set_address("ac000cdbe3c49955b218f8397ddfe533a32a4269658712a2f4a82e8b448e".to_string());
-    recipient.set_shared_key(WhiteflagEncryptionKey::new(
-        "b50cf705febdc9b6b2f7af10fa0955c1a5b454d6941494536d75d7810010a90d".to_string(),
-    ));
-    */
+    let message_serialized = "WF120F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!";
 
     let mut key = WhiteflagEncryptionKey::from_preshared_key(
         "b50cf705febdc9b6b2f7af10fa0955c1a5b454d6941494536d75d7810010a90d",
     );
 
-    let address = WhiteflagBuffer::decode_from_hexadecimal(
+    let mut address = WhiteflagBuffer::decode_from_hexadecimal(
         "ac000cdbe3c49955b218f8397ddfe533a32a4269658712a2f4a82e8b448e",
     )
-    .unwrap()
-    .to_byte_array();
+    .unwrap();
 
-    let message_serialized = "WF120F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!";
-    let message1 = BasicMessage::deserialize(message_serialized);
-    /*
-    message1.set_originator(originator.clone());
-    message1.set_recipient(recipient.clone());
-    */
+    key.set_context(&address.to_byte_array());
 
-    //let encrypted_msg = message1.encode();
     let iv = fennel_lib::generate_random_buffer(16);
-    //let iv = hex::decode("40aa85015d24e4601448c1ba8d7bf1aa").unwrap();
     let cipher = key.aes_256_ctr_cipher(&iv);
 
-    let encrypted_message = message1.encode_and_crypt(cipher, CryptMode::Encrypt);
+    let message1 = BasicMessage::deserialize(message_serialized);
+    let encrypted_message = message1.encode_and_crypt(&cipher, CryptMode::Encrypt);
+    let message2 = BasicMessage::decode_and_crypt(encrypted_message, &cipher);
 
-    let message2 =  BasicMessage::decode(message1.encode_and_crypt(cipher, CryptMode::Decrypt).into()); //encrypted_msg, originator, recipient, init_vector);
     assert_eq!(message_serialized, message2.serialize());
-    /* assert_eq!(message1.referenced_message(), message2.referenced_message());
-    assert_eq!(message1.text(), message2.text()); */
-} */
+}
 
 /*
 

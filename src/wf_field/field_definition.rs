@@ -73,7 +73,7 @@ impl FieldDefinition {
     }
 
     pub fn decode_to_field(self, data: &[u8]) -> Field {
-        let value = self.encoding.decode(data, self.bit_length());
+        let value = self.decode(data);
         Field::new(self, value)
     }
 
