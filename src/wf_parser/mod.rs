@@ -6,19 +6,30 @@ mod message_header_parser;
 mod parsed_field_definition;
 mod wf_header;
 
+use std::ops::Div;
+
 pub use message_code_parser::MessageCodeParser;
 pub use message_header_parser::MessageHeaderParser;
-pub use wf_header::{MessageHeaderFields, MessageHeader};
+pub use parsed_field_definition::ParsedFieldDefinition;
+pub use wf_header::{MessageHeaderFields, MessageHeaderValues};
 
 use crate::{
     wf_core::{basic_message::BasicMessage, FieldValue},
-    wf_field::{
-        create_request_fields,
-        definitions::{convert_value_to_code, get_body_from_code_char},
-        Field, FieldDefinition,
-    },
+    wf_field::{create_request_fields, definitions::convert_value_to_code, Field, FieldDefinition},
     wf_validation::Validation,
 };
+
+pub trait MessageHeader {
+    type Target: ?Sized;
+
+    fn prefix(&self) -> &Self::Target;
+    fn version(&self) -> &Self::Target;
+    fn encryption_indicator(&self) -> &Self::Target;
+    fn duress_indicator(&self) -> &Self::Target;
+    fn message_code(&self) -> &Self::Target;
+    fn reference_indicator(&self) -> &Self::Target;
+    fn referenced_message(&self) -> &Self::Target;
+}
 
 #[repr(usize)]
 #[derive(Copy, Clone)]
@@ -33,9 +44,12 @@ pub enum MessageHeaderOrder {
 }
 
 impl<'a> MessageHeaderOrder {
+    pub fn as_usize(&self) -> usize {
+        *self as usize
+    }
+
     pub fn get<'b>(&'a self, fields: &'b [Field]) -> &'b Field {
-        let index: usize = *self as usize;
-        &fields[index]
+        &fields[self.as_usize()]
     }
 
     pub fn get_code(fields: &[Field]) -> (&Field, char) {
@@ -46,54 +60,43 @@ impl<'a> MessageHeaderOrder {
 
 pub trait FieldDefinitionParser {
     fn parse(&mut self, definition: &FieldDefinition) -> String;
+    /// fetch the field definitions for the body
+    fn body_field_definitions(&self) -> MessageCodeParser;
+    /// meant to calculate remaining values (if any) for request field definitions
+    fn remaining(&self) -> usize;
 }
 
-pub struct WhiteflagMessageBuilder<'a, T: FieldValue> {
+pub struct SerializedMessageParser<'a> {
+    message: &'a str,
+    last_byte: usize,
+}
+
+impl FieldDefinitionParser for SerializedMessageParser<'_> {
+    fn parse(&mut self, definition: &FieldDefinition) -> String {
+        if let Some(end) = definition.end_byte {
+            self.last_byte = end;
+            self.message[definition.start_byte..end].to_owned()
+        } else {
+            self.last_byte = self.message.len();
+            self.message[definition.start_byte..].to_owned()
+        }
+    }
+
+    fn remaining(&self) -> usize {
+        (self.message.len() - self.last_byte).div(4)
+    }
+
+    fn body_field_definitions(&self) -> MessageCodeParser {
+        MessageCodeParser::parse_from_serialized(&self.message)
+    }
+}
+
+pub struct FieldValuesParser<'a, T: FieldValue> {
     data: &'a [T],
     index: usize,
 }
 
-impl<'a, T: FieldValue> WhiteflagMessageBuilder<'a, T> {
-    pub fn new(data: &'a [T]) -> Self {
-        WhiteflagMessageBuilder { data, index: 0 }
-    }
-
-    pub fn compile(mut self) -> BasicMessage {
-        let defs = crate::wf_field::definitions::Header::DEFINITIONS;
-        let header = self.convert_values_to_fields(defs.to_vec());
-
-        let header = MessageHeaderFields::from_fields(header);
-        let code = header.get_code();
-        let body_defs =
-            MessageCodeParser::parse_for_encode(self.data).get_field_definitions_for_encode();
-
-        let mut body = self.convert_values_to_fields(body_defs);
-
-        if code == 'Q' {
-            let n = (self.data.len() - self.index) / 2;
-            body.append(create_request_fields(n, &mut self).as_mut());
-        }
-
-        BasicMessage::new(code, header.to_vec(), body, None, None)
-    }
-
-    /// converts string values to their respective fields relative to their position and the corresponding field definition
-    fn convert_values_to_fields(&mut self, field_defs: Vec<FieldDefinition>) -> Vec<Field> {
-        if self.data.len() < field_defs.len() {
-            panic!("not enough field definitions to process given values\nvalues: {:#?}\ndefinitions: {:#?}", self.data, field_defs);
-        }
-
-        field_defs
-            .into_iter()
-            .map(|f| {
-                let value = self.parse(&f);
-                Field::new(f, value)
-            })
-            .collect()
-    }
-}
-
-impl<'a, T: FieldValue> FieldDefinitionParser for WhiteflagMessageBuilder<'a, T> {
+impl<'a, T: FieldValue> FieldDefinitionParser for FieldValuesParser<'a, T> {
     fn parse(&mut self, definition: &FieldDefinition) -> String {
         let value = self.data[self.index].as_ref();
 
@@ -109,14 +112,66 @@ impl<'a, T: FieldValue> FieldDefinitionParser for WhiteflagMessageBuilder<'a, T>
 
         value.into()
     }
+
+    fn remaining(&self) -> usize {
+        (self.data.len() - self.index) / 2
+    }
+
+    fn body_field_definitions(&self) -> MessageCodeParser {
+        MessageCodeParser::parse_for_encode(self.data)
+    }
 }
 
-pub fn from_serialized(serialized: &str, definitions: &[FieldDefinition]) -> Vec<String> {
-    definitions.iter().map(|d| {
-        if let Some(end) = d.end_byte {
-            serialized[d.start_byte..end].to_owned()
-        } else {
-            serialized[d.start_byte..].to_owned()
+pub struct WhiteflagMessageBuilder<F: FieldDefinitionParser> {
+    parser: F,
+}
+
+pub fn builder_from_field_values<T: FieldValue>(
+    data: &[T],
+) -> WhiteflagMessageBuilder<FieldValuesParser<T>> {
+    let parser = FieldValuesParser { data, index: 0 };
+    WhiteflagMessageBuilder { parser }
+}
+
+pub fn builder_from_serialized<'a>(
+    message: &'a str,
+) -> WhiteflagMessageBuilder<SerializedMessageParser<'a>> {
+    let parser = SerializedMessageParser {
+        message,
+        last_byte: 0,
+    };
+    WhiteflagMessageBuilder { parser }
+}
+
+impl<F: FieldDefinitionParser> WhiteflagMessageBuilder<F> {
+    pub fn compile(mut self) -> BasicMessage {
+        let header = self
+            .convert_values_to_fields(crate::wf_field::definitions::Header::DEFINITIONS.to_vec());
+
+        let code_parser = self.parser.body_field_definitions();
+        let body_defs = code_parser.get_field_definitions_for_encode();
+
+        let mut body = self.convert_values_to_fields(body_defs);
+
+        if code_parser.code == 'Q' {
+            body.append(create_request_fields(&mut self.parser).as_mut());
         }
-    }).collect()
+
+        BasicMessage::new(code_parser.code, header, body, None, None)
+    }
+
+    /// converts string values to their respective fields relative to their position and the corresponding field definition
+    fn convert_values_to_fields(&mut self, field_defs: Vec<FieldDefinition>) -> Vec<Field> {
+        /* if self.data.len() < field_defs.len() {
+            panic!("not enough field definitions to process given values\nvalues: {:#?}\ndefinitions: {:#?}", self.data, field_defs);
+        } */
+
+        field_defs
+            .into_iter()
+            .map(|f| {
+                let value = self.parser.parse(&f);
+                Field::new(f, value)
+            })
+            .collect()
+    }
 }

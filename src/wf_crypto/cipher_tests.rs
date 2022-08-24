@@ -1,8 +1,7 @@
 use crate::wf_crypto::{
-    cipher::{WfCipher, WhiteflagCipher},
-    ecdh_keypair::{generate_wfkeypair, WfECDHKeyPair},
-    wf_encryption_key::WfEncryptionKey,
+    ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey,
 };
+use fennel_lib::FennelCipher;
 
 /**
  * Whiteflag cipher test class
@@ -14,14 +13,17 @@ use crate::wf_crypto::{
 #[test]
 fn test_cipher_1() {
     let plaintext = "23000000000088888889111111119999999a22222222aaaaaaab33333333bbbbbbbb0983098309830983118b118b118b118b1993199319931993219b219b219b219b29a329a329a329a331ab31ab31ab31a9b1b9b1b9b1b9b1b9c1c9c1c9c1c9c1c8";
-
-    let key = WfEncryptionKey::new(
-        "32676187ba7badda85ea63a69870a7133909f1999774abb2eed251073616a6e7".to_string(),
+    let key = WhiteflagEncryptionKey::from_preshared_key(
+        "32676187ba7badda85ea63a69870a7133909f1999774abb2eed251073616a6e7",
     );
-    let cipher: WhiteflagCipher = WfCipher::from_key(key);
 
-    let ciphertext = cipher.encrypt(plaintext.to_string());
-    assert_eq!(plaintext, cipher.decrypt(ciphertext));
+    let cipher = key.aes_cipher();
+    let ciphertext = cipher.encrypt(plaintext);
+
+    assert_eq!(
+        plaintext,
+        String::from_utf8_lossy(&cipher.decrypt(ciphertext))
+    );
 }
 
 /**
@@ -30,19 +32,15 @@ fn test_cipher_1() {
 #[test]
 fn test_cipher_2() {
     let plaintext1 = "aa1bb2cc3dd4ee5ff6007008009000";
-    let keypair1 = generate_wfkeypair();
-    let pubkey1 = hex::encode(keypair1.get_raw_public_key());
 
-    let keypair2 = generate_wfkeypair();
-    let pubkey2 = hex::encode(keypair2.get_raw_public_key());
+    let keypair1 = WhiteflagECDHKeyPair::default();
+    let keypair2 = WhiteflagECDHKeyPair::default();
 
-    let key1 = WfEncryptionKey::new_key_from_ecdh_key(pubkey2, keypair1);
-    let cipher1: WhiteflagCipher = WfCipher::from_key(key1);
-    let ciphertext = cipher1.encrypt(plaintext1.to_string());
+    let cipher1 = keypair1.create_aes_cipher(keypair2.as_ref());
+    let ciphertext = cipher1.encrypt(plaintext1);
 
-    let key2 = WfEncryptionKey::new_key_from_ecdh_key(pubkey1, keypair2);
-    let cipher2: WhiteflagCipher = WfCipher::from_key(key2);
-    let plaintext2 = cipher2.decrypt(ciphertext.to_string());
+    let cipher2 = keypair2.create_aes_cipher(keypair1.as_ref());
+    let plaintext2 = cipher2.decrypt(ciphertext);
 
-    assert_eq!(plaintext1, plaintext2);
+    assert_eq!(plaintext1, String::from_utf8_lossy(&plaintext2));
 }

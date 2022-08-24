@@ -1,168 +1,72 @@
-use super::parsed_field_definition::ParsedFieldDefinition;
-use super::MessageHeaderOrder;
+use super::{parsed_field_definition::ParsedFieldDefinition, MessageHeader, MessageHeaderOrder};
 use crate::wf_buffer::WhiteflagBuffer;
-use crate::wf_codec::encoding::*;
-use crate::wf_field::definitions::convert_value_to_code;
-use crate::wf_field::{
-    definitions::{message_code, test_message_code},
-    FieldDefinition,
-};
-use crate::wf_field::{generic_header_fields, Field};
-use regex::Regex;
+use crate::wf_field::{definitions::test_message_code, Field, FieldDefinition};
 
 pub struct MessageHeaderParser {
-    prefix: ParsedFieldDefinition,
-    version: ParsedFieldDefinition,
-    encryption_indicator: ParsedFieldDefinition,
-    duress_indicator: ParsedFieldDefinition,
-    message_code: ParsedFieldDefinition,
-    reference_indicator: ParsedFieldDefinition,
-    referenced_message: ParsedFieldDefinition,
+    values: Vec<ParsedFieldDefinition>,
 }
 
-pub struct MessageHeader {
-    prefix: String,
-    version: String,
-    encryption_indicator: String,
-    duress_indicator: String,
-    message_code: char,
-    reference_indicator: String,
-    referenced_message: String,
-}
+impl MessageHeader for MessageHeaderParser {
+    type Target = ParsedFieldDefinition;
 
-pub struct MessageHeaderFields {
-    prefix: Field,
-    version: Field,
-    encryption_indicator: Field,
-    duress_indicator: Field,
-    message_code: Field,
-    reference_indicator: Field,
-    referenced_message: Field,
-}
-
-trait MessageHeaderVariant<T> {
-    fn get(&self, field: MessageHeaderOrder) -> &T;
-    fn to_vec(&self) -> Vec<T>;
-}
-
-impl MessageHeaderVariant<Field> for MessageHeaderFields {
-    fn get(&self, field: MessageHeaderOrder) -> &Field {
-        match field {
-            MessageHeaderOrder::Prefix => &self.prefix,
-            MessageHeaderOrder::Version => &self.version,
-            MessageHeaderOrder::EncryptionIndicator => &self.encryption_indicator,
-            MessageHeaderOrder::DuressIndicator => &self.duress_indicator,
-            MessageHeaderOrder::MessageCode => &self.message_code,
-            MessageHeaderOrder::ReferenceIndicator => &self.reference_indicator,
-            MessageHeaderOrder::ReferencedMessage => &self.referenced_message,
-        }
+    fn prefix(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::Prefix.as_usize()]
     }
 
-    fn to_vec(&self) -> Vec<Field> {
-        vec![
-            self.get(MessageHeaderOrder::Prefix).to_owned(),
-            self.get(MessageHeaderOrder::Version).to_owned(),
-            self.get(MessageHeaderOrder::EncryptionIndicator).to_owned(),
-            self.get(MessageHeaderOrder::DuressIndicator).to_owned(),
-            self.get(MessageHeaderOrder::MessageCode).to_owned(),
-            self.get(MessageHeaderOrder::ReferenceIndicator).to_owned(),
-            self.get(MessageHeaderOrder::ReferencedMessage).to_owned(),
-        ]
-    }
-}
-
-impl MessageHeaderFields {
-    pub fn new(mut fields: Vec<Field>) -> Self {
-        MessageHeaderFields {
-            prefix: fields.remove(0),
-            version: fields.remove(0),
-            encryption_indicator: fields.remove(0),
-            duress_indicator: fields.remove(0),
-            message_code: fields.remove(0),
-            reference_indicator: fields.remove(0),
-            referenced_message: fields.remove(0),
-        }
+    fn version(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::Version.as_usize()]
     }
 
-    pub fn get_code(&self) -> char {
-        convert_value_to_code(self.message_code.get())
+    fn encryption_indicator(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::EncryptionIndicator.as_usize()]
+    }
+
+    fn duress_indicator(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::DuressIndicator.as_usize()]
+    }
+
+    fn message_code(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::MessageCode.as_usize()]
+    }
+
+    fn reference_indicator(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::ReferenceIndicator.as_usize()]
+    }
+
+    fn referenced_message(&self) -> &Self::Target {
+        &self.values[MessageHeaderOrder::ReferencedMessage.as_usize()]
     }
 }
 
 impl MessageHeaderParser {
-    pub fn new(defs: &[FieldDefinition]) -> Self {
-        let mut parsed_defs = ParsedFieldDefinition::parse(defs.to_vec());
-
+    pub fn new() -> Self {
         MessageHeaderParser {
-            prefix: parsed_defs.remove(0),
-            version: parsed_defs.remove(0),
-            encryption_indicator: parsed_defs.remove(0),
-            duress_indicator: parsed_defs.remove(0),
-            message_code: parsed_defs.remove(0),
-            reference_indicator: parsed_defs.remove(0),
-            referenced_message: parsed_defs.remove(0),
-        }
-    }
-
-    pub fn parse(buffer: &WhiteflagBuffer) -> MessageHeaderFields {
-        let (bit_cursor, header) = buffer.decode(Self::default().to_vec(), 0);
-        let code = MessageHeaderOrder::MessageCode.get(&header);
-
-        MessageHeaderFields::new(header)
-    }
-
-    pub fn extract(&self, buffer: &WhiteflagBuffer) -> MessageHeader {
-        MessageHeader {
-            prefix: self.prefix.extract(&buffer),
-            version: self.version.extract(&buffer),
-            encryption_indicator: self.encryption_indicator.extract(&buffer),
-            duress_indicator: self.duress_indicator.extract(&buffer),
-            message_code: convert_value_to_code(&self.message_code.extract(&buffer)),
-            reference_indicator: self.reference_indicator.extract(&buffer),
-            referenced_message: self.referenced_message.extract(&buffer),
+            values: ParsedFieldDefinition::header(),
         }
     }
 
     pub fn to_fields(self, buffer: &WhiteflagBuffer) -> Vec<Field> {
-        buffer.decode(self.to_vec(), 0).1
-        //self.to_vec().into_iter().map(|f| )
-    }
-
-    /// message code is a default header
-    pub fn message_code(&self) -> &ParsedFieldDefinition {
-        &self.message_code
+        buffer.decode(self.to_vec().as_slice(), 0).1
     }
 
     /// the test message code is technically part of a test message body
     /// this field is always ordered after the header
     /// therefore, the `previous` position is the `end_bit` of the last header `ParsedFieldDefinition`
     pub fn test_message_code(&self) -> ParsedFieldDefinition {
-        self.referenced_message.next(test_message_code())
+        self.referenced_message().next(test_message_code())
+    }
+
+    pub fn to_vec_static(self) -> Vec<&'static FieldDefinition> {
+        self.values.into_iter().map(|f| f.into()).collect()
     }
 
     pub fn to_vec(self) -> Vec<FieldDefinition> {
-        vec![
-            self.prefix.into(),
-            self.version.into(),
-            self.encryption_indicator.into(),
-            self.duress_indicator.into(),
-            self.message_code.into(),
-            self.reference_indicator.into(),
-            self.referenced_message.into(),
-        ]
+        self.values.into_iter().map(|f| f.to_definition()).collect()
     }
 }
 
 impl Default for MessageHeaderParser {
     fn default() -> Self {
-        MessageHeaderParser::new(generic_header_fields())
+        MessageHeaderParser::new()
     }
 }
-
-/* impl std::ops::Deref for MessageHeaderParser {
-    type Target = [FieldDefinition];
-
-    fn deref(&self) -> &Self::Target {
-        .as_slice()
-    }
-} */

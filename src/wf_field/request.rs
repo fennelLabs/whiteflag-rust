@@ -9,7 +9,7 @@ const OBJECT_TYPE_QUANT: FieldDefinition = Request::OBJECT_TYPE_QUANT;
 /// this function takes n number of request objects and parsers out the remaining request fields
 ///
 /// wf spec 4.3.1.9 Object Request Fields
-pub fn create_request_fields<T: FieldDefinitionParser>(n: usize, parser: &mut T) -> Vec<Field> {
+pub fn create_request_fields<T: FieldDefinitionParser>(parser: &mut T) -> Vec<Field> {
     let ot_size = OBJECT_TYPE
         .expected_byte_length()
         .expect("request::OBJECT_TYPE is misconfigured: must have a start and end byte");
@@ -21,6 +21,7 @@ pub fn create_request_fields<T: FieldDefinitionParser>(n: usize, parser: &mut T)
         .expect("request::OBJECT_TYPE is misconfigured: should have a name");
 
     let mut start_byte = OBJECT_TYPE.start_byte;
+    let n = parser.remaining();
 
     (0..(n.mul(2)))
         .step_by(2)

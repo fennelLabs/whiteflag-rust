@@ -10,11 +10,7 @@ impl WhiteflagBuffer {
      * @param fieldIndex the index of the next field to be decoded
      * @throws WfCoreException if the message cannot be decoded
      */
-    pub fn decode(
-        &self,
-        field_defs: Vec<FieldDefinition>,
-        start_bit: usize,
-    ) -> (usize, Vec<Field>) {
+    pub fn decode(&self, field_defs: &[FieldDefinition], start_bit: usize) -> (usize, Vec<Field>) {
         if field_defs.len() < 1 {
             panic!("field definition vector should not be empty")
         }
