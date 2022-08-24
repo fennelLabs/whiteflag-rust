@@ -1,73 +1,6 @@
 use super::constants::*;
 
 /**
- * converts buffer into hexadecimal string
- * java equivalent: WfBinaryBuffer.convertToHexString
- */
-pub fn to_hex(data: &Vec<u8>) -> String {
-    data.iter().flat_map(|b| convert_byte_to_hex(*b)).collect()
-}
-
-fn convert_byte_to_hex(byte: u8) -> [char; 2] {
-    let byte_u32 = byte as u32;
-    let c1 = std::char::from_digit((byte_u32 >> QUADBIT) & 0xF, HEXRADIX as u32)
-        .expect("encoding failed");
-    let c2 = std::char::from_digit(byte_u32 & 0xF, HEXRADIX as u32).expect("encoding failed");
-    [c1, c2]
-}
-
-/**
- * decodes a hexadecimal string into a buffer and includes bit_length
- * java equivalent: WfBinaryBuffer.convertToByteArray
- */
-pub fn decode_from_hexadecimal<T: AsRef<str>>(data: T) -> (Vec<u8>, usize) {
-    let buffer = hex::decode(remove_hexadecimal_prefix(data.as_ref())).unwrap();
-    let bit_length = buffer.len() * BYTE;
-    (buffer, bit_length)
-}
-
-/**
- * Converts a hexadecimal string to a byte array
- * @param hexstr the hexadecimal string
- * @return a byte array
- * @throws IllegalArgumentException if argument is not a hexadecimal string
- * java equivalent: WfBinaryBuffer.convertToByteArray
- */
-pub fn from_hex<T: AsRef<str>>(hex: T) -> Vec<u8> {
-    let mut cleaned_hex = remove_hexadecimal_prefix(hex.as_ref()).to_string();
-
-    if cleaned_hex.len() % 2 == 1 {
-        cleaned_hex += "0";
-    }
-
-    /*
-
-    TODO: check for invalid hex strings?
-
-    if (!HEXPATTERN.matcher(str).matches()) {
-        throw new IllegalArgumentException("Invalid hexadecimal string");
-    }
-
-    */
-
-    /* Loop through hexadecimal string and take two chars at a time*/
-    let data: Vec<char> = cleaned_hex.chars().into_iter().collect();
-    //let data = cleaned_hex.as_bytes();
-    let str_length = data.len();
-    let mut buffer = vec![0; str_length / 2];
-
-    for i in (0..str_length).step_by(2) {
-        buffer[i / 2] = (u8::from_str_radix(&data[i].to_string(), HEXRADIX as u32)
-            .expect("conversion error")
-            << QUADBIT)
-            + u8::from_str_radix(&data[i + 1].to_string(), HEXRADIX as u32)
-                .expect("conversion error");
-    }
-
-    buffer
-}
-
-/**
  * removes characters from string that are invalid in hexadecimal format
  * java equivalent: N/A
  */
@@ -76,9 +9,6 @@ pub fn remove_all_invalid_hex_characters<T: AsRef<str>>(data: T) -> String {
     re.replace_all(data.as_ref(), "").to_string()
 }
 
-/**
- * java equivalent: N/A
- */
 pub fn remove_hexadecimal_prefix(data: &str) -> &str {
     if data.starts_with("0x") {
         return &data[2..];
@@ -87,12 +17,16 @@ pub fn remove_hexadecimal_prefix(data: &str) -> &str {
     data
 }
 
+pub fn remove_hexadecimal_prefix_mut(mut data: &str) {
+    data = remove_hexadecimal_prefix(data);
+}
+
 /**
  * Calculates the number of bytes required to hold the given number of bits
  * java equivalent: WfBinaryBuffer.byteLength
  */
-pub fn byte_length(bit_length: isize) -> isize {
-    let i_byte = BYTE as isize;
+pub fn byte_length(bit_length: usize) -> usize {
+    let i_byte = BYTE;
     (bit_length / i_byte) + (if (bit_length % i_byte) > 0 { 1 } else { 0 })
 }
 
@@ -100,39 +34,28 @@ pub fn byte_length(bit_length: isize) -> isize {
  * Shortens the byte array to fit the length of the used bits
  * java equivalent: WfBinaryBuffer.cropBits
  */
-pub fn crop_bits(buffer: Vec<u8>, bit_length: isize) -> Vec<u8> {
+pub fn crop_bits(buffer: &mut Vec<u8>, bit_length: usize) {
     if bit_length == 0 {
-        return buffer;
+        return;
     }
 
-    let is_positive = bit_length > 0;
-    let u_bit_length = bit_length as usize;
+    let buffer_length = buffer.len();
+    let byte_len = byte_length(bit_length);
+    buffer.drain(byte_len..);
 
-    let (byte_length, clear_bits) = match is_positive {
-        true => {
-            let length = byte_length(bit_length);
-            if length > buffer.len() as isize {
-                return buffer[0..length as usize].to_vec();
-            }
-            (length as usize, BYTE - (u_bit_length % BYTE))
-        }
-        false => {
-            let length: isize = buffer.len() as isize + (bit_length / (BYTE as isize));
-            if length < 1 {
-                return vec![0];
-            }
-            (length as usize, u_bit_length)
-        }
-    };
-
-    let mut cropped_buffer = buffer[0..byte_length].to_vec();
+    if byte_len > buffer_length {
+        return;
+    }
 
     /* Clear unused bits in last byte */
-    if clear_bits < BYTE {
-        cropped_buffer[byte_length - 1] &= 0xFF << clear_bits;
+    let clear_bits = BYTE - (bit_length % BYTE);
+    if !(clear_bits < BYTE) {
+        return;
     }
 
-    cropped_buffer
+    if let Some(x) = buffer.last_mut() {
+        *x &= 0xFF << clear_bits;
+    }
 }
 
 /**
@@ -189,7 +112,7 @@ pub fn shift_left(buffer: &[u8], shift: isize) -> Vec<u8> {
         }
     }
 
-    crop_bits(new_buffer, -(shift % BYTE as isize))
+    new_buffer
 }
 
 /**
@@ -210,7 +133,7 @@ pub fn extract_bits(
     }
 
     let start_byte = start_bit / BYTE;
-    let byte_length = byte_length(bit_length as isize) as usize;
+    let byte_length = byte_length(bit_length);
     let shift = start_bit % BYTE;
     let mask: u8 = (BYTE - shift).checked_shl(0xFF).unwrap_or(u8::MAX as usize) as u8;
 
@@ -238,7 +161,8 @@ pub fn extract_bits(
         }
     }
 
-    crop_bits(new_byte_array, bit_length as isize)
+    crop_bits(new_byte_array.as_mut(), bit_length);
+    new_byte_array
 }
 
 /**
@@ -296,7 +220,7 @@ pub fn concatinate_bits(
     let free_bits = if shift == 0 { 0 } else { BYTE - shift };
     let byte_length_1 = (n_bits_1 / BYTE) + (if free_bits == 0 { 0 } else { 1 });
     let bit_length = n_bits_1 + n_bits_2;
-    let byte_length = byte_length(bit_length as isize) as usize;
+    let byte_length = byte_length(bit_length);
 
     /* Prepare byte arrays */
     let byte_array_2_shift = shift_right(&byte_array_2, shift as isize);
@@ -327,5 +251,6 @@ pub fn concatinate_bits(
         byte_cursor += 1;
     }
 
-    return crop_bits(new_byte_array, bit_length as isize);
+    crop_bits(new_byte_array.as_mut(), bit_length);
+    new_byte_array
 }
