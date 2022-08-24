@@ -8,6 +8,19 @@ pub struct MessageHeaderValues {
     values: Vec<String>,
 }
 
+pub fn from_serialized(serialized: &str, definitions: &[FieldDefinition]) -> Vec<String> {
+    definitions
+        .iter()
+        .map(|d| {
+            if let Some(end) = d.end_byte {
+                serialized[d.start_byte..end].to_owned()
+            } else {
+                serialized[d.start_byte..].to_owned()
+            }
+        })
+        .collect()
+}
+
 impl MessageHeader for MessageHeaderValues {
     type Target = str;
 
@@ -42,7 +55,7 @@ impl MessageHeader for MessageHeaderValues {
 
 impl MessageHeaderValues {
     pub fn from_serialized(serialized: &str) -> MessageHeaderValues {
-        let fields: Vec<String> = super::from_serialized(
+        let fields: Vec<String> = from_serialized(
             serialized,
             crate::wf_field::definitions::Header::DEFINITIONS,
         );

@@ -175,16 +175,3 @@ impl<F: FieldDefinitionParser> WhiteflagMessageBuilder<F> {
             .collect()
     }
 }
-
-pub fn from_serialized(serialized: &str, definitions: &[FieldDefinition]) -> Vec<String> {
-    definitions
-        .iter()
-        .map(|d| {
-            if let Some(end) = d.end_byte {
-                serialized[d.start_byte..end].to_owned()
-            } else {
-                serialized[d.start_byte..].to_owned()
-            }
-        })
-        .collect()
-}
