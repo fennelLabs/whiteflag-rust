@@ -1,4 +1,4 @@
-use super::basic_message::BasicMessage;
+use super::message::Message;
 use crate::wf_buffer::WhiteflagBuffer;
 use crate::wf_field::definitions::{
     convert_value_to_code, get_body_from_code_char, test_message_code,
@@ -37,7 +37,7 @@ impl Decoder {
         }
     }
 
-    pub fn decode(mut self) -> BasicMessage {
+    pub fn decode(mut self) -> Message {
         let mut body: Vec<Field> = Vec::new();
 
         let code = match self.header.get_code() {
@@ -58,7 +58,7 @@ impl Decoder {
             body.append(create_request_fields(&mut self).as_mut());
         }
 
-        BasicMessage::new(code, self.header.to_vec(), body, None, None)
+        Message::new(code, self.header.to_vec(), body, None, None)
     }
 
     fn decode_field(&mut self, definition: &FieldDefinition) -> Field {

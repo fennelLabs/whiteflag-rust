@@ -14,7 +14,7 @@ pub use parsed_field_definition::ParsedFieldDefinition;
 pub use wf_header::{MessageHeaderFields, MessageHeaderValues};
 
 use crate::{
-    wf_core::{basic_message::BasicMessage, FieldValue},
+    wf_core::{message::Message, FieldValue},
     wf_field::{create_request_fields, definitions::convert_value_to_code, Field, FieldDefinition},
     wf_validation::Validation,
 };
@@ -144,7 +144,7 @@ pub fn builder_from_serialized<'a>(
 }
 
 impl<F: FieldDefinitionParser> WhiteflagMessageBuilder<F> {
-    pub fn compile(mut self) -> BasicMessage {
+    pub fn compile(mut self) -> Message {
         let header = self
             .convert_values_to_fields(crate::wf_field::definitions::Header::DEFINITIONS.to_vec());
 
@@ -157,7 +157,7 @@ impl<F: FieldDefinitionParser> WhiteflagMessageBuilder<F> {
             body.append(create_request_fields(&mut self.parser).as_mut());
         }
 
-        BasicMessage::new(code_parser.code, header, body, None, None)
+        Message::new(code_parser.code, header, body, None, None)
     }
 
     /// converts string values to their respective fields relative to their position and the corresponding field definition

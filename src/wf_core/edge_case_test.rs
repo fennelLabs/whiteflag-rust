@@ -1,4 +1,4 @@
-use crate::wf_core::basic_message::BasicMessage;
+use crate::wf_core::message::Message;
 
 mod test_message {
     pub const SERIALIZED: &'static str = "WF101T33efb4e0cfa83122b242634254c1920a769d615dfcc4c670bb53eb6f12843c3aeM802013-08-31T04:29:15ZP00D00H00M22+30.79658-037.8260287653210042";
@@ -54,22 +54,6 @@ mod request_signal_message {
 #[test]
 fn test_t_message() {
     test(test_message::SERIALIZED, test_message::VALUES)
-    /*
-    assert_eq!(
-        None,
-        messageDecoded.set_transaction_hash("a1b2c3".to_string())
-    );
-    assert_eq!(
-        "a1b2c3",
-        messageDecoded
-            .set_transaction_hash("d4e5f6".to_string())
-            .unwrap()
-    );
-    assert_eq!(
-        None,
-        messageDecoded.set_originator_address("abc123".to_string())
-    );
-    assert_eq!("abc123", messageDecoded.get_originator_address()); */
 }
 
 #[test]
@@ -81,7 +65,7 @@ fn test_q_message() {
 }
 
 fn test(serialized: &'static str, values: &'static [&'static str]) {
-    let message: BasicMessage = values.into();
+    let message: Message = values.into();
     let encoded_message = super::encode(values);
     let decoded_message = super::decode(&encoded_message);
 

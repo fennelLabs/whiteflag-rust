@@ -1,7 +1,7 @@
-use crate::wf_core::basic_message::BasicMessage;
+use crate::wf_core::message::Message;
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 
-impl Serialize for BasicMessage {
+impl Serialize for Message {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,

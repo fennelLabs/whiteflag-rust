@@ -1,13 +1,13 @@
 use crate::{
     wf_account::{account::WfAccount, test_impl::WhiteflagAccount},
     wf_buffer::{CryptMode, WhiteflagBuffer},
-    wf_core::basic_message::BasicMessage,
+    wf_core::message::Message,
     wf_crypto::{ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey},
 };
 use fennel_lib::FennelCipher;
 
 fn test(values: &[&str]) {
-    let message = BasicMessage::compile(values);
+    let message = Message::compile(values);
     assert_eq!(values.concat(), message.serialize());
 }
 
@@ -62,7 +62,7 @@ fn auth_message_serialization() {
 #[test]
 fn auth_message_deserialization() {
     let message_serialized = "WF100A000000000000000000000000000000000000000000000000000000000000000001https://organisation.int/whiteflag";
-    let message = BasicMessage::deserialize(message_serialized);
+    let message = Message::deserialize(message_serialized);
     assert_eq!(message_serialized, message.serialize());
 }
 
@@ -79,7 +79,7 @@ fn auth_message_decoding() {
         "1",
         "https://organisation.int/whiteflag",
     ];
-    let message = BasicMessage::decode_from_hexadecimal("5746313020800000000000000000000000000000000000000000000000000000000000000000b43a3a38399d1797b7b933b0b734b9b0ba34b7b71734b73a17bbb434ba32b33630b380");
+    let message = Message::decode_from_hexadecimal("5746313020800000000000000000000000000000000000000000000000000000000000000000b43a3a38399d1797b7b933b0b734b9b0ba34b7b71734b73a17bbb434ba32b33630b380");
     assert_eq!(field_values.concat(), message.serialize());
 }
 
@@ -121,7 +121,7 @@ fn sign_signal_message_encoding() {
         "3210",
         "042",
     ];
-    let message = BasicMessage::compile(&field_values);
+    let message = Message::compile(&field_values);
     assert_eq!(message_encoded, message.encode_as_hex());
 }
 
@@ -146,7 +146,7 @@ fn sign_signal_message_decoding() {
         "3210",
         "042",
     ];
-    let message = BasicMessage::decode_from_hexadecimal(message_encoded);
+    let message = Message::decode_from_hexadecimal(message_encoded);
     assert_eq!(field_values.concat(), message.serialize());
 }
 
@@ -172,9 +172,9 @@ fn test_message() {
         "3210",
         "042",
     ];
-    let message = BasicMessage::compile(&field_values);
+    let message = Message::compile(&field_values);
     let message_encoded = message.encode_as_hex();
-    let message_decoded = BasicMessage::decode_from_hexadecimal(message_encoded);
+    let message_decoded = Message::decode_from_hexadecimal(message_encoded);
 
     assert_eq!(message_serialized, message.serialize());
     assert_eq!(message_serialized, message_decoded.serialize());
@@ -205,9 +205,9 @@ fn request_message() {
         "20",
         "03",
     ];
-    let message = BasicMessage::compile(&field_values);
+    let message = Message::compile(&field_values);
     let message_encoded = message.encode_as_hex();
-    let message_decoded = BasicMessage::decode_from_hexadecimal(message_encoded);
+    let message_decoded = Message::decode_from_hexadecimal(message_encoded);
 
     assert_eq!(message_serialized, message.serialize());
     assert_eq!(message_serialized, message_decoded.serialize());
@@ -215,8 +215,8 @@ fn request_message() {
 
 #[test]
 fn free_text_message() {
-    let message1 = BasicMessage::deserialize("WF100F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!");
-    let message2 = BasicMessage::decode_from_hexadecimal("57463130232fb60f0f6c4a8589bddcf076e790ac9eb1601d3fd9ced67eaaa62c9fb9644a16fabb434ba32b33630b3903a32b9ba1036b2b9b9b0b3b2908");
+    let message1 = Message::deserialize("WF100F5f6c1e1ed8950b137bb9e0edcf21593d62c03a7fb39dacfd554c593f72c8942dfWhiteflag test message!");
+    let message2 = Message::decode_from_hexadecimal("57463130232fb60f0f6c4a8589bddcf076e790ac9eb1601d3fd9ced67eaaa62c9fb9644a16fabb434ba32b33630b3903a32b9ba1036b2b9b9b0b3b2908");
 
     assert_eq!(message1.serialize(), message2.serialize());
 }
@@ -243,7 +243,7 @@ fn message_encryption_1() {
     ];
     let cipher = key.aes_256_ctr_cipher(&iv);
 
-    let message = BasicMessage::decode_from_hexadecimal(encoded_msg);
+    let message = Message::decode_from_hexadecimal(encoded_msg);
 
     assert_eq!(
         encrypted_msg,
@@ -269,9 +269,9 @@ fn message_encryption_2() {
     let iv = fennel_lib::generate_random_buffer(16);
     let cipher = key.aes_256_ctr_cipher(&iv);
 
-    let message1 = BasicMessage::deserialize(message_serialized);
+    let message1 = Message::deserialize(message_serialized);
     let encrypted_message = message1.encode_and_crypt(&cipher, CryptMode::Encrypt);
-    let message2 = BasicMessage::decode_and_crypt(encrypted_message, &cipher);
+    let message2 = Message::decode_and_crypt(encrypted_message, &cipher);
 
     assert_eq!(message_serialized, message2.serialize());
 }
@@ -294,14 +294,14 @@ fn message_encryption_3() {
     let iv = fennel_lib::generate_random_buffer(16);
     let cipher = key.aes_256_ctr_cipher(&iv);
 
-    let message1 = BasicMessage::deserialize(message_serialized);
+    let message1 = Message::deserialize(message_serialized);
     assert_eq!(
         message_serialized,
         message1.serialize(),
         "failing immediately"
     );
     let encrypted_message = message1.encode_and_crypt(&cipher, CryptMode::Encrypt);
-    let message2 = BasicMessage::decode_and_crypt(encrypted_message, &cipher);
+    let message2 = Message::decode_and_crypt(encrypted_message, &cipher);
 
     assert_eq!(message_serialized, message2.serialize());
 }
