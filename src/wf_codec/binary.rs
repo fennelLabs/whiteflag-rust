@@ -1,4 +1,4 @@
-use super::constants::BYTE;
+use wf_common::constants::BYTE;
 
 /// encodes a binary string into a binary buffer
 ///

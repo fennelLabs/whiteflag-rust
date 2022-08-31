@@ -4,6 +4,9 @@ version = "1.0.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[workspace]
+members = ["wf_common"]
+
 
 [dependencies]
 regex = "1.5.5"
@@ -16,3 +19,4 @@ fennel-lib = { git = "https://github.com/fennelLabs/fennel-lib", branch = "maste
 hkdf = "0.12.3"
 sha2 = "0.10.2"
 lazy_static = "1.4.0"
+wf_common = { path = "wf_common" }

@@ -1,6 +1,8 @@
-use super::common::{crop_bits, remove_all_invalid_hex_characters, shift_right};
-use super::constants::QUADBIT;
 use super::hexadecimal::encode_from_bdx;
+use wf_common::{
+    common::{crop_bits, remove_all_invalid_hex_characters, shift_right},
+    constants::QUADBIT,
+};
 
 const PLUS: &'static str = "+";
 const MINUS: &'static str = "-";

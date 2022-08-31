@@ -1,4 +1,4 @@
-use super::constants::QUADBIT;
+use wf_common::constants::QUADBIT;
 
 /// encodes a hexadecimal string into a binary buffer
 ///

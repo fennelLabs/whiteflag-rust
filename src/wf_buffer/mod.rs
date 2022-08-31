@@ -5,11 +5,13 @@ use self::{
 use crate::wf_field::{Field, FieldDefinition};
 use fennel_lib::FennelCipher;
 
+pub use wf_common::*;
+
 #[cfg(test)]
 mod tests;
 
-pub mod common;
-pub mod constants;
+/* pub mod common;
+pub mod constants; */
 mod crypted_buffer;
 mod decode;
 mod encode;

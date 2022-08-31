@@ -1,9 +1,13 @@
-use super::binary::{decode_to_binary, encode_from_binary};
-use super::common::{remove_all_invalid_hex_characters, shift_left};
-use super::constants::*;
-use super::hexadecimal::{decode_to_bdx, encode_from_bdx};
-use super::latlong::encode_latlong;
+use super::{
+    binary::{decode_to_binary, encode_from_binary},
+    hexadecimal::{decode_to_bdx, encode_from_bdx},
+    latlong::encode_latlong,
+};
 use crate::wf_validation::{Validation, ValidationError};
+use wf_common::{
+    common::{remove_all_invalid_hex_characters, shift_left},
+    constants::*,
+};
 
 #[derive(Clone, Debug)]
 pub struct Encoding {
