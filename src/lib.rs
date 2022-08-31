@@ -6,7 +6,6 @@ mod wf_auth;
 mod wf_buffer;
 #[allow(dead_code)]
 mod wf_core;
-mod wf_crypto;
 mod wf_json;
 mod wf_parser;
 

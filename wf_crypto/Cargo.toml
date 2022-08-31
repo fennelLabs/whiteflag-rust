@@ -1,0 +1,14 @@
+[package]
+name = "wf_crypto"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+thiserror = "1.0.31"
+hex = "0.4.3"
+x25519-dalek = "2.0.0-pre.1"
+fennel-lib = { git = "https://github.com/fennelLabs/fennel-lib", branch = "master", package = "fennel-lib" }
+hkdf = "0.12.3"
+sha2 = "0.10.2"

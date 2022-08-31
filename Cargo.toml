@@ -5,7 +5,7 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [workspace]
-members = ["wf_common", "wf_validation", "wf_codec", "wf_field"]
+members = ["wf_common", "wf_validation", "wf_codec", "wf_field", "wf_crypto"]
 
 
 [dependencies]
@@ -21,3 +21,4 @@ wf_common = { path = "wf_common" }
 wf_validation = { path = "wf_validation" }
 wf_codec = { path = "wf_codec" }
 wf_field = { path = "wf_field" }
+wf_crypto = { path = "wf_crypto" }

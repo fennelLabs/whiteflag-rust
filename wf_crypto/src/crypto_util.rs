@@ -1,6 +1,5 @@
+use super::{CryptoError, CryptoResult};
 use hkdf::hmac::Hmac;
-
-use crate::error::{WhiteflagError, WhiteflagResult};
 
 /// Zeroises a byte array
 pub fn zeroise(byte_array: &mut [u8]) {
@@ -30,7 +29,7 @@ impl Hkdf {
         }
     }
 
-    pub fn expand(&self, info: &[u8], key_length: usize) -> WhiteflagResult<Vec<u8>> {
+    pub fn expand(&self, info: &[u8], key_length: usize) -> CryptoResult<Vec<u8>> {
         self.hkdf.expand(info, key_length)
     }
 }
@@ -62,11 +61,11 @@ where
     }
 
     /// Performs RFC 5869 HKDF Step 2: expand
-    pub fn expand(&self, info: &[u8], key_length: usize) -> WhiteflagResult<Vec<u8>> {
+    pub fn expand(&self, info: &[u8], key_length: usize) -> CryptoResult<Vec<u8>> {
         let mut okm: Vec<u8> = vec![0; key_length];
         self.hk
             .expand(info, &mut okm)
-            .map_err(|e| WhiteflagError::HkdfOutput(e))?;
+            .map_err(|e| CryptoError::HkdfOutput(e))?;
         Ok(okm)
     }
 }
@@ -76,10 +75,10 @@ where
     H: hkdf::hmac::digest::OutputSizeUser,
     I: hkdf::HmacImpl<H>,
 {
-    type Error = WhiteflagError;
+    type Error = CryptoError;
 
     fn try_from(prk: &[u8]) -> Result<Self, Self::Error> {
-        let hk = hkdf::Hkdf::<H, I>::from_prk(prk).map_err(|e| WhiteflagError::HkdfInput(e))?;
+        let hk = hkdf::Hkdf::<H, I>::from_prk(prk).map_err(|e| CryptoError::HkdfInput(e))?;
         Ok(WhiteflagHkdf {
             hk,
             prk: prk.to_vec(),

@@ -1,11 +1,9 @@
 use x25519_dalek::PublicKey;
 
-use crate::{
-    wf_auth::WhiteflagAuthToken,
-    wf_crypto::{ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey},
-};
+use crate::wf_auth::WhiteflagAuthToken;
 
 use super::error::WhiteflagAccountResult;
+use wf_crypto::{ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey};
 
 /// Ports the interface found in https://github.com/fennelLabs/whiteflag-java/blob/master/src/main/java/org/whiteflagprotocol/java/WfAccount.java
 pub trait WfAccount {

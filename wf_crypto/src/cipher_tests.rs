@@ -1,6 +1,4 @@
-use crate::wf_crypto::{
-    ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey,
-};
+use super::{ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey};
 use fennel_lib::FennelCipher;
 
 /**

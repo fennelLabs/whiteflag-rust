@@ -1,6 +1,6 @@
 mod test;
 
-use crate::{error::WhiteflagResult, wf_crypto::hkdf};
+use wf_crypto::{hkdf, CryptoResult};
 
 /// Whiteflag specifies two methods for authentication
 /// (4.3.4.2 https://standard.whiteflagprotocol.org/v1/)
@@ -70,7 +70,7 @@ impl WhiteflagAuthToken {
         }
     }
 
-    pub fn get_verification_data<T: AsRef<[u8]>>(&self, context: T) -> WhiteflagResult<String> {
+    pub fn get_verification_data<T: AsRef<[u8]>>(&self, context: T) -> CryptoResult<String> {
         let result = hkdf(
             &self.token,
             &self.method.hkdf_salt,

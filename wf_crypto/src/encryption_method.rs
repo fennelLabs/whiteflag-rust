@@ -1,5 +1,5 @@
-use super::error::{WhiteflagCryptoError, WhiteflagCryptoResult};
-use crate::wf_crypto::crypto_util::Hkdf;
+use super::crypto_util::Hkdf;
+use super::error::{CryptoError, CryptoResult};
 
 pub struct EncryptionAlgorithm {
     field_value: usize,
@@ -38,12 +38,12 @@ pub enum WhiteflagEncryptionMethod {
 }
 
 impl WhiteflagEncryptionMethod {
-    pub fn from_str(number: &str) -> WhiteflagCryptoResult<Self> {
+    pub fn from_str(number: &str) -> CryptoResult<Self> {
         let n = number.parse::<usize>().unwrap();
         Self::from_number(n)
     }
 
-    pub fn from_number(number: usize) -> WhiteflagCryptoResult<Self> {
+    pub fn from_number(number: usize) -> CryptoResult<Self> {
         let method = match number {
             0 => Self::NoEncryption,
 
@@ -52,7 +52,7 @@ impl WhiteflagEncryptionMethod {
 
             3 => Self::Aes512IegEcdh,
             4 => Self::Aes512IegPsk,
-            _ => return Err(WhiteflagCryptoError::InvalidMethod),
+            _ => return Err(CryptoError::InvalidMethod),
         };
 
         Ok(method)

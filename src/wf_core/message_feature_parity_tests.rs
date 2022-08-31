@@ -2,9 +2,9 @@ use crate::{
     wf_account::{account::WfAccount, test_impl::WhiteflagAccount},
     wf_buffer::{CryptMode, WhiteflagBuffer},
     wf_core::message::Message,
-    wf_crypto::{ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey},
 };
 use fennel_lib::FennelCipher;
+use wf_crypto::{ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey};
 
 fn test(values: &[&str]) {
     let message = Message::compile(values);

@@ -1,5 +1,3 @@
-use crate::error::WhiteflagResult;
-
 #[cfg(test)]
 mod keypair_tests;
 
@@ -15,6 +13,8 @@ pub mod encryption_method;
 mod error;
 pub mod wf_encryption_key;
 
-pub fn hkdf(ikm: &[u8], salt: &[u8], info: &[u8], length: usize) -> WhiteflagResult<Vec<u8>> {
+pub use error::{CryptoError, CryptoResult};
+
+pub fn hkdf(ikm: &[u8], salt: &[u8], info: &[u8], length: usize) -> CryptoResult<Vec<u8>> {
     crypto_util::Hkdf::extract(ikm, salt).expand(info, length)
 }
