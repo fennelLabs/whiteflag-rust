@@ -1,0 +1,13 @@
+[package]
+name = "wf_codec"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+wf_common = { path = "../wf_common" }
+wf_validation = { path = "../wf_validation" }
+lazy_static = "1.4.0"
+regex = "1.5.5"
+hex = "0.4.3"

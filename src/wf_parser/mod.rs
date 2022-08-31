@@ -16,8 +16,9 @@ pub use wf_header::{MessageHeaderFields, MessageHeaderValues};
 use crate::{
     wf_core::{message::Message, FieldValue},
     wf_field::{create_request_fields, definitions::convert_value_to_code, Field, FieldDefinition},
-    wf_validation::Validation,
 };
+
+use wf_validation::Validation;
 
 pub trait MessageHeader {
     type Target: ?Sized;

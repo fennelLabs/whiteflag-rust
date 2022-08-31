@@ -1,6 +1,11 @@
 #[cfg(test)]
 mod codec_tests;
+
+#[cfg(test)]
 mod test;
+
+#[cfg(test)]
+mod validation_test;
 
 #[allow(dead_code)]
 pub mod definitions;

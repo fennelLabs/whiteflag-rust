@@ -3,11 +3,11 @@ use super::{
     hexadecimal::{decode_to_bdx, encode_from_bdx},
     latlong::encode_latlong,
 };
-use crate::wf_validation::{Validation, ValidationError};
 use wf_common::{
     common::{remove_all_invalid_hex_characters, shift_left},
     constants::*,
 };
+use wf_validation::{Validation, ValidationError};
 
 #[derive(Clone, Debug)]
 pub struct Encoding {
@@ -156,7 +156,7 @@ macro_rules! encoding {
             }
         }
 
-        impl Validation for crate::wf_codec::encoding::Encoding {
+        impl Validation for Encoding {
             fn validate(&self, value: &str) -> Result<(), ValidationError> {
                 match self.byte_length {
                     Some(x) if value.len() != x => return Err(ValidationError::InvalidLength {

@@ -1,5 +1,6 @@
 use super::Field;
-use crate::{wf_codec::encoding::*, wf_validation::*};
+use wf_codec::encoding::Encoding;
+use wf_validation::{Validation, ValidationError};
 
 #[derive(Clone, Debug)]
 pub struct FieldDefinition {
@@ -98,5 +99,23 @@ impl FieldDefinition {
         return self
             .encoding
             .convert_to_bit_length(self.expected_byte_length().unwrap_or(0));
+    }
+}
+
+const NULL_FIELD_NAME: &'static str = "NULL FIELD NAME";
+
+impl Validation for FieldDefinition {
+    fn validate(&self, value: &str) -> Result<(), ValidationError> {
+        match self.expected_byte_length() {
+            Some(len) if len != value.len() => Err(ValidationError::InvalidLength {
+                data: value.to_string(),
+                expected_length: len,
+                specification_level: format!(
+                    "== Field Definition Error for {} ==",
+                    self.get_name().unwrap_or(NULL_FIELD_NAME)
+                ),
+            }),
+            _ => self.encoding.validate(value),
+        }
     }
 }

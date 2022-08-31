@@ -1,5 +1,5 @@
 use super::{Field, FieldDefinition};
-use crate::wf_codec::encoding::*;
+use wf_codec::encoding::*;
 
 const FIELDNAME: &str = "TESTFIELD";
 

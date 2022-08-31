@@ -75,7 +75,7 @@ macro_rules! message_fields {
 
                 $( pub const $upp: FieldDefinition = FieldDefinition {
                     name: Some(names::$upp),
-                    encoding: crate::wf_codec::encoding::$encoding,
+                    encoding: wf_codec::encoding::$encoding,
                     start_byte: $start,
                     end_byte: if $end == 0 { None } else { Some($end) },
                 }; )*
