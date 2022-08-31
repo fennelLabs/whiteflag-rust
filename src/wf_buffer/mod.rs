@@ -192,3 +192,10 @@ impl From<WhiteflagBuffer> for Vec<u8> {
         buffer.data
     }
 }
+
+impl From<&Field> for WhiteflagBuffer {
+    fn from(field: &Field) -> Self {
+        let length = field.bit_length();
+        WhiteflagBuffer::new(field.into(), length)
+    }
+}

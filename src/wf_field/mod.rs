@@ -10,7 +10,6 @@ mod field;
 mod field_definition;
 mod request;
 
-use crate::wf_buffer::WhiteflagBuffer;
 pub use definitions::{generic_header_fields, get_body_from_code, message_code, test_message_code};
 pub use field::Field;
 pub use field_definition::FieldDefinition;
@@ -26,13 +25,6 @@ pub const FIELD_TESTMESSAGETYPE: &'static str = "PseudoMessageCode";
 impl From<&Field> for Vec<u8> {
     fn from(field: &Field) -> Self {
         field.encode()
-    }
-}
-
-impl From<&Field> for WhiteflagBuffer {
-    fn from(field: &Field) -> Self {
-        let length = field.bit_length();
-        WhiteflagBuffer::new(field.into(), length)
     }
 }
 
