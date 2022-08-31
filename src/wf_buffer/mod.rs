@@ -1,17 +1,14 @@
-use self::{
-    common::{append_bits, crop_bits, extract_bits, remove_hexadecimal_prefix},
-    constants::BYTE,
-};
 use crate::wf_field::{Field, FieldDefinition};
 use fennel_lib::FennelCipher;
 
-pub use wf_common::*;
+pub use wf_common::{
+    common::{append_bits, crop_bits, extract_bits, remove_hexadecimal_prefix},
+    constants::BYTE,
+};
 
 #[cfg(test)]
 mod tests;
 
-/* pub mod common;
-pub mod constants; */
 mod crypted_buffer;
 mod decode;
 mod encode;
