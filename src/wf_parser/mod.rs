@@ -7,20 +7,15 @@ mod parsed_field_definition;
 mod request;
 mod wf_header;
 
-pub use request::create_request_fields;
-
-use std::ops::Div;
-
 pub use message_code_parser::MessageCodeParser;
 pub use message_header_parser::MessageHeaderParser;
 pub use parsed_field_definition::ParsedFieldDefinition;
+pub use request::create_request_fields;
 pub use wf_header::{MessageHeaderFields, MessageHeaderValues};
 
-use crate::{
-    wf_core::{message::Message, FieldValue},
-    wf_field::{definitions::convert_value_to_code, Field, FieldDefinition},
-};
-
+use crate::wf_core::{message::Message, FieldValue};
+use std::ops::Div;
+use wf_field::{definitions::convert_value_to_code, Field, FieldDefinition};
 use wf_validation::Validation;
 
 pub trait MessageHeader {
@@ -149,8 +144,8 @@ pub fn builder_from_serialized<'a>(
 
 impl<F: FieldDefinitionParser> WhiteflagMessageBuilder<F> {
     pub fn compile(mut self) -> Message {
-        let header = self
-            .convert_values_to_fields(crate::wf_field::definitions::Header::DEFINITIONS.to_vec());
+        let header =
+            self.convert_values_to_fields(wf_field::definitions::Header::DEFINITIONS.to_vec());
 
         let code_parser = self.parser.body_field_definitions();
         let body_defs = code_parser.get_field_definitions_for_encode();

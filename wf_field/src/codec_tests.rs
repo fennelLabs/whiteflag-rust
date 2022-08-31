@@ -171,7 +171,7 @@ fn hex_encoding() {
 #[test]
 fn hex_decoding() {
     let def = FieldDefinition::new(FIELDNAME, HEX, 0, 2);
-    let buffer = crate::wf_buffer::decode_hex("0x3f").unwrap();
+    let buffer = hex::decode("3f").unwrap();
     let result = "3f";
 
     let actual: String = def.decode(&buffer);

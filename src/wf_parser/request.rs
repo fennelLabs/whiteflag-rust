@@ -1,6 +1,6 @@
 use super::FieldDefinitionParser;
-use crate::wf_field::{definitions::*, Field, FieldDefinition};
 use std::ops::Mul;
+use wf_field::{definitions::*, Field, FieldDefinition};
 
 const OBJECT_TYPE: FieldDefinition = Request::OBJECT_TYPE;
 const OBJECT_TYPE_QUANT: FieldDefinition = Request::OBJECT_TYPE_QUANT;

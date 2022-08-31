@@ -1,12 +1,10 @@
-use crate::{
-    wf_core::FieldValue,
-    wf_field::{
-        definitions::{convert_value_to_code, get_body_from_code_char},
-        FieldDefinition,
-    },
-};
+use crate::wf_core::FieldValue;
 
 use super::{MessageHeader, MessageHeaderOrder, MessageHeaderParser};
+use wf_field::{
+    definitions::{convert_value_to_code, get_body_from_code_char},
+    FieldDefinition,
+};
 
 #[derive(Debug)]
 pub struct MessageCodeParser {

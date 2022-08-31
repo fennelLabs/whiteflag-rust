@@ -1,5 +1,5 @@
-use crate::wf_field::{Field, FieldDefinition};
 use fennel_lib::FennelCipher;
+use wf_field::{Field, FieldDefinition};
 
 pub use wf_common::{
     common::{append_bits, crop_bits, extract_bits, remove_hexadecimal_prefix},

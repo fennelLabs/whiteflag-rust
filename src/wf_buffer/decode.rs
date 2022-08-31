@@ -1,5 +1,5 @@
 use super::WhiteflagBuffer;
-use crate::wf_field::{Field, FieldDefinition};
+use wf_field::{Field, FieldDefinition};
 
 impl WhiteflagBuffer {
     /**

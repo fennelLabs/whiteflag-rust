@@ -1,5 +1,6 @@
-use crate::{wf_buffer::WhiteflagBuffer, wf_field::Field};
+use crate::wf_buffer::WhiteflagBuffer;
 use std::ops::{Deref, DerefMut};
+use wf_field::Field;
 
 #[derive(Clone)]
 pub struct MessageSegment {

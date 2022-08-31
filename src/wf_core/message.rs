@@ -4,9 +4,9 @@ use super::FieldValue;
 use crate::wf_account::test_impl::WhiteflagAccount;
 use crate::wf_buffer::{CryptMode, CryptedBuffer, WhiteflagBuffer};
 use crate::wf_crypto::encryption_method::WhiteflagEncryptionMethod;
-use crate::wf_field::Field;
 use crate::wf_parser::{builder_from_field_values, builder_from_serialized};
 use fennel_lib::FennelCipher;
+use wf_field::Field;
 
 const METAKEY_ORIGINATOR: &str = "originatorAddress";
 const METAKEY_RECIPIENT: &str = "recipientAddress";

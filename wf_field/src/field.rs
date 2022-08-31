@@ -1,5 +1,4 @@
 use super::field_definition::FieldDefinition;
-use crate::wf_core::error::{WhiteflagError, WhiteflagResult};
 use wf_common::common::extract_bits;
 
 #[derive(Clone, Debug)]
