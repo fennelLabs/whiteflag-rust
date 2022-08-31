@@ -4,7 +4,10 @@ mod test;
 mod message_code_parser;
 mod message_header_parser;
 mod parsed_field_definition;
+mod request;
 mod wf_header;
+
+pub use request::create_request_fields;
 
 use std::ops::Div;
 
@@ -15,7 +18,7 @@ pub use wf_header::{MessageHeaderFields, MessageHeaderValues};
 
 use crate::{
     wf_core::{message::Message, FieldValue},
-    wf_field::{create_request_fields, definitions::convert_value_to_code, Field, FieldDefinition},
+    wf_field::{definitions::convert_value_to_code, Field, FieldDefinition},
 };
 
 use wf_validation::Validation;

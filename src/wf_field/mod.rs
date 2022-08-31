@@ -8,12 +8,10 @@ mod validation_test;
 pub mod definitions;
 mod field;
 mod field_definition;
-mod request;
 
 pub use definitions::{generic_header_fields, get_body_from_code, message_code, test_message_code};
 pub use field::Field;
 pub use field_definition::FieldDefinition;
-pub use request::create_request_fields;
 
 use definitions::get_body_from_code_char;
 

@@ -1,5 +1,5 @@
-use super::{definitions::*, Field, FieldDefinition};
-use crate::wf_parser::FieldDefinitionParser;
+use super::FieldDefinitionParser;
+use crate::wf_field::{definitions::*, Field, FieldDefinition};
 use std::ops::Mul;
 
 const OBJECT_TYPE: FieldDefinition = Request::OBJECT_TYPE;
