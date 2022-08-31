@@ -2,9 +2,6 @@
 mod codec_tests;
 
 #[cfg(test)]
-mod test;
-
-#[cfg(test)]
 mod validation_test;
 
 #[allow(dead_code)]
@@ -19,7 +16,7 @@ pub use field::Field;
 pub use field_definition::FieldDefinition;
 pub use request::create_request_fields;
 
-use self::definitions::get_body_from_code_char;
+use definitions::get_body_from_code_char;
 
 pub const FIELD_PREFIX: &'static str = "Prefix";
 pub const FIELD_VERSION: &'static str = "Version";

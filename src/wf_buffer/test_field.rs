@@ -1,5 +1,5 @@
-use super::definitions;
-use crate::{wf_buffer::WhiteflagBuffer, wf_field::Field, wf_field::FieldDefinition};
+use super::WhiteflagBuffer;
+use crate::wf_field::{definitions, Field, FieldDefinition};
 use wf_codec::encoding::{BIN, DATETIME, DEC, HEX, UTF8};
 
 const FIELDNAME: &str = "TESTFIELD";

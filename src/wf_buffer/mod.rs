@@ -9,6 +9,9 @@ pub use wf_common::{
 #[cfg(test)]
 mod tests;
 
+#[cfg(test)]
+mod test_field;
+
 mod crypted_buffer;
 mod decode;
 mod encode;
