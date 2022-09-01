@@ -3,9 +3,15 @@ use super::{AuthenticationMethod, WhiteflagAuthToken};
 #[test]
 fn test_auth_token() {
     /* Setup */
-    let secret = hex::decode("000102030405060708090a0b0c").unwrap();
-    let context = hex::decode("6fdb25dc394d5a437d88f15b459406ac6db8b386a49dbfc38c").unwrap();
-    let verification_data = "a951cb35881ee7f78b05f8476a2193de4556455d48ffcfebcfc8938f4a37a70f";
+    let secret = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    let context = vec![
+        111, 219, 37, 220, 57, 77, 90, 67, 125, 136, 241, 91, 69, 148, 6, 172, 109, 184, 179, 134,
+        164, 157, 191, 195, 140,
+    ];
+    let verification_data = vec![
+        169, 81, 203, 53, 136, 30, 231, 247, 139, 5, 248, 71, 106, 33, 147, 222, 69, 86, 69, 93,
+        72, 255, 207, 235, 207, 200, 147, 143, 74, 55, 167, 15,
+    ];
     let token = WhiteflagAuthToken::new(secret);
 
     /* Verify */

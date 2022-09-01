@@ -59,8 +59,8 @@ impl WhiteflagAuthMethod {
 
 #[derive(Clone)]
 pub struct WhiteflagAuthToken {
-    token: Vec<u8>,
     method: WhiteflagAuthMethod,
+    token: Vec<u8>,
 }
 
 impl WhiteflagAuthToken {
@@ -71,14 +71,14 @@ impl WhiteflagAuthToken {
         }
     }
 
-    pub fn get_verification_data<T: AsRef<[u8]>>(&self, context: T) -> CryptoResult<String> {
+    pub fn get_verification_data<T: AsRef<[u8]>>(&self, context: T) -> CryptoResult<Vec<u8>> {
         let result = hkdf(
             &self.token,
             &self.method.hkdf_salt,
             context.as_ref(),
             self.method.length,
         )?;
-        Ok(hex::encode(result))
+        Ok(result)
     }
 }
 
