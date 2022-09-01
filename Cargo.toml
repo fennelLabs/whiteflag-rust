@@ -24,4 +24,5 @@ wf_field = { path = "wf_field" }
 wf_crypto = { path = "wf_crypto" }
 wf_auth = { path = "wf_auth" }
 wf_buffer = { path = "wf_buffer" }
-wf_parser = {path = "wf_parser"}
+wf_parser = { path = "wf_parser" }
+wf_account = { path = "wf_account" }

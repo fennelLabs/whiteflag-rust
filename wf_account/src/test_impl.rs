@@ -10,7 +10,7 @@ use x25519_dalek::PublicKey;
 pub struct WhiteflagAccount {
     owned: bool,
     address: Option<Vec<u8>>,
-    auth_url: Option<String>,
+    auth_url: Option<Vec<u8>>,
     auth_token: Option<WhiteflagAuthToken>,
     ecdh_keypair: Option<WhiteflagECDHKeyPair>,
     ecdh_public_key: Option<PublicKey>,
@@ -34,31 +34,23 @@ impl WfAccount for WhiteflagAccount {
         self.owned
     }
 
-    fn set_address(&mut self, address: String) {
-        self.address = Some(hex::decode(address).unwrap());
+    fn set_address(&mut self, address: Vec<u8>) {
+        self.address = Some(address);
     }
 
-    fn get_address(&mut self) -> Option<String> {
+    fn get_address(&mut self) -> Option<&Vec<u8>> {
         if self.address.is_none() {
             None
         } else {
-            Some(hex::encode(self.address.as_ref().unwrap()))
+            self.address.as_ref()
         }
     }
 
-    fn get_binary_address(&mut self) -> Vec<u8> {
-        if self.address.is_none() {
-            vec![0 as u8]
-        } else {
-            self.address.as_ref().unwrap().to_vec()
-        }
-    }
-
-    fn get_auth_url(&mut self) -> Option<&String> {
+    fn get_auth_url(&mut self) -> Option<&Vec<u8>> {
         self.auth_url.as_ref()
     }
 
-    fn set_auth_url(&mut self, url: String) {
+    fn set_auth_url(&mut self, url: Vec<u8>) {
         self.auth_url = Some(url);
     }
 

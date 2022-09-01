@@ -1,7 +1,6 @@
 use error::WhiteflagError;
 
 mod error;
-mod wf_account;
 #[allow(dead_code)]
 mod wf_core;
 mod wf_json;

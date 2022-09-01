@@ -1,9 +1,7 @@
-use x25519_dalek::PublicKey;
-
-use wf_auth::WhiteflagAuthToken;
-
 use super::error::WhiteflagAccountResult;
+use wf_auth::WhiteflagAuthToken;
 use wf_crypto::{ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey};
+use x25519_dalek::PublicKey;
 
 /// Ports the interface found in https://github.com/fennelLabs/whiteflag-java/blob/master/src/main/java/org/whiteflagprotocol/java/WfAccount.java
 pub trait WfAccount {
@@ -13,14 +11,13 @@ pub trait WfAccount {
     fn is_owned(&self) -> bool;
 
     /// Gets this account's public address.
-    fn set_address(&mut self, address: String);
-    fn get_address(&mut self) -> Option<String>;
-    fn get_binary_address(&mut self) -> Vec<u8>;
+    fn set_address(&mut self, address: Vec<u8>);
+    fn get_address(&mut self) -> Option<&Vec<u8>>;
 
     /// Gets the authentication URL sent with an A1 message used to identify the originator associated with this account
     /// Whiteflag Specification 5.1.2.1 Method 1: URL Validation
-    fn get_auth_url(&mut self) -> Option<&String>;
-    fn set_auth_url(&mut self, url: String);
+    fn get_auth_url(&mut self) -> Option<&Vec<u8>>;
+    fn set_auth_url(&mut self, url: Vec<u8>);
 
     /// Gets the authentication token sent with an A2 message to identify the originator associated with this account
     /// Whiteflag Specification 5.1.2.2 Method 2: Shared Token Validation

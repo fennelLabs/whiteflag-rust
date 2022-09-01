@@ -4,8 +4,8 @@ use super::{
     wf_message_builder::{builder_from_field_values, builder_from_serialized},
     Decoder, FieldValue,
 };
-use crate::wf_account::test_impl::WhiteflagAccount;
 use fennel_lib::FennelCipher;
+use wf_account::test_impl::WhiteflagAccount;
 use wf_buffer::WhiteflagBuffer;
 use wf_crypto::encryption_method::WhiteflagEncryptionMethod;
 use wf_field::Field;
