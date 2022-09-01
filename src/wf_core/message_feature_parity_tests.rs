@@ -1,9 +1,5 @@
-use crate::{
-    wf_account::{account::WfAccount, test_impl::WhiteflagAccount},
-    wf_buffer::{CryptMode, WhiteflagBuffer},
-    wf_core::message::Message,
-};
-use fennel_lib::FennelCipher;
+use super::crypted_buffer::CryptMode;
+use crate::{wf_buffer::WhiteflagBuffer, wf_core::message::Message};
 use wf_crypto::{ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey};
 
 fn test(values: &[&str]) {

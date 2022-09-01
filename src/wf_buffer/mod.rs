@@ -1,4 +1,3 @@
-use fennel_lib::FennelCipher;
 use wf_field::{Field, FieldDefinition};
 
 pub use wf_common::{
@@ -12,13 +11,10 @@ mod tests;
 #[cfg(test)]
 mod test_field;
 
-mod crypted_buffer;
 mod decode;
 mod encode;
 
 use hex::FromHexError;
-
-pub use crypted_buffer::{CryptMode, CryptedBuffer};
 
 pub fn decode_hex<T: AsRef<str>>(value: T) -> Result<Vec<u8>, FromHexError> {
     hex::decode(remove_hexadecimal_prefix(value.as_ref()))
@@ -43,28 +39,6 @@ impl WhiteflagBuffer {
             data: buffer,
             bit_length,
         }
-    }
-
-    pub fn crypt<T: FennelCipher>(
-        &self,
-        cipher: &T,
-        mode: CryptMode,
-        position: usize,
-    ) -> WhiteflagBuffer {
-        let mut buffer = WhiteflagBuffer::default();
-        // add unencrypted part
-        buffer.append(self.extract_bits(0, position), None);
-
-        let second_half = self.extract_bits_from(position);
-
-        let crypted_half = match mode {
-            CryptMode::Encrypt => cipher.encrypt(second_half),
-            CryptMode::Decrypt => cipher.decrypt(second_half),
-        };
-
-        // add decrypted/encrypted part
-        buffer.append(crypted_half.into(), None);
-        buffer
     }
 
     pub fn extract_bits(&self, start: usize, end: usize) -> WhiteflagBuffer {

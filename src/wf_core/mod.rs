@@ -7,6 +7,7 @@ mod message_feature_parity_tests;
 #[cfg(test)]
 mod edge_case_test;
 
+mod crypted_buffer;
 mod decoder;
 pub mod error;
 pub mod message;
