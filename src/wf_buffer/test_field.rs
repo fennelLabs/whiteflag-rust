@@ -1,6 +1,6 @@
 use super::WhiteflagBuffer;
 use wf_codec::encoding::{BIN, DATETIME, DEC, HEX, UTF8};
-use wf_field::{definitions, Field, FieldDefinition};
+use wf_field::FieldDefinition;
 
 const FIELDNAME: &str = "TESTFIELD";
 

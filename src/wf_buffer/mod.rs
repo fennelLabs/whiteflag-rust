@@ -1,9 +1,9 @@
-use wf_field::{Field, FieldDefinition};
-
-pub use wf_common::{
+use hex::FromHexError;
+use wf_common::{
     common::{append_bits, crop_bits, extract_bits, remove_hexadecimal_prefix},
     constants::BYTE,
 };
+use wf_field::{Field, FieldDefinition};
 
 #[cfg(test)]
 mod tests;
@@ -13,8 +13,6 @@ mod test_field;
 
 mod decode;
 mod encode;
-
-use hex::FromHexError;
 
 pub fn decode_hex<T: AsRef<str>>(value: T) -> Result<Vec<u8>, FromHexError> {
     hex::decode(remove_hexadecimal_prefix(value.as_ref()))
