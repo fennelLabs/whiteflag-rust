@@ -1,12 +1,14 @@
-use super::decoder::Decoder;
-use super::segment::MessageSegment;
-use super::FieldValue;
-use crate::wf_account::test_impl::WhiteflagAccount;
-use crate::wf_buffer::{CryptMode, CryptedBuffer, WhiteflagBuffer};
-use crate::wf_crypto::encryption_method::WhiteflagEncryptionMethod;
-use crate::wf_field::Field;
-use crate::wf_parser::{builder_from_field_values, builder_from_serialized};
+use super::{
+    crypted_buffer::{CryptMode, CryptedBuffer},
+    segment::MessageSegment,
+    wf_message_builder::{builder_from_field_values, builder_from_serialized},
+    Decoder, FieldValue,
+};
 use fennel_lib::FennelCipher;
+use wf_account::test_impl::WhiteflagAccount;
+use wf_buffer::WhiteflagBuffer;
+use wf_crypto::encryption_method::WhiteflagEncryptionMethod;
+use wf_field::Field;
 
 const METAKEY_ORIGINATOR: &str = "originatorAddress";
 const METAKEY_RECIPIENT: &str = "recipientAddress";
@@ -86,7 +88,7 @@ impl Message {
             .header
             .bit_length_of_field(encryption_indicator_index as isize);
 
-        encoded.crypt(cipher, mode, position)
+        mode.crypt(cipher, encoded, position)
     }
 
     pub fn encode(&self) -> Vec<u8> {

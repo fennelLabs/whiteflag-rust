@@ -1,11 +1,12 @@
-use super::message::Message;
-use crate::wf_buffer::WhiteflagBuffer;
-use crate::wf_field::definitions::{
-    convert_value_to_code, get_body_from_code_char, test_message_code,
+use super::{
+    message::Message, request::create_request_fields, wf_message_builder::FieldDefinitionParser,
 };
-use crate::wf_field::{create_request_fields, Field, FieldDefinition};
-use crate::wf_parser::MessageHeaderFields;
-use crate::wf_parser::{FieldDefinitionParser, MessageCodeParser};
+use wf_buffer::WhiteflagBuffer;
+use wf_field::{
+    definitions::{convert_value_to_code, get_body_from_code_char, test_message_code},
+    Field, FieldDefinition,
+};
+use wf_parser::{MessageCodeParser, MessageHeaderFields};
 
 pub struct Decoder {
     buffer: WhiteflagBuffer,

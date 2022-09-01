@@ -7,17 +7,18 @@ mod message_feature_parity_tests;
 #[cfg(test)]
 mod edge_case_test;
 
+mod crypted_buffer;
 mod decoder;
 pub mod error;
 pub mod message;
+mod request;
 mod segment;
 mod types;
-
-pub trait FieldValue: AsRef<str> + Into<String> + std::fmt::Debug {}
-impl<T> FieldValue for T where T: AsRef<str> + Into<String> + std::fmt::Debug {}
+mod wf_message_builder;
 
 use decoder::Decoder;
 use message::Message;
+use wf_field::FieldValue;
 
 /// encode an array of values, ordered according to the WF specification, into a hexadecimal string
 pub fn encode<T: FieldValue>(fields: &[T]) -> String {

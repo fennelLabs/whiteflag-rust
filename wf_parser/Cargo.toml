@@ -1,0 +1,10 @@
+[package]
+name = "wf_parser"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+wf_field = { path = "../wf_field"}
+wf_buffer = {path = "../wf_buffer"}
