@@ -1,5 +1,5 @@
 use super::{parsed_field_definition::ParsedFieldDefinition, MessageHeader, MessageHeaderOrder};
-use crate::wf_buffer::WhiteflagBuffer;
+use wf_buffer::WhiteflagBuffer;
 use wf_field::{definitions::test_message_code, Field, FieldDefinition};
 
 pub struct MessageHeaderParser {

@@ -1,5 +1,5 @@
-use super::crypted_buffer::CryptMode;
-use crate::{wf_buffer::WhiteflagBuffer, wf_core::message::Message};
+use super::{crypted_buffer::CryptMode, message::Message};
+use wf_buffer::WhiteflagBuffer;
 use wf_crypto::{ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey};
 
 fn test(values: &[&str]) {

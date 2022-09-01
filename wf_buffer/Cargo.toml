@@ -1,0 +1,13 @@
+[package]
+name = "wf_buffer"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+wf_field = { path = "../wf_field" }
+wf_codec = { path = "../wf_codec" }
+wf_common = { path = "../wf_common" }
+hex = "0.4.3"
+fennel-lib = { git = "https://github.com/fennelLabs/fennel-lib", branch = "master", package = "fennel-lib" }

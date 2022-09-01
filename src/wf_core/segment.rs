@@ -1,5 +1,5 @@
-use crate::wf_buffer::WhiteflagBuffer;
 use std::ops::{Deref, DerefMut};
+use wf_buffer::WhiteflagBuffer;
 use wf_field::Field;
 
 #[derive(Clone)]

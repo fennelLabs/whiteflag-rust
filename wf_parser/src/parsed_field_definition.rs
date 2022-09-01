@@ -1,5 +1,5 @@
-use crate::{wf_buffer::WhiteflagBuffer, wf_core::FieldValue};
-use wf_field::{definitions, FieldDefinition};
+use wf_buffer::WhiteflagBuffer;
+use wf_field::{definitions, FieldDefinition, FieldValue};
 
 pub struct ParsedFieldDefinition {
     definition: &'static FieldDefinition,

@@ -1,8 +1,5 @@
-use crate::{
-    wf_buffer::WhiteflagBuffer,
-    wf_parser::{message_header_parser::MessageHeaderParser, MessageHeader},
-};
-
+use super::{message_header_parser::MessageHeaderParser, MessageHeader};
+use wf_buffer::WhiteflagBuffer;
 use wf_field::definitions;
 
 /// hexadecimal whiteflag authentication message

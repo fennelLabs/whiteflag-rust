@@ -1,6 +1,6 @@
-use crate::wf_buffer::WhiteflagBuffer;
-use crate::wf_parser::{MessageHeaderOrder, ParsedFieldDefinition};
 use fennel_lib::FennelCipher;
+use wf_buffer::WhiteflagBuffer;
+use wf_parser::{MessageHeaderOrder, ParsedFieldDefinition};
 
 pub struct CryptedBuffer {
     unencrypted_first_half: WhiteflagBuffer,
@@ -43,20 +43,20 @@ impl CryptedBuffer {
     }
 }
 
-impl WhiteflagBuffer {
+impl CryptMode {
     pub fn crypt<T: FennelCipher>(
         &self,
         cipher: &T,
-        mode: CryptMode,
+        input: WhiteflagBuffer,
         position: usize,
     ) -> WhiteflagBuffer {
         let mut buffer = WhiteflagBuffer::default();
         // add unencrypted part
-        buffer.append(self.extract_bits(0, position), None);
+        buffer.append(input.extract_bits(0, position), None);
 
-        let second_half = self.extract_bits_from(position);
+        let second_half = input.extract_bits_from(position);
 
-        let crypted_half = match mode {
+        let crypted_half = match self {
             CryptMode::Encrypt => cipher.encrypt(second_half),
             CryptMode::Decrypt => cipher.decrypt(second_half),
         };

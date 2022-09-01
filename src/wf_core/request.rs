@@ -1,4 +1,4 @@
-use super::FieldDefinitionParser;
+use super::wf_message_builder::FieldDefinitionParser;
 use std::ops::Mul;
 use wf_field::{definitions::*, Field, FieldDefinition};
 
