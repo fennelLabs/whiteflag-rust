@@ -22,3 +22,4 @@ wf_validation = { path = "wf_validation" }
 wf_codec = { path = "wf_codec" }
 wf_field = { path = "wf_field" }
 wf_crypto = { path = "wf_crypto" }
+wf_auth = { path = "wf_auth" }

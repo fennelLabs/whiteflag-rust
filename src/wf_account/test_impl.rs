@@ -2,7 +2,7 @@ use super::{
     account::WfAccount,
     error::{WhiteflagAccountError, WhiteflagAccountResult},
 };
-use crate::wf_auth::WhiteflagAuthToken;
+use wf_auth::WhiteflagAuthToken;
 use wf_crypto::{ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey};
 use x25519_dalek::PublicKey;
 

@@ -1,6 +1,6 @@
 use x25519_dalek::PublicKey;
 
-use crate::wf_auth::WhiteflagAuthToken;
+use wf_auth::WhiteflagAuthToken;
 
 use super::error::WhiteflagAccountResult;
 use wf_crypto::{ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey};

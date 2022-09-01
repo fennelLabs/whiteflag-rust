@@ -2,7 +2,6 @@ use error::WhiteflagError;
 
 mod error;
 mod wf_account;
-mod wf_auth;
 mod wf_buffer;
 #[allow(dead_code)]
 mod wf_core;

@@ -1,6 +1,4 @@
-use crate::wf_auth::AuthenticationMethod;
-
-use super::WhiteflagAuthToken;
+use super::{AuthenticationMethod, WhiteflagAuthToken};
 
 #[test]
 fn test_auth_token() {
