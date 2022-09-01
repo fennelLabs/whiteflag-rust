@@ -1,3 +1,4 @@
+#[cfg(test)]
 mod test;
 
 use wf_crypto::{hkdf, CryptoResult};

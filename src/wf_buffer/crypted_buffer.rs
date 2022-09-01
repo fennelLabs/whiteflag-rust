@@ -1,6 +1,4 @@
-use crate::wf_parser::{
-    MessageHeader, MessageHeaderOrder, MessageHeaderParser, ParsedFieldDefinition,
-};
+use crate::wf_parser::{MessageHeaderOrder, ParsedFieldDefinition};
 
 use super::WhiteflagBuffer;
 use fennel_lib::FennelCipher;
