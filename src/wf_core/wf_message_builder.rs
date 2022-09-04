@@ -1,14 +1,14 @@
 use std::ops::Div;
-
 use super::{message::Message, request::create_request_fields};
-use wf_field::{Field, FieldDefinition, FieldValue};
-use wf_parser::MessageCodeParser;
+use wf_buffer::WhiteflagBuffer;
+use wf_field::{definitions::convert_value_to_code, Field, FieldDefinition, FieldValue};
+use wf_parser::{MessageCodeParser, MessageHeaderOrder};
 use wf_validation::Validation;
 
 pub trait FieldDefinitionParser {
     fn parse(&mut self, definition: &FieldDefinition) -> String;
     /// fetch the field definitions for the body
-    fn body_field_definitions(&self) -> MessageCodeParser;
+    fn body_field_definitions(&self) -> Vec<FieldDefinition>;
     /// meant to calculate remaining values (if any) for request field definitions
     fn remaining(&self) -> usize;
 }
@@ -33,8 +33,8 @@ impl FieldDefinitionParser for SerializedMessageParser<'_> {
         (self.message.len() - self.last_byte).div(4)
     }
 
-    fn body_field_definitions(&self) -> MessageCodeParser {
-        MessageCodeParser::parse_from_serialized(&self.message)
+    fn body_field_definitions(&self) -> Vec<FieldDefinition> {
+        MessageCodeParser::parse_from_serialized(&self.message).get_field_definitions()
     }
 }
 
@@ -64,8 +64,31 @@ impl<'a, T: FieldValue> FieldDefinitionParser for FieldValuesParser<'a, T> {
         (self.data.len() - self.index) / 2
     }
 
-    fn body_field_definitions(&self) -> MessageCodeParser {
-        MessageCodeParser::parse_for_encode(self.data)
+    fn body_field_definitions(&self) -> Vec<FieldDefinition> {
+        MessageCodeParser::parse_for_encode(self.data).get_field_definitions()
+    }
+}
+
+pub struct EncodedMessageParser {
+    buffer: WhiteflagBuffer,
+    bit_cursor: usize,
+}
+
+impl FieldDefinitionParser for EncodedMessageParser {
+    fn parse(&mut self, definition: &FieldDefinition) -> String {
+        let value = self
+            .buffer
+            .extract_message_value(definition, self.bit_cursor);
+        self.bit_cursor += definition.bit_length();
+        value
+    }
+
+    fn remaining(&self) -> usize {
+        (self.buffer.bit_length() - self.bit_cursor) / 16
+    }
+
+    fn body_field_definitions(&self) -> Vec<FieldDefinition> {
+        MessageCodeParser::parse_for_decode(&self.buffer).get_field_definitions()
     }
 }
 
@@ -90,21 +113,32 @@ pub fn builder_from_serialized<'a>(
     WhiteflagMessageBuilder { parser }
 }
 
+pub fn builder_from_encoded(
+    message: WhiteflagBuffer,
+) -> WhiteflagMessageBuilder<EncodedMessageParser> {
+    let parser = EncodedMessageParser {
+        buffer: message,
+        bit_cursor: 0,
+    };
+    WhiteflagMessageBuilder { parser }
+}
+
 impl<F: FieldDefinitionParser> WhiteflagMessageBuilder<F> {
     pub fn compile(mut self) -> Message {
         let header =
             self.convert_values_to_fields(wf_field::definitions::Header::DEFINITIONS.to_vec());
 
-        let code_parser = self.parser.body_field_definitions();
-        let body_defs = code_parser.get_field_definitions_for_encode();
+        let code = convert_value_to_code(header[MessageHeaderOrder::MessageCode.as_usize()].get());
+
+        let body_defs = self.parser.body_field_definitions();
 
         let mut body = self.convert_values_to_fields(body_defs);
 
-        if code_parser.code == 'Q' {
+        if code == 'Q' {
             body.append(create_request_fields(&mut self.parser).as_mut());
         }
 
-        Message::new(code_parser.code, header, body, None, None)
+        Message::new(code, header, body, None, None)
     }
 
     /// converts string values to their respective fields relative to their position and the corresponding field definition

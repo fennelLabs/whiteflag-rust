@@ -8,7 +8,6 @@ mod message_feature_parity_tests;
 mod edge_case_test;
 
 mod crypted_buffer;
-mod decoder;
 pub mod error;
 pub mod message;
 mod request;
@@ -16,7 +15,6 @@ mod segment;
 mod types;
 mod wf_message_builder;
 
-use decoder::Decoder;
 use message::Message;
 use wf_field::FieldValue;
 
@@ -29,5 +27,5 @@ pub fn encode<T: FieldValue>(fields: &[T]) -> String {
 
 /// decode a hexadecimal encoded whiteflag message
 pub fn decode<T: AsRef<str>>(message: T) -> Message {
-    Decoder::from_hexadecimal(message).decode()
+    Message::decode_from_hexadecimal(message)
 }
