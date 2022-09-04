@@ -49,7 +49,12 @@ impl Field {
     }
 
     pub fn decode(&mut self, data: &[u8]) -> String {
-        let s = self.definition.encoding.decode(data, self.bit_length());
+        let s = match self.definition.encoding.decode(data, self.bit_length()) {
+            Ok(r) => r,
+            Err(e) => {
+                panic!("error: {}\n\t{:#?}", e, &self);
+            }
+        };
         self.value = s.clone();
         s
     }
