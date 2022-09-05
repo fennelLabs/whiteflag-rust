@@ -30,6 +30,7 @@ impl<T: FieldDefinitionParserBase> FieldDefinitionParser for T {
 }
 
 pub struct Parser {
+    pub code: char,
     pub header: Vec<Field>,
     pub body: Vec<Field>,
 }
@@ -46,6 +47,6 @@ impl Parser {
             body.append(create_request_fields(&mut parser).as_mut());
         }
 
-        Parser { header, body }
+        Parser { code, header, body }
     }
 }

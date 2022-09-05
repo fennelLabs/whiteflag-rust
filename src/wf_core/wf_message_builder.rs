@@ -1,9 +1,7 @@
 use super::message::Message;
 use std::ops::Div;
 use wf_buffer::WhiteflagBuffer;
-use wf_field::{
-    FieldDefinition, FieldDefinitionParserBase, FieldValue, MessageHeaderOrder, Parser,
-};
+use wf_field::{FieldDefinition, FieldDefinitionParserBase, FieldValue, Parser};
 use wf_parser::MessageCodeParser;
 use wf_validation::Validation;
 
@@ -120,7 +118,6 @@ pub fn builder_from_encoded(
 impl<F: FieldDefinitionParserBase> WhiteflagMessageBuilder<F> {
     pub fn compile(self) -> Message {
         let message = Parser::parse(self.parser);
-        let code = MessageHeaderOrder::get_code(message.header.as_ref()).1;
-        Message::new(code, message.header, message.body, None, None)
+        Message::new(message.code, message.header, message.body, None, None)
     }
 }
