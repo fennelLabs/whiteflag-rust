@@ -1,7 +1,7 @@
 use super::{message::Message, request::create_request_fields};
 use std::ops::Div;
 use wf_buffer::WhiteflagBuffer;
-use wf_field::{definitions::convert_value_to_code, Field, FieldDefinition, FieldValue};
+use wf_field::{Field, FieldDefinition, FieldValue};
 use wf_parser::{MessageCodeParser, MessageHeaderOrder};
 use wf_validation::Validation;
 
@@ -128,10 +128,8 @@ impl<F: FieldDefinitionParser> WhiteflagMessageBuilder<F> {
         let header =
             self.convert_values_to_fields(wf_field::definitions::Header::DEFINITIONS.to_vec());
 
-        let code = convert_value_to_code(header[MessageHeaderOrder::MessageCode.as_usize()].get());
-
+        let code = MessageHeaderOrder::get_code(header.as_ref()).1;
         let body_defs = self.parser.body_field_definitions();
-
         let mut body = self.convert_values_to_fields(body_defs);
 
         if code == 'Q' {
