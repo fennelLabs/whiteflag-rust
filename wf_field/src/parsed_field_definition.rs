@@ -1,5 +1,4 @@
-use wf_buffer::WhiteflagBuffer;
-use wf_field::{definitions, FieldDefinition, FieldValue};
+use crate::{definitions, FieldDefinition, FieldValue};
 
 pub struct ParsedFieldDefinition {
     definition: &'static FieldDefinition,
@@ -53,11 +52,6 @@ impl ParsedFieldDefinition {
 
     pub fn header() -> Vec<ParsedFieldDefinition> {
         Self::parse(definitions::Header::DEFINITIONS, 0)
-    }
-
-    /// used in the decoding process
-    pub fn extract(&self, buffer: &WhiteflagBuffer) -> String {
-        buffer.extract_message_value(&self.definition, self.start_bit)
     }
 
     /// used in the compiling process

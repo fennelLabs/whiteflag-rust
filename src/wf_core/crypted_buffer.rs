@@ -1,7 +1,6 @@
 use fennel_lib::FennelCipher;
 use wf_buffer::WhiteflagBuffer;
-use wf_field::MessageHeaderOrder;
-use wf_parser::ParsedFieldDefinition;
+use wf_field::{MessageHeaderOrder, ParsedFieldDefinition};
 
 pub struct CryptedBuffer {
     unencrypted_first_half: WhiteflagBuffer,

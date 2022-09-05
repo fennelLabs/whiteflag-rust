@@ -1,5 +1,5 @@
 use crate::{message_header_parser::MessageHeaderParser, MessageHeader};
-use wf_buffer::WhiteflagBuffer;
+use wf_buffer::{BufferReader, WhiteflagBuffer};
 use wf_field::{
     definitions::{convert_value_to_code, get_body_from_code_char},
     FieldDefinition, FieldValue, MessageHeaderOrder,
@@ -14,10 +14,10 @@ pub struct MessageCodeParser {
 impl MessageCodeParser {
     pub fn parse_for_decode(message: &WhiteflagBuffer) -> MessageCodeParser {
         let header = MessageHeaderParser::default();
-        let code = convert_value_to_code(header.message_code().extract(&message).as_ref());
+        let code = convert_value_to_code(header.message_code().read(&message).as_ref());
         let test_code = match code {
             'T' => Some(convert_value_to_code(
-                header.test_message_code().extract(&message).as_ref(),
+                header.test_message_code().read(&message).as_ref(),
             )),
             _ => None,
         };

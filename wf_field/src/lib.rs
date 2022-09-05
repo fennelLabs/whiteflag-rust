@@ -13,6 +13,7 @@ mod field;
 mod field_definition;
 mod field_definition_parser;
 mod header_order;
+mod parsed_field_definition;
 mod request;
 
 pub use definitions::{generic_header_fields, get_body_from_code, message_code, test_message_code};
@@ -20,6 +21,7 @@ pub use field::Field;
 pub use field_definition::FieldDefinition;
 pub use field_definition_parser::{FieldDefinitionParser, Parser};
 pub use header_order::MessageHeaderOrder;
+pub use parsed_field_definition::ParsedFieldDefinition;
 
 use definitions::get_body_from_code_char;
 

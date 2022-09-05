@@ -3,7 +3,7 @@ use wf_common::{
     common::{append_bits, crop_bits, extract_bits, remove_hexadecimal_prefix},
     constants::BYTE,
 };
-use wf_field::{Field, FieldDefinition};
+use wf_field::{Field, FieldDefinition, ParsedFieldDefinition};
 
 #[cfg(test)]
 mod tests;
@@ -169,5 +169,16 @@ impl From<&Field> for WhiteflagBuffer {
     fn from(field: &Field) -> Self {
         let length = field.bit_length();
         WhiteflagBuffer::new(field.into(), length)
+    }
+}
+
+pub trait BufferReader {
+    fn read(&self, buffer: &WhiteflagBuffer) -> String;
+}
+
+impl BufferReader for ParsedFieldDefinition {
+    /// used in the decoding process
+    fn read(&self, buffer: &WhiteflagBuffer) -> String {
+        buffer.extract_message_value(&self, self.start_bit)
     }
 }

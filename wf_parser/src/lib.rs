@@ -3,11 +3,9 @@ mod test;
 
 mod message_code_parser;
 mod message_header_parser;
-mod parsed_field_definition;
 mod wf_header;
 
 pub use message_code_parser::MessageCodeParser;
-pub use parsed_field_definition::ParsedFieldDefinition;
 
 pub trait MessageHeader {
     type Target: ?Sized;
