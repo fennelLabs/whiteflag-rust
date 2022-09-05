@@ -1,24 +1,19 @@
 use super::{message::Message, request::create_request_fields};
 use std::ops::Div;
 use wf_buffer::WhiteflagBuffer;
-use wf_field::{Field, FieldDefinition, FieldValue};
-use wf_parser::{MessageCodeParser, MessageHeaderOrder};
+use wf_field::{
+    Field, FieldDefinition, FieldDefinitionParser, FieldDefinitionParserBase, FieldValue,
+    MessageHeaderOrder,
+};
+use wf_parser::MessageCodeParser;
 use wf_validation::Validation;
-
-pub trait FieldDefinitionParser {
-    fn parse(&mut self, definition: &FieldDefinition) -> String;
-    /// fetch the field definitions for the body
-    fn body_field_definitions(&self) -> Vec<FieldDefinition>;
-    /// meant to calculate remaining values (if any) for request field definitions
-    fn remaining(&self) -> usize;
-}
 
 pub struct SerializedMessageParser<'a> {
     message: &'a str,
     last_byte: usize,
 }
 
-impl FieldDefinitionParser for SerializedMessageParser<'_> {
+impl FieldDefinitionParserBase for SerializedMessageParser<'_> {
     fn parse(&mut self, definition: &FieldDefinition) -> String {
         if let Some(end) = definition.end_byte {
             self.last_byte = end;
@@ -43,7 +38,7 @@ pub struct FieldValuesParser<'a, T: FieldValue> {
     index: usize,
 }
 
-impl<'a, T: FieldValue> FieldDefinitionParser for FieldValuesParser<'a, T> {
+impl<T: FieldValue> FieldDefinitionParserBase for FieldValuesParser<'_, T> {
     fn parse(&mut self, definition: &FieldDefinition) -> String {
         let value = self.data[self.index].as_ref();
 
@@ -74,7 +69,7 @@ pub struct EncodedMessageParser {
     bit_cursor: usize,
 }
 
-impl FieldDefinitionParser for EncodedMessageParser {
+impl FieldDefinitionParserBase for EncodedMessageParser {
     fn parse(&mut self, definition: &FieldDefinition) -> String {
         let value = self
             .buffer
@@ -123,7 +118,7 @@ pub fn builder_from_encoded(
     WhiteflagMessageBuilder { parser }
 }
 
-impl<F: FieldDefinitionParser> WhiteflagMessageBuilder<F> {
+impl<F: FieldDefinitionParserBase> WhiteflagMessageBuilder<F> {
     pub fn compile(mut self) -> Message {
         let header =
             self.convert_values_to_fields(wf_field::definitions::Header::DEFINITIONS.to_vec());

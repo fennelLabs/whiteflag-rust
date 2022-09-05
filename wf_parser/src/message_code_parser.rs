@@ -1,8 +1,8 @@
-use super::{MessageHeader, MessageHeaderOrder, MessageHeaderParser};
+use super::{MessageHeader, MessageHeaderParser};
 use wf_buffer::WhiteflagBuffer;
 use wf_field::{
     definitions::{convert_value_to_code, get_body_from_code_char},
-    FieldDefinition, FieldValue,
+    FieldDefinition, FieldValue, MessageHeaderOrder,
 };
 
 #[derive(Debug)]

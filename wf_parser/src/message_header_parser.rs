@@ -1,6 +1,6 @@
-use super::{parsed_field_definition::ParsedFieldDefinition, MessageHeader, MessageHeaderOrder};
+use super::{parsed_field_definition::ParsedFieldDefinition, MessageHeader};
 use wf_buffer::WhiteflagBuffer;
-use wf_field::{definitions::test_message_code, Field, FieldDefinition};
+use wf_field::{definitions::test_message_code, Field, FieldDefinition, MessageHeaderOrder};
 
 pub struct MessageHeaderParser {
     values: Vec<ParsedFieldDefinition>,
