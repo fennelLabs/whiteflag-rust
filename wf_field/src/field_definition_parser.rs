@@ -1,4 +1,4 @@
-use crate::{Field, FieldDefinition};
+use crate::{request::create_request_fields, Field, FieldDefinition, MessageHeaderOrder};
 
 pub trait FieldDefinitionParserBase {
     fn parse(&mut self, definition: &FieldDefinition) -> String;
@@ -29,10 +29,23 @@ impl<T: FieldDefinitionParserBase> FieldDefinitionParser for T {
     }
 }
 
-pub struct Parser<T: FieldDefinitionParserBase> {
-    parser: T,
+pub struct Parser {
+    pub header: Vec<Field>,
+    pub body: Vec<Field>,
 }
 
-impl<T: FieldDefinitionParserBase> Parser<T> {
-    pub fn parse(&self) {}
+impl Parser {
+    pub fn parse<T: FieldDefinitionParserBase>(mut parser: T) -> Self {
+        let header = parser.parse_fields(crate::definitions::Header::DEFINITIONS.to_vec());
+
+        let code = MessageHeaderOrder::get_code(header.as_ref()).1;
+        let body_defs = parser.body_field_definitions();
+        let mut body = parser.parse_fields(body_defs);
+
+        if code == 'Q' {
+            body.append(create_request_fields(&mut parser).as_mut());
+        }
+
+        Parser { header, body }
+    }
 }

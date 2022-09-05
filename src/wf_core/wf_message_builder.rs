@@ -1,9 +1,8 @@
-use super::{message::Message, request::create_request_fields};
+use super::message::Message;
 use std::ops::Div;
 use wf_buffer::WhiteflagBuffer;
 use wf_field::{
-    Field, FieldDefinition, FieldDefinitionParser, FieldDefinitionParserBase, FieldValue,
-    MessageHeaderOrder,
+    FieldDefinition, FieldDefinitionParserBase, FieldValue, MessageHeaderOrder, Parser,
 };
 use wf_parser::MessageCodeParser;
 use wf_validation::Validation;
@@ -87,7 +86,7 @@ impl FieldDefinitionParserBase for EncodedMessageParser {
     }
 }
 
-pub struct WhiteflagMessageBuilder<F: FieldDefinitionParser> {
+pub struct WhiteflagMessageBuilder<F: FieldDefinitionParserBase> {
     parser: F,
 }
 
@@ -119,33 +118,9 @@ pub fn builder_from_encoded(
 }
 
 impl<F: FieldDefinitionParserBase> WhiteflagMessageBuilder<F> {
-    pub fn compile(mut self) -> Message {
-        let header =
-            self.convert_values_to_fields(wf_field::definitions::Header::DEFINITIONS.to_vec());
-
-        let code = MessageHeaderOrder::get_code(header.as_ref()).1;
-        let body_defs = self.parser.body_field_definitions();
-        let mut body = self.convert_values_to_fields(body_defs);
-
-        if code == 'Q' {
-            body.append(create_request_fields(&mut self.parser).as_mut());
-        }
-
-        Message::new(code, header, body, None, None)
-    }
-
-    /// converts string values to their respective fields relative to their position and the corresponding field definition
-    fn convert_values_to_fields(&mut self, field_defs: Vec<FieldDefinition>) -> Vec<Field> {
-        /* if self.data.len() < field_defs.len() {
-            panic!("not enough field definitions to process given values\nvalues: {:#?}\ndefinitions: {:#?}", self.data, field_defs);
-        } */
-
-        field_defs
-            .into_iter()
-            .map(|f| {
-                let value = self.parser.parse(&f);
-                Field::new(f, value)
-            })
-            .collect()
+    pub fn compile(self) -> Message {
+        let message = Parser::parse(self.parser);
+        let code = MessageHeaderOrder::get_code(message.header.as_ref()).1;
+        Message::new(code, message.header, message.body, None, None)
     }
 }
