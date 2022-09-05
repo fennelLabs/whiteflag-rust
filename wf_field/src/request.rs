@@ -1,4 +1,4 @@
-use crate::{definitions::*, Field, FieldDefinition, FieldDefinitionParserBase};
+use crate::{definitions::*, Field, FieldDefinition, FieldDefinitionParser};
 use std::ops::Mul;
 
 const OBJECT_TYPE: FieldDefinition = Request::OBJECT_TYPE;
@@ -8,7 +8,7 @@ const OBJECT_TYPE_QUANT: FieldDefinition = Request::OBJECT_TYPE_QUANT;
 /// this function takes n number of request objects and parsers out the remaining request fields
 ///
 /// wf spec 4.3.1.9 Object Request Fields
-pub fn create_request_fields<T: FieldDefinitionParserBase>(parser: &mut T) -> Vec<Field> {
+pub fn create_request_fields<T: FieldDefinitionParser>(parser: &mut T) -> Vec<Field> {
     let ot_size = OBJECT_TYPE
         .expected_byte_length()
         .expect("request::OBJECT_TYPE is misconfigured: must have a start and end byte");

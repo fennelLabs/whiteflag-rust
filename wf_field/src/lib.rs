@@ -18,7 +18,7 @@ mod request;
 pub use definitions::{generic_header_fields, get_body_from_code, message_code, test_message_code};
 pub use field::Field;
 pub use field_definition::FieldDefinition;
-pub use field_definition_parser::{FieldDefinitionParserBase, Parser};
+pub use field_definition_parser::{FieldDefinitionParser, Parser};
 pub use header_order::MessageHeaderOrder;
 
 use definitions::get_body_from_code_char;

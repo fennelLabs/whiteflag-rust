@@ -1,7 +1,7 @@
 use super::message::Message;
 use std::ops::Div;
 use wf_buffer::WhiteflagBuffer;
-use wf_field::{FieldDefinition, FieldDefinitionParserBase, FieldValue, Parser};
+use wf_field::{FieldDefinition, FieldDefinitionParser, FieldValue, Parser};
 use wf_parser::MessageCodeParser;
 use wf_validation::Validation;
 
@@ -10,7 +10,7 @@ pub struct SerializedMessageParser<'a> {
     last_byte: usize,
 }
 
-impl FieldDefinitionParserBase for SerializedMessageParser<'_> {
+impl FieldDefinitionParser for SerializedMessageParser<'_> {
     fn parse(&mut self, definition: &FieldDefinition) -> String {
         if let Some(end) = definition.end_byte {
             self.last_byte = end;
@@ -35,7 +35,7 @@ pub struct FieldValuesParser<'a, T: FieldValue> {
     index: usize,
 }
 
-impl<T: FieldValue> FieldDefinitionParserBase for FieldValuesParser<'_, T> {
+impl<T: FieldValue> FieldDefinitionParser for FieldValuesParser<'_, T> {
     fn parse(&mut self, definition: &FieldDefinition) -> String {
         let value = self.data[self.index].as_ref();
 
@@ -66,7 +66,7 @@ pub struct EncodedMessageParser {
     bit_cursor: usize,
 }
 
-impl FieldDefinitionParserBase for EncodedMessageParser {
+impl FieldDefinitionParser for EncodedMessageParser {
     fn parse(&mut self, definition: &FieldDefinition) -> String {
         let value = self
             .buffer
@@ -84,7 +84,7 @@ impl FieldDefinitionParserBase for EncodedMessageParser {
     }
 }
 
-pub struct WhiteflagMessageBuilder<F: FieldDefinitionParserBase> {
+pub struct WhiteflagMessageBuilder<F: FieldDefinitionParser> {
     parser: F,
 }
 
@@ -115,7 +115,7 @@ pub fn builder_from_encoded(
     WhiteflagMessageBuilder { parser }
 }
 
-impl<F: FieldDefinitionParserBase> WhiteflagMessageBuilder<F> {
+impl<F: FieldDefinitionParser> WhiteflagMessageBuilder<F> {
     pub fn compile(self) -> Message {
         let message = Parser::parse(self.parser);
         Message::new(message.code, message.header, message.body, None, None)

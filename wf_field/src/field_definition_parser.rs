@@ -1,6 +1,6 @@
 use crate::{request::create_request_fields, Field, FieldDefinition, MessageHeaderOrder};
 
-pub trait FieldDefinitionParserBase {
+pub trait FieldDefinitionParser {
     fn parse(&mut self, definition: &FieldDefinition) -> String;
     /// fetch the field definitions for the body
     fn body_field_definitions(&self) -> Vec<FieldDefinition>;
@@ -8,11 +8,11 @@ pub trait FieldDefinitionParserBase {
     fn remaining(&self) -> usize;
 }
 
-pub trait FieldDefinitionParser {
+pub trait FieldDefinitionParserBase {
     fn parse_fields(&mut self, field_defs: Vec<FieldDefinition>) -> Vec<Field>;
 }
 
-impl<T: FieldDefinitionParserBase> FieldDefinitionParser for T {
+impl<T: FieldDefinitionParser> FieldDefinitionParserBase for T {
     /// parses array of field definitions from a data source into a Field
     fn parse_fields(&mut self, field_defs: Vec<FieldDefinition>) -> Vec<Field> {
         /* if self.data.len() < field_defs.len() {
@@ -36,7 +36,7 @@ pub struct Parser {
 }
 
 impl Parser {
-    pub fn parse<T: FieldDefinitionParserBase>(mut parser: T) -> Self {
+    pub fn parse<T: FieldDefinitionParser>(mut parser: T) -> Self {
         let header = parser.parse_fields(crate::definitions::Header::DEFINITIONS.to_vec());
 
         let code = MessageHeaderOrder::get_code(header.as_ref()).1;
