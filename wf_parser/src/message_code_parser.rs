@@ -1,4 +1,4 @@
-use super::{MessageHeader, MessageHeaderParser};
+use crate::{message_header_parser::MessageHeaderParser, MessageHeader};
 use wf_buffer::WhiteflagBuffer;
 use wf_field::{
     definitions::{convert_value_to_code, get_body_from_code_char},
