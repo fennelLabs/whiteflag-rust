@@ -1,5 +1,5 @@
-use std::ops::Div;
 use super::{message::Message, request::create_request_fields};
+use std::ops::Div;
 use wf_buffer::WhiteflagBuffer;
 use wf_field::{definitions::convert_value_to_code, Field, FieldDefinition, FieldValue};
 use wf_parser::{MessageCodeParser, MessageHeaderOrder};
