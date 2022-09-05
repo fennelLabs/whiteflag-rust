@@ -1,8 +1,5 @@
 use super::encoding;
-use wf_common::constants::{BYTE, OCTET, QUADBIT};
 use wf_validation::{invalid_length_test, test, ValidationError};
-
-const PRINT_ERRORS: bool = true;
 
 #[test]
 fn invalid_charset_1() {

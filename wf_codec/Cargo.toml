@@ -11,3 +11,4 @@ wf_validation = { path = "../wf_validation" }
 lazy_static = "1.4.0"
 regex = "1.5.5"
 hex = "0.4.3"
+thiserror = "1.0.31"

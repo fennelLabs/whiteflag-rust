@@ -70,7 +70,12 @@ impl FieldDefinition {
     }
 
     pub fn decode(&self, data: &[u8]) -> String {
-        self.encoding.decode(data, self.bit_length())
+        match self.encoding.decode(data, self.bit_length()) {
+            Ok(r) => r,
+            Err(e) => {
+                panic!("error: {}\n\t{:#?}", e, &self);
+            }
+        }
     }
 
     pub fn decode_to_field(self, data: &[u8]) -> Field {

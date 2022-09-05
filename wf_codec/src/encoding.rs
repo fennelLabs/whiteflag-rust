@@ -1,3 +1,5 @@
+use crate::error::CodecResult;
+
 use super::{
     binary::{decode_to_binary, encode_from_binary},
     hexadecimal::{decode_to_bdx, encode_from_bdx},
@@ -68,18 +70,18 @@ impl Encoding {
      * @return the uncompressed value of the field
      * java equivalent: WfMessageCodec.decodeField
      */
-    pub fn decode(&self, buffer: &[u8], bit_length: usize) -> String {
+    pub fn decode(&self, buffer: &[u8], bit_length: usize) -> CodecResult<String> {
         let mut s = String::new();
 
         match &self.kind {
             EncodingKind::UTF8 => {
-                return std::str::from_utf8(buffer).expect("utf8 error").to_string();
+                return Ok(std::str::from_utf8(buffer)?.to_string());
             }
             EncodingKind::BIN => {
-                return decode_to_binary(buffer, bit_length);
+                return Ok(decode_to_binary(buffer, bit_length));
             }
             EncodingKind::DEC | EncodingKind::HEX => {
-                return decode_to_bdx(buffer, bit_length);
+                return Ok(decode_to_bdx(buffer, bit_length));
             }
             EncodingKind::DATETIME => {
                 s.push_str(&decode_to_bdx(buffer, bit_length));
@@ -112,7 +114,7 @@ impl Encoding {
             }
         }
 
-        s
+        Ok(s)
     }
 
     pub fn is_fixed_length(&self) -> bool {

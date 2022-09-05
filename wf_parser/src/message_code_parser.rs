@@ -1,4 +1,5 @@
 use super::{MessageHeader, MessageHeaderOrder, MessageHeaderParser};
+use wf_buffer::WhiteflagBuffer;
 use wf_field::{
     definitions::{convert_value_to_code, get_body_from_code_char},
     FieldDefinition, FieldValue,
@@ -11,6 +12,22 @@ pub struct MessageCodeParser {
 }
 
 impl MessageCodeParser {
+    pub fn parse_for_decode(message: &WhiteflagBuffer) -> MessageCodeParser {
+        let header = MessageHeaderParser::default();
+        let code = convert_value_to_code(header.message_code().extract(&message).as_ref());
+        let test_code = match code {
+            'T' => Some(convert_value_to_code(
+                header.test_message_code().extract(&message).as_ref(),
+            )),
+            _ => None,
+        };
+
+        MessageCodeParser { code, test_code }
+    }
+
+    /// extracts message code and test message code using the parsed field definition api
+    /// the parsed field definitions are field definitions, but contextualized within their proper order
+    /// they have their start and end bytes properly set according to their relative field position
     pub fn parse_from_serialized(message: &str) -> MessageCodeParser {
         let header = MessageHeaderParser::default();
 
@@ -50,13 +67,8 @@ impl MessageCodeParser {
         MessageCodeParser { code, test_code }
     }
 
-    /// collects all the field definitions based on the parsed codes
-    pub fn get_field_definitions_for_decode(&self) -> Vec<FieldDefinition> {
-        get_body_from_code_char(&self.test_code.unwrap_or(self.code))
-    }
-
     // collects all the field definitions based on the parsed codes
-    pub fn get_field_definitions_for_encode(&self) -> Vec<FieldDefinition> {
+    pub fn get_field_definitions(&self) -> Vec<FieldDefinition> {
         let mut defs = get_body_from_code_char(&self.code);
 
         if let Some(c) = &self.test_code {

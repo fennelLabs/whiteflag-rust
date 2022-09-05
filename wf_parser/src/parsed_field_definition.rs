@@ -65,6 +65,7 @@ impl ParsedFieldDefinition {
         values[self.index].as_ref()
     }
 
+    /// used in the deserializing process
     pub fn read_from_serialized<'a>(&self, message: &'a str) -> &'a str {
         match self.end_byte {
             Some(e) => &message[self.start_byte..e],
