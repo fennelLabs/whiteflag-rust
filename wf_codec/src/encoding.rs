@@ -20,13 +20,11 @@ pub struct Encoding {
 }
 
 #[derive(Clone, Copy, Debug)]
-pub struct ConfiguredByteLength {
-    /// if this is 0, then consider it None
-    /// if not 0, then it is a fixed byte length
+pub struct ByteLength {
     length: usize,
 }
 
-impl ConfiguredByteLength {
+impl ByteLength {
     pub const fn new(length: usize) -> Self {
         Self { length }
     }
@@ -42,9 +40,42 @@ impl ConfiguredByteLength {
     pub const fn as_usize(&self) -> usize {
         self.length
     }
+}
 
+#[derive(Clone, Copy, Debug)]
+pub struct ConfiguredByteLength {
+    byte_length: ByteLength,
+}
+
+impl ConfiguredByteLength {
+    pub const fn new(length: usize) -> Self {
+        Self {
+            byte_length: ByteLength { length },
+        }
+    }
+
+    /// if this is 0, then consider it None
+    /// if not 0, then it is a fixed byte length
     pub const fn is_fixed(&self) -> bool {
-        self.length != 0
+        self.byte_length.length != 0
+    }
+
+    pub const fn length(&self) -> usize {
+        self.byte_length.length
+    }
+}
+
+impl std::ops::Deref for ConfiguredByteLength {
+    type Target = ByteLength;
+
+    fn deref(&self) -> &Self::Target {
+        &self.byte_length
+    }
+}
+
+impl From<ConfiguredByteLength> for ByteLength {
+    fn from(config: ConfiguredByteLength) -> Self {
+        config.byte_length
     }
 }
 

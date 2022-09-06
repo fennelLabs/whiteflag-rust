@@ -1,5 +1,5 @@
 use super::field_definition::*;
-use wf_codec::encoding::{ConfiguredByteLength, Encoding};
+use wf_codec::encoding::{ByteLength, Encoding};
 
 pub fn get_body_from_code(code: &str) -> Vec<FieldDefinition> {
     get_body_from_code_char(&convert_value_to_code(code)).to_vec()
@@ -92,7 +92,7 @@ pub struct BytePositions {
     /// most fields will have an end byte, but some are unbounded
     pub end: Option<usize>,
     /// (end - start) unless the encoding has a fixed byte length or it is the last field and isn't bounded (end = 0 or None)
-    length: ConfiguredByteLength,
+    length: ByteLength,
     encoding: Encoding,
     /// some encodings will have a fixed byte length
     is_fixed: bool,
@@ -107,9 +107,9 @@ impl BytePositions {
 
     pub const fn new(start: usize, end: usize, encoding: Encoding) -> Self {
         let (end, length) = if end == 0 {
-            (None, encoding.byte_length)
+            (None, ByteLength::new(encoding.byte_length.length()))
         } else {
-            (Some(end), ConfiguredByteLength::new(end - start))
+            (Some(end), ByteLength::new(end - start))
         };
         let is_fixed = encoding.byte_length.is_fixed();
         let bit_length = if is_fixed {
@@ -130,7 +130,9 @@ impl BytePositions {
     pub const fn next() {}
 }
 
-struct BitPosition {}
+/* pub const fn convert(positions: &'static [BytePositions]) {
+    positions.iter().enumerate();
+} */
 
 macro_rules! message_fields {
     (
@@ -148,10 +150,15 @@ macro_rules! message_fields {
                     $( pub const $upp: &str = stringify!($name); )*
                 }
 
+                pub mod positions {
+                    use super::*;
+                    $( pub const $upp: BytePositions = BytePositions::new($start, $end, wf_codec::encoding::$encoding); )*
+                }
+
                 $( pub const $upp: FieldDefinition = FieldDefinition {
                     name: Some(names::$upp),
                     encoding: wf_codec::encoding::$encoding,
-                    positions: BytePositions::new($start, $end, wf_codec::encoding::$encoding)
+                    positions: positions::$upp,
                 }; )*
 
                 pub const DEFINITIONS: &'static [FieldDefinition] = &[$( $upp, )*];
