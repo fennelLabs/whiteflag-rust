@@ -19,7 +19,7 @@ pub fn create_request_fields<T: FieldDefinitionParser>(parser: &mut T) -> Vec<Fi
         .get_name()
         .expect("request::OBJECT_TYPE is misconfigured: should have a name");
 
-    let mut start_byte = OBJECT_TYPE.start_byte;
+    let mut start_byte = OBJECT_TYPE.positions.start;
     let n = parser.remaining();
 
     (0..(n.mul(2)))

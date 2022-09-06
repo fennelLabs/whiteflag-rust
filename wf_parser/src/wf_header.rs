@@ -15,10 +15,10 @@ pub fn from_serialized(serialized: &str, definitions: &[FieldDefinition]) -> Vec
     definitions
         .iter()
         .map(|d| {
-            if let Some(end) = d.end_byte {
-                serialized[d.start_byte..end].to_owned()
+            if let Some(end) = d.positions.end {
+                serialized[d.positions.start..end].to_owned()
             } else {
-                serialized[d.start_byte..].to_owned()
+                serialized[d.positions.start..].to_owned()
             }
         })
         .collect()

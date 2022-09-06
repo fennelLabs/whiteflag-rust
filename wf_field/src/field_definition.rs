@@ -1,3 +1,5 @@
+use crate::definitions::BytePositions;
+
 use super::Field;
 use wf_codec::encoding::Encoding;
 use wf_validation::{Validation, ValidationError};
@@ -6,8 +8,7 @@ use wf_validation::{Validation, ValidationError};
 pub struct FieldDefinition {
     pub name: Option<&'static str>,
     pub encoding: Encoding,
-    pub start_byte: usize,
-    pub end_byte: Option<usize>,
+    pub positions: BytePositions,
 }
 
 impl FieldDefinition {
@@ -23,18 +24,18 @@ impl FieldDefinition {
     ) -> FieldDefinition {
         FieldDefinition {
             name: Some(name),
-            encoding,
-            start_byte,
-            end_byte: if end_byte < 1 { None } else { Some(end_byte) },
+            encoding: encoding.kind.get_encoding(),
+            positions: BytePositions::new(start_byte, end_byte, encoding),
         }
     }
 
     pub fn next(&self, end: Option<usize>) -> FieldDefinition {
+        let start = self.positions.end.expect("next() assumes an end_byte");
+        let encoding = self.encoding.kind.get_encoding();
         FieldDefinition {
             name: None,
-            encoding: self.encoding.kind.get_encoding(),
-            start_byte: self.end_byte.expect("next() assumes an end_byte"),
-            end_byte: end,
+            encoding: encoding.kind.get_encoding(),
+            positions: BytePositions::new(start, end.unwrap_or(0), encoding),
         }
     }
 
@@ -45,18 +46,17 @@ impl FieldDefinition {
     ) -> FieldDefinition {
         FieldDefinition {
             name: None,
-            encoding,
-            start_byte,
-            end_byte: if end_byte < 1 { None } else { Some(end_byte) },
+            encoding: encoding.kind.get_encoding(),
+            positions: BytePositions::new(start_byte, end_byte, encoding),
         }
     }
 
     pub fn get_minimum_starting_position(&self) -> usize {
-        if let Some(e) = self.end_byte {
+        if let Some(e) = self.positions.end {
             return e;
         }
 
-        return self.start_byte;
+        return self.positions.start;
     }
 
     /**
@@ -90,8 +90,8 @@ impl FieldDefinition {
     /// returns the byte length of the unencoded field value
     /// if the field definition does not have a fixed length then it will return `0`
     pub fn expected_byte_length(&self) -> Option<usize> {
-        match self.end_byte {
-            Some(e) if e > 0 && e > self.start_byte => Some(e - self.start_byte),
+        match self.positions.end {
+            Some(e) if e > 0 && e > self.positions.start => Some(e - self.positions.start),
             _ => None,
         }
     }

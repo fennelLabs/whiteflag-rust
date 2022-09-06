@@ -15,8 +15,37 @@ use wf_validation::{Validation, ValidationError};
 pub struct Encoding {
     pub charset: &'static str,
     pub bit_length: usize,
-    pub byte_length: Option<usize>,
+    pub byte_length: ConfiguredByteLength,
     pub kind: EncodingKind,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct ConfiguredByteLength {
+    /// if this is 0, then consider it None
+    /// if not 0, then it is a fixed byte length
+    length: usize,
+}
+
+impl ConfiguredByteLength {
+    pub const fn new(length: usize) -> Self {
+        Self { length }
+    }
+
+    pub const fn as_opt(&self) -> Option<usize> {
+        if self.length == 0 {
+            None
+        } else {
+            Some(self.length)
+        }
+    }
+
+    pub const fn as_usize(&self) -> usize {
+        self.length
+    }
+
+    pub const fn is_fixed(&self) -> bool {
+        self.length != 0
+    }
 }
 
 /* impl EncodingKind {
@@ -32,7 +61,7 @@ impl Encoding {
     fn new(
         charset: &'static str,
         bit_length: usize,
-        byte_length: Option<usize>,
+        byte_length: ConfiguredByteLength,
         kind: EncodingKind,
     ) -> Encoding {
         Encoding {
@@ -118,7 +147,7 @@ impl Encoding {
     }
 
     pub fn is_fixed_length(&self) -> bool {
-        self.byte_length != None
+        self.byte_length.as_opt() != None
     }
 
     /**
@@ -160,7 +189,7 @@ macro_rules! encoding {
 
         impl Validation for Encoding {
             fn validate(&self, value: &str) -> Result<(), ValidationError> {
-                match self.byte_length {
+                match self.byte_length.as_opt() {
                     Some(x) if value.len() != x => return Err(ValidationError::InvalidLength {
                         data: value.to_string(),
                         expected_length: x,
@@ -182,7 +211,7 @@ macro_rules! encoding {
         $( pub const $name: Encoding = Encoding {
             charset: charsets::$name,
             bit_length: $bit_length,
-            byte_length: $byte_length,
+            byte_length: ConfiguredByteLength::new($byte_length),
             kind: EncodingKind::$name
         }; )*
 
@@ -200,12 +229,12 @@ macro_rules! encoding {
 }
 
 encoding!(
-    BIN, "[01]", BIT, None;
-    DEC, "[0-9]", QUADBIT, None;
-    HEX, "[a-fA-F0-9]", QUADBIT, None;
-    UTF8, r"[\u0000-\u007F]", OCTET, None;
-    DATETIME, "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z", 56, Some(20);
-    DURATION, "P[0-9]{2}D[0-9]{2}H[0-9]{2}M", 24, Some(10);
-    LAT, "[+\\-][0-9]{2}\\.[0-9]{5}", 29, Some(9);
-    LONG, "[+\\-][0-9]{3}\\.[0-9]{5}", 33, Some(10)
+    BIN, "[01]", BIT, 0;
+    DEC, "[0-9]", QUADBIT, 0;
+    HEX, "[a-fA-F0-9]", QUADBIT, 0;
+    UTF8, r"[\u0000-\u007F]", OCTET, 0;
+    DATETIME, "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z", 56, 20;
+    DURATION, "P[0-9]{2}D[0-9]{2}H[0-9]{2}M", 24, 10;
+    LAT, "[+\\-][0-9]{2}\\.[0-9]{5}", 29, 9;
+    LONG, "[+\\-][0-9]{3}\\.[0-9]{5}", 33, 10
 );

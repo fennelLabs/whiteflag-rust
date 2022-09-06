@@ -1,4 +1,5 @@
 use super::field_definition::*;
+use wf_codec::encoding::{ConfiguredByteLength, Encoding};
 
 pub fn get_body_from_code(code: &str) -> Vec<FieldDefinition> {
     get_body_from_code_char(&convert_value_to_code(code)).to_vec()
@@ -48,6 +49,89 @@ pub enum FieldKind {
     REQUEST,
 }
 
+pub struct ParsedFieldDefinition {
+    definition: &'static FieldDefinition,
+    pub start_bit: usize,
+    pub end_bit: usize,
+    index: usize,
+}
+
+impl ParsedFieldDefinition {
+    /// creates the `ParsedFieldDefinition` that is ordered after this one
+    pub fn next(&self, next: &'static FieldDefinition) -> Self {
+        ParsedFieldDefinition::new(self.index, self.end_bit, next)
+    }
+
+    pub fn new(index: usize, previous_end_bit: usize, current: &'static FieldDefinition) -> Self {
+        let start_bit = previous_end_bit;
+        let end_bit = start_bit + current.bit_length();
+        ParsedFieldDefinition {
+            definition: current,
+            start_bit,
+            end_bit,
+            index,
+        }
+    }
+
+    pub fn parse(defs: &'static [FieldDefinition], start: usize) -> Vec<ParsedFieldDefinition> {
+        let mut previous = start;
+        defs.iter()
+            .enumerate()
+            .map(|(i, d)| {
+                let p = ParsedFieldDefinition::new(i, previous, d);
+                previous = p.end_bit;
+                p
+            })
+            .collect()
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct BytePositions {
+    pub start: usize,
+    /// most fields will have an end byte, but some are unbounded
+    pub end: Option<usize>,
+    /// (end - start) unless the encoding has a fixed byte length or it is the last field and isn't bounded (end = 0 or None)
+    length: ConfiguredByteLength,
+    encoding: Encoding,
+    /// some encodings will have a fixed byte length
+    is_fixed: bool,
+    /// (length * encoding.bit_length) unless is_fixed is true, then it is equal to encoding.bit_length
+    bit_length: usize,
+}
+
+impl BytePositions {
+    /* pub fn new_from_opt(start: usize, end: Option<usize>) -> Self {
+        Self { start, end, length: end.and_then(|e| Some(e - start)).or(None)}
+    } */
+
+    pub const fn new(start: usize, end: usize, encoding: Encoding) -> Self {
+        let (end, length) = if end == 0 {
+            (None, encoding.byte_length)
+        } else {
+            (Some(end), ConfiguredByteLength::new(end - start))
+        };
+        let is_fixed = encoding.byte_length.is_fixed();
+        let bit_length = if is_fixed {
+            encoding.bit_length
+        } else {
+            length.as_usize() * encoding.bit_length
+        };
+        Self {
+            start,
+            end,
+            length,
+            encoding,
+            is_fixed,
+            bit_length,
+        }
+    }
+
+    pub const fn next() {}
+}
+
+struct BitPosition {}
+
 macro_rules! message_fields {
     (
         $(
@@ -55,15 +139,6 @@ macro_rules! message_fields {
             $( $name:ident, $upp:ident, $pat:expr, $encoding:ident, $start:expr, $end:expr );*
         )*
     ) => {
-
-
-        /*
-
-        pub enum MessageTypes {
-            $(
-                $group,
-            )*
-        } */
 
         $(
             pub mod $group {
@@ -76,8 +151,7 @@ macro_rules! message_fields {
                 $( pub const $upp: FieldDefinition = FieldDefinition {
                     name: Some(names::$upp),
                     encoding: wf_codec::encoding::$encoding,
-                    start_byte: $start,
-                    end_byte: if $end == 0 { None } else { Some($end) },
+                    positions: BytePositions::new($start, $end, wf_codec::encoding::$encoding)
                 }; )*
 
                 pub const DEFINITIONS: &'static [FieldDefinition] = &[$( $upp, )*];
@@ -142,3 +216,37 @@ message_fields!(
     ObjectType, OBJECT_TYPE, "^[a-fA-F0-9]{2}$", HEX, 135, 137;
     ObjectTypeQuant, OBJECT_TYPE_QUANT, "^[0-9]{2}$", DEC, 137, 139
 );
+
+/* /// returns the byte length of the unencoded field value
+/// if the field definition does not have a fixed length then it will return `0`
+const fn byte_length(start: usize, end: Option<usize>) -> Option<usize> {
+    match end {
+        Some(e) if e > 0 && e > start => Some(e - start),
+        _ => None,
+    }
+}
+
+/**
+ * Gets the bit length of the encoded field
+ * @return the bit length of the compressed encoded field value
+ */
+const fn bit_length(encoding: Encoding, byte_length: Option<usize>) -> usize {
+    return encoding
+        .convert_to_bit_length(byte_length.unwrap_or(0));
+}
+
+/**
+ * Returns the bit length of a field for a given encoding and unencoded field byte length
+ * @param byteLength the number of bytes in the unencoded field
+ * @return the number of bits in a compressed encoded field
+ * java equivalent: Encoding.bitLength (WfMessageCodec.java)
+ */
+const fn convert_to_bit_length(encoding: &'static Encoding, byte_length: usize) -> usize {
+    if encoding.byte_length != None {
+        return encoding.bit_length;
+    }
+
+    encoding.byte_length.map(|_| encoding.bit_length);
+
+    byte_length * encoding.bit_length
+} */

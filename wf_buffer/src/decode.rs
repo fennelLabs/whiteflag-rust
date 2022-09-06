@@ -18,12 +18,12 @@ impl WhiteflagBuffer {
         let mut bit_cursor = start_bit;
 
         // the byte cursor only ensures definitions are in their proper order relative to each other
-        let mut byte_cursor = field_defs[0].start_byte;
+        let mut byte_cursor = field_defs[0].positions.start;
 
         let fields = field_defs
             .into_iter()
             .map(|f| {
-                if f.start_byte != byte_cursor {
+                if f.positions.start != byte_cursor {
                     panic!(
                         "\nstart byte should match byte cursor\n\tcursor: {}\n\tfield: {:#?}",
                         byte_cursor, f
@@ -33,7 +33,7 @@ impl WhiteflagBuffer {
                 let field = self.extract_message_field(f, bit_cursor);
 
                 bit_cursor += field.bit_length();
-                byte_cursor = field.definition.end_byte.unwrap_or(0);
+                byte_cursor = field.definition.positions.end.unwrap_or(0);
 
                 field
             })

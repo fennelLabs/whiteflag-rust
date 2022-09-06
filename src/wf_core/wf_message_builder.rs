@@ -12,12 +12,12 @@ pub struct SerializedMessageParser<'a> {
 
 impl FieldDefinitionParser for SerializedMessageParser<'_> {
     fn parse(&mut self, definition: &FieldDefinition) -> String {
-        if let Some(end) = definition.end_byte {
+        if let Some(end) = definition.positions.end {
             self.last_byte = end;
-            self.message[definition.start_byte..end].to_owned()
+            self.message[definition.positions.start..end].to_owned()
         } else {
             self.last_byte = self.message.len();
-            self.message[definition.start_byte..].to_owned()
+            self.message[definition.positions.start..].to_owned()
         }
     }
 
