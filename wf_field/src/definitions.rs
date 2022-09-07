@@ -29,6 +29,22 @@ pub enum FieldKind {
     }
 } */
 
+pub fn convert(configured_byte_positions: &[ByteConfiguration]) -> Vec<CodecPositions> {
+    configured_byte_positions[1..].into_iter().fold(
+        vec![configured_byte_positions[0].to_position(0)],
+        |mut a, i| {
+            if let Some(c) = a.last() {
+                a.push(c.next(*i));
+            }
+
+            a
+        },
+    )
+}
+
+// declarative macros
+// fragment specs: https://veykril.github.io/tlborm/decl-macros/minutiae/fragment-specifiers.html
+
 macro_rules! module {
     (
         $name:ident, $($code:item)*

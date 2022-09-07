@@ -1,6 +1,8 @@
 use wf_codec::encoding::{ByteLength, Encoding};
 
-#[derive(Clone, Debug)]
+use crate::codec_positions::CodecPositions;
+
+#[derive(Clone, Copy, Debug)]
 pub struct ByteConfiguration {
     pub start: usize,
     /// most fields will have an end byte, but some are unbounded
@@ -36,5 +38,9 @@ impl ByteConfiguration {
         } else {
             self.length.as_usize() * self.encoding.bit_length
         }
+    }
+
+    pub const fn to_position(self, bit_start: usize) -> CodecPositions {
+        CodecPositions::new(self, bit_start)
     }
 }

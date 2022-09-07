@@ -11,7 +11,7 @@ use wf_common::{
 };
 use wf_validation::{Validation, ValidationError};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Encoding {
     pub charset: &'static str,
     pub bit_length: usize,
