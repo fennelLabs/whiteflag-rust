@@ -7,6 +7,8 @@ mod codec_tests;
 #[cfg(test)]
 mod validation_test;
 
+mod byte_configuration;
+mod codec_positions;
 #[allow(dead_code)]
 pub mod definitions;
 mod field;
@@ -16,14 +18,11 @@ mod header_order;
 mod parsed_field_definition;
 mod request;
 
-pub use definitions::{generic_header_fields, get_body_from_code, message_code, test_message_code};
 pub use field::Field;
 pub use field_definition::FieldDefinition;
 pub use field_definition_parser::{FieldDefinitionParser, Parser};
 pub use header_order::MessageHeaderOrder;
 pub use parsed_field_definition::ParsedFieldDefinition;
-
-use definitions::get_body_from_code_char;
 
 pub const FIELD_PREFIX: &'static str = "Prefix";
 pub const FIELD_VERSION: &'static str = "Version";
@@ -75,4 +74,43 @@ pub fn get_message_body(fields: &[Field]) -> (Vec<FieldDefinition>, char) {
     let body = get_body_from_code_char(&message_code);
 
     (body, message_code)
+}
+
+pub fn get_body_from_code(code: &str) -> Vec<FieldDefinition> {
+    get_body_from_code_char(&convert_value_to_code(code)).to_vec()
+}
+
+use definitions::*;
+
+pub fn get_body_from_code_char(code: &char) -> Vec<FieldDefinition> {
+    match code {
+        'A' => authentication::DEFINITIONS,
+        'K' => crypto::DEFINITIONS,
+        'T' => test::DEFINITIONS,
+        'R' => resource::DEFINITIONS,
+        'F' => freetext::DEFINITIONS,
+        'P' | 'E' | 'D' | 'S' | 'I' | 'M' | 'Q' => sign::DEFINITIONS,
+        _ => panic!("'{}' is not a valid message code", code),
+    }
+    .to_vec()
+}
+
+/// fields that are codes are single characters
+pub fn convert_value_to_code(value: &str) -> char {
+    value
+        .chars()
+        .nth(0)
+        .unwrap_or_else(|| panic!("invalid message code: {}", value))
+}
+
+pub fn generic_header_fields() -> &'static [FieldDefinition] {
+    header::DEFINITIONS
+}
+
+pub fn message_code() -> &'static FieldDefinition {
+    &header::MESSAGE_CODE
+}
+
+pub fn test_message_code() -> &'static FieldDefinition {
+    &test::PSEUDO_MESSAGE_CODE
 }

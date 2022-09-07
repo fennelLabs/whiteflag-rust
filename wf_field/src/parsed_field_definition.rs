@@ -51,7 +51,7 @@ impl ParsedFieldDefinition {
     }
 
     pub fn header() -> Vec<ParsedFieldDefinition> {
-        Self::parse(definitions::Header::DEFINITIONS, 0)
+        Self::parse(definitions::header::DEFINITIONS, 0)
     }
 
     /// used in the compiling process
@@ -61,9 +61,9 @@ impl ParsedFieldDefinition {
 
     /// used in the deserializing process
     pub fn read_from_serialized<'a>(&self, message: &'a str) -> &'a str {
-        match self.positions.end {
-            Some(e) => &message[self.positions.start..e],
-            None => &message[self.positions.start..],
+        match self.positions.bytes.end {
+            Some(e) => &message[self.positions.bytes.start..e],
+            None => &message[self.positions.bytes.start..],
         }
     }
 

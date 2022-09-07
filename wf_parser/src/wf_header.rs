@@ -1,8 +1,7 @@
 use wf_buffer::WhiteflagBuffer;
 use wf_field::{
-    definitions,
-    definitions::{convert_value_to_code, get_body_from_code},
-    Field, FieldDefinition, MessageHeaderOrder,
+    convert_value_to_code, definitions, get_body_from_code, Field, FieldDefinition,
+    MessageHeaderOrder,
 };
 
 use super::MessageHeader;
@@ -15,10 +14,10 @@ pub fn from_serialized(serialized: &str, definitions: &[FieldDefinition]) -> Vec
     definitions
         .iter()
         .map(|d| {
-            if let Some(end) = d.positions.end {
-                serialized[d.positions.start..end].to_owned()
+            if let Some(end) = d.positions.bytes.end {
+                serialized[d.positions.bytes.start..end].to_owned()
             } else {
-                serialized[d.positions.start..].to_owned()
+                serialized[d.positions.bytes.start..].to_owned()
             }
         })
         .collect()
@@ -58,7 +57,7 @@ impl MessageHeader for MessageHeaderValues {
 
 impl MessageHeaderValues {
     pub fn from_serialized(serialized: &str) -> MessageHeaderValues {
-        let fields: Vec<String> = from_serialized(serialized, definitions::Header::DEFINITIONS);
+        let fields: Vec<String> = from_serialized(serialized, definitions::header::DEFINITIONS);
 
         MessageHeaderValues { values: fields }
     }
@@ -84,7 +83,7 @@ pub struct MessageHeaderFields {
 
 impl MessageHeaderFields {
     pub fn from_buffer(buffer: &WhiteflagBuffer) -> (usize, MessageHeaderFields) {
-        let (cursor, header) = buffer.decode(definitions::Header::DEFINITIONS, 0);
+        let (cursor, header) = buffer.decode(definitions::header::DEFINITIONS, 0);
         (cursor, Self::from_fields(header))
     }
 
@@ -131,5 +130,5 @@ pub fn convert_header_definitions<F>(convert: F) -> impl Iterator<Item = Field>
 where
     F: Fn((usize, &'static FieldDefinition)) -> Field,
 {
-    convert_definitions(definitions::Header::DEFINITIONS, convert)
+    convert_definitions(definitions::header::DEFINITIONS, convert)
 }

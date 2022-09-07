@@ -1,4 +1,4 @@
-use crate::{definitions::convert_value_to_code, Field};
+use crate::{convert_value_to_code, Field};
 
 #[repr(usize)]
 #[derive(Copy, Clone)]

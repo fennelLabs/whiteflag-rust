@@ -47,7 +47,7 @@ const TEST_MESSAGE: &'static str = "57463130aa19f7da7067d41891592131a12a60c9053b
 
 #[test]
 fn extract_code_for_a_message() {
-    let def = definitions::message_code();
+    let def = wf_field::message_code();
     let buffer = WhiteflagBuffer::decode_from_hexadecimal(AUTH_MESSAGE).unwrap();
 
     let field = buffer.extract_message_value(&def, 33);

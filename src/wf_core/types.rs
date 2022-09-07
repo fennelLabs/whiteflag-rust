@@ -1,4 +1,4 @@
-use wf_field::{definitions::get_body_from_code_char, FieldDefinition};
+use wf_field::{get_body_from_code_char, FieldDefinition};
 
 struct MessageType {
     pub message_code: char,

@@ -1,8 +1,7 @@
 use crate::{message_header_parser::MessageHeaderParser, MessageHeader};
 use wf_buffer::{BufferReader, WhiteflagBuffer};
 use wf_field::{
-    definitions::{convert_value_to_code, get_body_from_code_char},
-    FieldDefinition, FieldValue, MessageHeaderOrder,
+    convert_value_to_code, get_body_from_code_char, FieldDefinition, FieldValue, MessageHeaderOrder,
 };
 
 #[derive(Debug)]

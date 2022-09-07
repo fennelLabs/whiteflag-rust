@@ -37,7 +37,7 @@ pub struct Parser {
 
 impl Parser {
     pub fn parse<T: FieldDefinitionParser>(mut parser: T) -> Self {
-        let header = parser.parse_fields(crate::definitions::Header::DEFINITIONS.to_vec());
+        let header = parser.parse_fields(crate::definitions::header::DEFINITIONS.to_vec());
 
         let code = MessageHeaderOrder::get_code(header.as_ref()).1;
         let body_defs = parser.body_field_definitions();

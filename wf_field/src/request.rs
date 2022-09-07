@@ -1,8 +1,8 @@
 use crate::{definitions::*, Field, FieldDefinition, FieldDefinitionParser};
 use std::ops::Mul;
 
-const OBJECT_TYPE: FieldDefinition = Request::OBJECT_TYPE;
-const OBJECT_TYPE_QUANT: FieldDefinition = Request::OBJECT_TYPE_QUANT;
+const OBJECT_TYPE: FieldDefinition = request::OBJECT_TYPE;
+const OBJECT_TYPE_QUANT: FieldDefinition = request::OBJECT_TYPE_QUANT;
 
 /// there can be any amount of request field pairs at the end of the message
 /// this function takes n number of request objects and parsers out the remaining request fields
@@ -19,7 +19,7 @@ pub fn create_request_fields<T: FieldDefinitionParser>(parser: &mut T) -> Vec<Fi
         .get_name()
         .expect("request::OBJECT_TYPE is misconfigured: should have a name");
 
-    let mut start_byte = OBJECT_TYPE.positions.start;
+    let mut start_byte = OBJECT_TYPE.positions.bytes.start;
     let n = parser.remaining();
 
     (0..(n.mul(2)))

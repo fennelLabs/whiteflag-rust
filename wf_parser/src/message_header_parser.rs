@@ -1,8 +1,7 @@
 use super::MessageHeader;
 use wf_buffer::WhiteflagBuffer;
 use wf_field::{
-    definitions::test_message_code, Field, FieldDefinition, MessageHeaderOrder,
-    ParsedFieldDefinition,
+    test_message_code, Field, FieldDefinition, MessageHeaderOrder, ParsedFieldDefinition,
 };
 
 pub struct MessageHeaderParser {
