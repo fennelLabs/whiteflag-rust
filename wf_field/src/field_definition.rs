@@ -15,18 +15,11 @@ impl FieldDefinition {
     }
 
     /*
-
-    pub fn next(&self, end: Option<usize>) -> FieldDefinition {
-        let start = self.positions.end.expect("next() assumes an end_byte");
-        let encoding = self.encoding.kind.get_encoding();
-        FieldDefinition {
-            name: None,
-            encoding: encoding.kind.get_encoding(),
-            positions: CodecPositions::new(start, end.unwrap_or(0), encoding),
-        }
+    /// used in the compiling process
+    pub fn read_from_values<'a, T: FieldValue>(&self, values: &'a [T]) -> &'a str {
+        values[self.index].as_ref()
     }
-
-     */
+    */
 
     pub fn new(
         name: &'static str,

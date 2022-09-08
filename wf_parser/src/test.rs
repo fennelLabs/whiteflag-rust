@@ -1,6 +1,5 @@
-use super::{message_header_parser::MessageHeaderParser, MessageHeader};
 use wf_buffer::{BufferReader, WhiteflagBuffer};
-use wf_field::definitions;
+use wf_field::{message_code, test_message_code};
 
 /// hexadecimal whiteflag authentication message
 /// the field values are below
@@ -58,20 +57,18 @@ fn extract_code_for_a_message() {
 #[test]
 fn extract_code_for_a_message_2() {
     let buffer = WhiteflagBuffer::decode_from_hexadecimal(AUTH_MESSAGE).unwrap();
-    let code = MessageHeaderParser::default().message_code().read(&buffer);
+    let code = message_code().read(&buffer);
     assert_eq!("A", code, "extracted message code should be A");
 }
 
 #[test]
 fn extract_code_for_t_message() {
     let buffer = WhiteflagBuffer::decode_from_hexadecimal(TEST_MESSAGE).unwrap();
-    let code = MessageHeaderParser::default().message_code().read(&buffer);
+    let code = message_code().read(&buffer);
 
     assert_eq!("T", code, "extracted message code should be T");
 
-    let test_code = MessageHeaderParser::default()
-        .test_message_code()
-        .read(&buffer);
+    let test_code = test_message_code().read(&buffer);
 
     assert_eq!("M", test_code, "extracted message code should be T");
 }

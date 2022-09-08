@@ -15,7 +15,6 @@ mod field;
 mod field_definition;
 mod field_definition_parser;
 mod header_order;
-mod parsed_field_definition;
 mod request;
 
 #[cfg(test)]
@@ -25,7 +24,6 @@ pub use field::Field;
 pub use field_definition::FieldDefinition;
 pub use field_definition_parser::{FieldDefinitionParser, Parser};
 pub use header_order::MessageHeaderOrder;
-pub use parsed_field_definition::ParsedFieldDefinition;
 
 pub const FIELD_PREFIX: &'static str = "Prefix";
 pub const FIELD_VERSION: &'static str = "Version";

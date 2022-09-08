@@ -30,12 +30,11 @@ impl CodecPositions {
         }
     }
 
-    pub const fn next(&self, config: ByteConfiguration) -> Self {
-        Self::new(config, self.bit_end)
+    /// used in the deserializing process
+    pub fn read_from_serialized<'a>(&self, message: &'a str) -> &'a str {
+        match self.bytes.end {
+            Some(e) => &message[self.bytes.start..e],
+            None => &message[self.bytes.start..],
+        }
     }
-
-    /* pub const fn next(&mut self, start:usize, end:usize) {
-        self.bit_start = Some(start);
-        self.bit_end = Some(end);
-    } */
 }

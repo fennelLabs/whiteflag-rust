@@ -26,17 +26,6 @@ fn test_bit_positions(def: &FieldDefinition, start: usize, end: usize) {
     );
 }
 
-/* fn print() {
-    ParsedFieldDefinition::header().iter().for_each(|f| {
-        println!(
-            "{}\n\tstart: {}\n\tend: {}\n",
-            f.name.unwrap_or("NA"),
-            f.start_bit,
-            f.end_bit
-        );
-    });
-} */
-
 #[test]
 fn test_whiteflag_fields() {
     assert_eq!(WhiteflagFields::HeaderPrefix.get_start_bit(), 0);

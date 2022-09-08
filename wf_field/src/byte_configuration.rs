@@ -1,6 +1,5 @@
-use wf_codec::encoding::{ByteLength, Encoding};
-
 use crate::codec_positions::CodecPositions;
+use wf_codec::encoding::{ByteLength, Encoding};
 
 #[derive(Clone, Copy, Debug)]
 pub struct ByteConfiguration {

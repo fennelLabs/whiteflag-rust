@@ -1,7 +1,7 @@
-use crate::{message_header_parser::MessageHeaderParser, MessageHeader};
 use wf_buffer::{BufferReader, WhiteflagBuffer};
 use wf_field::{
-    convert_value_to_code, get_body_from_code_char, FieldDefinition, FieldValue, MessageHeaderOrder,
+    convert_value_to_code, get_body_from_code_char, message_code, test_message_code,
+    FieldDefinition, FieldValue, MessageHeaderOrder,
 };
 
 #[derive(Debug)]
@@ -12,11 +12,10 @@ pub struct MessageCodeParser {
 
 impl MessageCodeParser {
     pub fn parse_for_decode(message: &WhiteflagBuffer) -> MessageCodeParser {
-        let header = MessageHeaderParser::default();
-        let code = convert_value_to_code(header.message_code().read(&message).as_ref());
+        let code = convert_value_to_code(message_code().read(&message).as_ref());
         let test_code = match code {
             'T' => Some(convert_value_to_code(
-                header.test_message_code().read(&message).as_ref(),
+                test_message_code().read(&message).as_ref(),
             )),
             _ => None,
         };
@@ -28,12 +27,10 @@ impl MessageCodeParser {
     /// the parsed field definitions are field definitions, but contextualized within their proper order
     /// they have their start and end bytes properly set according to their relative field position
     pub fn parse_from_serialized(message: &str) -> MessageCodeParser {
-        let header = MessageHeaderParser::default();
-
-        let code = convert_value_to_code(header.message_code().read_from_serialized(message));
+        let code = convert_value_to_code(message_code().positions.read_from_serialized(message));
         let test_code = if code == 'T' {
             Some(convert_value_to_code(
-                header.test_message_code().read_from_serialized(message),
+                test_message_code().positions.read_from_serialized(message),
             ))
         } else {
             None
