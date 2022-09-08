@@ -3,8 +3,6 @@ use crate::{
 };
 use count_macro::count;
 use paste::paste;
-use seq_macro::seq;
-use wf_codec::encoding::{ByteLength, Encoding};
 
 pub enum FieldKind {
     GENERIC,
@@ -117,12 +115,6 @@ macro_rules! message_fields {
                     )*
 
                     pub const DEFINITIONS: &'static [FieldDefinition] = &[$( $upp, )*];
-
-                    enum MessageFields {
-                        $(
-                            $name,
-                        )*
-                    }
 
                     /* pub mod rx {
                         use regex::Regex;
