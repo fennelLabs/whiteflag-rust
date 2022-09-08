@@ -1,6 +1,6 @@
 use hex::FromHexError;
 use wf_common::{
-    common::{append_bits, crop_bits, extract_bits, remove_hexadecimal_prefix},
+    common::{extract_bits, remove_hexadecimal_prefix},
     constants::BYTE,
 };
 use wf_field::{Field, FieldDefinition};
@@ -11,6 +11,8 @@ mod tests;
 #[cfg(test)]
 mod test_field;
 
+mod common;
+mod converions;
 mod decode;
 mod encode;
 
@@ -39,35 +41,8 @@ impl WhiteflagBuffer {
         }
     }
 
-    pub fn extract_bits(&self, start: usize, end: usize) -> WhiteflagBuffer {
-        WhiteflagBuffer::new(
-            extract_bits(&self.data, self.bit_length, start, end),
-            end - start,
-        )
-    }
-
-    pub fn extract_bits_from(&self, start: usize) -> WhiteflagBuffer {
-        WhiteflagBuffer::new(
-            extract_bits(&self.data, self.bit_length, start, self.bit_length),
-            self.bit_length - start,
-        )
-    }
-
     pub fn append_field(&mut self, field: &Field) {
         self.append(field.into(), None);
-    }
-
-    pub fn append(&mut self, mut buffer: WhiteflagBuffer, bits: Option<usize>) {
-        let bit_length_to_extract = bits.unwrap_or_else(|| buffer.bit_length);
-        let (buffer, length) = append_bits(
-            &self.data,
-            self.bit_length,
-            buffer.to_byte_array(),
-            bit_length_to_extract,
-        );
-
-        self.data = buffer;
-        self.bit_length = length;
     }
 
     pub fn extract_message_field(&self, definition: &FieldDefinition, start_bit: usize) -> Field {
@@ -91,10 +66,6 @@ impl WhiteflagBuffer {
         definition.decode(&field_buffer)
     }
 
-    pub fn crop(&mut self) {
-        crop_bits(self.data.as_mut(), self.bit_length);
-    }
-
     pub fn bit_length(&self) -> usize {
         self.bit_length
     }
@@ -110,65 +81,6 @@ impl WhiteflagBuffer {
     pub fn decode_from_hexadecimal<T: AsRef<str>>(hex: T) -> Result<WhiteflagBuffer, FromHexError> {
         let buffer = decode_hex(hex)?;
         Ok(buffer.into())
-    }
-
-    /// Returns the Whiteflag encoded message as a byte array
-    /// @return a byte array with an encoded message
-    pub fn to_byte_array<'a>(&'a mut self) -> &'a [u8] {
-        crop_bits(self.data.as_mut(), self.bit_length);
-        &self.data
-    }
-}
-
-impl From<(Vec<u8>, usize)> for WhiteflagBuffer {
-    fn from((buffer, bit_length): (Vec<u8>, usize)) -> Self {
-        WhiteflagBuffer::new(buffer, bit_length)
-    }
-}
-
-impl From<WhiteflagBuffer> for (Vec<u8>, usize) {
-    fn from(buffer: WhiteflagBuffer) -> Self {
-        (buffer.data, buffer.bit_length)
-    }
-}
-
-impl AsRef<Vec<u8>> for WhiteflagBuffer {
-    fn as_ref(&self) -> &Vec<u8> {
-        &self.data
-    }
-}
-
-impl AsRef<[u8]> for WhiteflagBuffer {
-    fn as_ref(&self) -> &[u8] {
-        &self.data
-    }
-}
-
-impl From<Vec<u8>> for WhiteflagBuffer {
-    fn from(buffer: Vec<u8>) -> Self {
-        WhiteflagBuffer::from(buffer)
-    }
-}
-
-impl Default for WhiteflagBuffer {
-    fn default() -> Self {
-        Self {
-            data: Default::default(),
-            bit_length: Default::default(),
-        }
-    }
-}
-
-impl From<WhiteflagBuffer> for Vec<u8> {
-    fn from(buffer: WhiteflagBuffer) -> Self {
-        buffer.data
-    }
-}
-
-impl From<&Field> for WhiteflagBuffer {
-    fn from(field: &Field) -> Self {
-        let length = field.bit_length();
-        WhiteflagBuffer::new(field.into(), length)
     }
 }
 
