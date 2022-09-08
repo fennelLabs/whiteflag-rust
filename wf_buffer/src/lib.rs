@@ -3,7 +3,7 @@ use wf_common::{
     common::{append_bits, crop_bits, extract_bits, remove_hexadecimal_prefix},
     constants::BYTE,
 };
-use wf_field::{Field, FieldDefinition, ParsedFieldDefinition};
+use wf_field::{Field, FieldDefinition};
 
 #[cfg(test)]
 mod tests;
@@ -176,9 +176,9 @@ pub trait BufferReader {
     fn read(&self, buffer: &WhiteflagBuffer) -> String;
 }
 
-impl BufferReader for ParsedFieldDefinition {
+impl BufferReader for FieldDefinition {
     /// used in the decoding process
     fn read(&self, buffer: &WhiteflagBuffer) -> String {
-        buffer.extract_message_value(&self, self.start_bit)
+        buffer.extract_message_value(&self, self.positions.bit_start)
     }
 }

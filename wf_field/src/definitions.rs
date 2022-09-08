@@ -17,47 +17,6 @@ pub enum FieldKind {
     REQUEST,
 }
 
-/* pub const fn const_convert(i: usize, position: CodecPositions, configuration: &'static [ByteConfiguration]) -> CodecPositions {
-    let current = configuration[i];
-    let begin = current.to_position(0);
-
-    position.next(config[i])
-
-    if i == 0 {
-        return begin;
-    }
-
-    if let Some(p) = position {
-        return const_convert(i, configuration, Some(p.next(current)));
-    } else {
-        return begin;
-    }
-
-    panic!("recursive solution failed!");
-} */
-
-/* pub const fn next_position(current_index: usize, config: ByteConfiguration, prev: Option<ByteConfiguration>) -> CodecPositions {
-    let mut begin = CodecPositions::start(config);
-    if current_index == 0 {
-        return begin;
-    }
-
-    if let Some(p) = prev {
-        return CodecPositions::new(config, p.);
-    }
-
-
-
-    let mut i = 0;
-    let mut position = 0;
-    while i < current_index {
-        //position += *all_config[i].bit_length();
-        begin = begin.next(*all_config[i]);
-        i += 1;
-    }
-    begin
-} */
-
 pub fn convert(configured_byte_positions: &[ByteConfiguration]) -> Vec<CodecPositions> {
     configured_byte_positions[1..].into_iter().fold(
         vec![configured_byte_positions[0].to_position(0)],
@@ -85,21 +44,6 @@ macro_rules! module {
     };
 }
 
-macro_rules! create_field_definition {
-    (
-        $count:literal, $prev:literal, $config:expr, $var_name:ident, $name:expr, $encoding:expr
-    ) => {
-        paste! {
-            pub const [<POS $count>]: CodecPositions = if $prev == 0 { POS0 } else { [<POS $prev>].next($config) };
-            pub const $var_name: FieldDefinition = FieldDefinition {
-                name: Some($name),
-                encoding: $encoding,
-                positions: [<POS $count>]
-            };
-        }
-    };
-}
-
 macro_rules! message_fields {
     (
         $(
@@ -108,22 +52,83 @@ macro_rules! message_fields {
         )*
     ) => {
         paste! {
+
+            pub const ALL_BYTE_CONFIG: &'static [ByteConfiguration] = &[$(
+                $( ByteConfiguration::new($start, $end, wf_codec::encoding::$encoding), )*
+            )*];
+
+            count! {
+                //#[repr(usize)]
+                #[derive(Copy, Clone)]
+                pub enum WhiteflagFields {
+                    $( $( [<$group $name>] = _int_, )* )*
+                }
+            }
+
+            impl WhiteflagFields {
+                pub const fn get_start_bit(&self) -> usize {
+                    let index = self.as_usize();
+                    if index == 0 { 0 }
+                    else {
+                        // first field after last header field must begin at the last header
+                        let prev_index = if WhiteflagFields::is_first_in_group(&self) { WhiteflagFields::HeaderReferencedMessage.as_usize() } else { index - 1 };
+                        let prev_field = WhiteflagFields::as_enum(prev_index);
+                        ALL_BYTE_CONFIG[prev_index].bit_length() + WhiteflagFields::get_start_bit(&prev_field)
+                    }
+                }
+
+                pub const fn as_usize(&self) -> usize {
+                    *self as usize
+                }
+
+                pub const fn as_enum(i: usize) -> Self {
+                    count! {
+                        match i {
+                            $( $( _int_ => WhiteflagFields::[<$group $name>], )* )*
+                            _ => panic!("number is not supported!"),
+                        }
+                    }
+                }
+
+                pub const fn get_byte_config(&self) -> ByteConfiguration {
+                    ALL_BYTE_CONFIG[self.as_usize()]
+                }
+
+                pub const fn is_first_in_group(&self) -> bool {
+                    match &self {
+                        WhiteflagFields::HeaderPrefix => true,
+                        WhiteflagFields::AuthenticationVerificationMethod => true,
+                        WhiteflagFields::CryptoCryptoDataType => true,
+                        WhiteflagFields::FreeTextText => true,
+                        WhiteflagFields::ResourceResourceMethod => true,
+                        WhiteflagFields::TestPseudoMessageCode => true,
+                        WhiteflagFields::SignSubjectCode => true,
+                        WhiteflagFields::RequestObjectType => true,
+                        _ => false,
+                    }
+                }
+
+                pub const fn create_codec_position(&self) -> CodecPositions {
+                    CodecPositions::new(
+                        WhiteflagFields::get_byte_config(self),
+                        WhiteflagFields::get_start_bit(self)
+                    )
+                }
+            }
+
             $(
                 pub mod [<$group:lower>] {
                     use super::*;
 
                     module!(names, $( pub const $upp: &str = stringify!($name); )*);
-                    module!(config, $( pub const $upp: ByteConfiguration = ByteConfiguration::new($start, $end, wf_codec::encoding::$encoding); )*);
 
-                    pub const BYTE_CONFIG: &'static [ByteConfiguration] = &[$( config::$upp, )*];
-
-                    count!{
-                        const POS_int_name_: CodecPositions = CodecPositions::start(BYTE_CONFIG[_int_]);
-
-                        $(
-                            create_field_definition!(_int_name_, _int_prev_, config::$upp, $upp, names::$upp, wf_codec::encoding::$encoding);
-                        )*
-                    }
+                    $(
+                        pub const $upp: FieldDefinition = FieldDefinition {
+                            name: Some(names::$upp),
+                            encoding: wf_codec::encoding::$encoding,
+                            positions: WhiteflagFields::[<$group $name>].create_codec_position()
+                        };
+                    )*
 
                     pub const DEFINITIONS: &'static [FieldDefinition] = &[$( $upp, )*];
 
@@ -133,12 +138,12 @@ macro_rules! message_fields {
                         )*
                     }
 
-                    pub mod rx {
+                    /* pub mod rx {
                         use regex::Regex;
                         lazy_static!{
                             $( pub static ref $upp: Regex = Regex::new($pat).unwrap(); )*
                         }
-                    }
+                    } */
                 }
             )*
         }
