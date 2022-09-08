@@ -1,10 +1,8 @@
 use wf_buffer::WhiteflagBuffer;
 use wf_field::{
-    convert_value_to_code, definitions, get_body_from_code, Field, FieldDefinition,
+    convert_value_to_code, definitions, get_body_from_code, Field, FieldDefinition, MessageHeader,
     MessageHeaderOrder,
 };
-
-use super::MessageHeader;
 
 pub struct MessageHeaderValues {
     values: Vec<String>,

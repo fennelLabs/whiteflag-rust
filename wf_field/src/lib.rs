@@ -117,3 +117,15 @@ pub fn message_code() -> &'static FieldDefinition {
 pub fn test_message_code() -> &'static FieldDefinition {
     &test::PSEUDO_MESSAGE_CODE
 }
+
+pub trait MessageHeader {
+    type Target: ?Sized;
+
+    fn prefix(&self) -> &Self::Target;
+    fn version(&self) -> &Self::Target;
+    fn encryption_indicator(&self) -> &Self::Target;
+    fn duress_indicator(&self) -> &Self::Target;
+    fn message_code(&self) -> &Self::Target;
+    fn reference_indicator(&self) -> &Self::Target;
+    fn referenced_message(&self) -> &Self::Target;
+}
