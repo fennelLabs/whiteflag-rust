@@ -20,10 +20,12 @@ mod request;
 #[cfg(test)]
 mod test_field_definition;
 
-pub use field::Field;
-pub use field_definition::FieldDefinition;
-pub use field_definition_parser::{FieldDefinitionParser, Parser};
-pub use header_order::MessageHeaderOrder;
+pub use {
+    field::Field,
+    field_definition::FieldDefinition,
+    field_definition_parser::{FieldDefinitionParser, Parser},
+    header_order::MessageHeaderOrder,
+};
 
 pub const FIELD_PREFIX: &'static str = "Prefix";
 pub const FIELD_VERSION: &'static str = "Version";

@@ -2,21 +2,16 @@ use super::WhiteflagBuffer;
 use wf_field::Field;
 
 impl WhiteflagBuffer {
-    /**
-     * Encodes this message segment
-     * @return a binary buffer with the binary encoded message segment and its bit length
-     * @throws WfCoreException if the message cannot be encoded
-     */
+    /// encodes given array of [`Field`] and appends them into the buffer
+    ///
+    /// # Arguments
+    ///
+    /// * `fields` - array of fields to append and encode into the buffer
     pub fn encode(&mut self, fields: &[Field]) {
-        //let cursor = self.fields[0].start_byte;
-        fields.into_iter().for_each(|f| {
-            /* if (field.startByte != byteCursor) {
-                throw new WfCoreException("Invalid field order while encoding: did not expect field " + field.debugInfo() + " at byte " + byteCursor, null);
-            } */
+        fields.into_iter().for_each(|f| self.append_field(f));
+    }
 
-            self.append_field(f);
-
-            //byteCursor = field.endByte;
-        });
+    pub fn append_field(&mut self, field: &Field) {
+        self.append(field.into(), None);
     }
 }

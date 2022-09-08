@@ -7,5 +7,7 @@ mod error;
 pub mod hexadecimal;
 pub mod latlong;
 
+pub use error::{CodecError, CodecResult};
+
 #[cfg(test)]
 mod validation_tests;

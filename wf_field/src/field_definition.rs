@@ -78,7 +78,7 @@ impl FieldDefinition {
     }
 
     pub fn decode(&self, data: &[u8]) -> String {
-        match self.bytes.encoding.decode(data, self.bit_length()) {
+        match self.positions.bytes.decode(data) {
             Ok(r) => r,
             Err(e) => {
                 panic!("error: {}\n\t{:#?}", e, &self);

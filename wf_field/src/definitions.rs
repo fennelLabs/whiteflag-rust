@@ -15,9 +15,6 @@ pub enum FieldKind {
     REQUEST,
 }
 
-// declarative macros
-// fragment specs: https://veykril.github.io/tlborm/decl-macros/minutiae/fragment-specifiers.html
-// https://docs.rs/paste/latest/paste/#case-conversion
 macro_rules! module {
     (
         $name:ident, $($code:item)*

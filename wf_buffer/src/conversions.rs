@@ -1,7 +1,11 @@
-use crate::{decode_hex, WhiteflagBuffer};
+use crate::WhiteflagBuffer;
 use hex::FromHexError;
-use wf_common::constants::BYTE;
+use wf_common::{common::remove_hexadecimal_prefix, constants::BYTE};
 use wf_field::Field;
+
+pub fn decode_hex<T: AsRef<str>>(value: T) -> Result<Vec<u8>, FromHexError> {
+    hex::decode(remove_hexadecimal_prefix(value.as_ref()))
+}
 
 impl WhiteflagBuffer {
     pub fn from(buffer: Vec<u8>) -> Self {

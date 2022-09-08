@@ -1,5 +1,8 @@
 use crate::codec_positions::CodecPositions;
-use wf_codec::encoding::{ByteLength, Encoding};
+use wf_codec::{
+    encoding::{ByteLength, Encoding},
+    CodecResult,
+};
 
 #[derive(Clone, Copy, Debug)]
 pub struct ByteConfiguration {
@@ -41,5 +44,31 @@ impl ByteConfiguration {
 
     pub const fn to_position(self, bit_start: usize) -> CodecPositions {
         CodecPositions::new(self, bit_start)
+    }
+
+    pub fn decode(&self, data: &[u8]) -> CodecResult<String> {
+        self.encoding.decode(data, self.bit_length())
+    }
+}
+
+struct ByteCursorTracker {
+    cursor: usize,
+}
+
+impl ByteCursorTracker {
+    pub fn new(bytes: ByteConfiguration) -> Self {
+        Self {
+            cursor: bytes.start,
+        }
+    }
+
+    pub fn validate(&mut self, bytes: ByteConfiguration) -> Result<(), String> {
+        if bytes.start != self.cursor {
+            return Err(format!("start byte should match byte cursor\n\ttracked cursor: {}\n\tgiven start cursor: {}", self.cursor, bytes.start));
+        }
+
+        self.cursor = bytes.end.unwrap_or(0);
+
+        Ok(())
     }
 }
