@@ -1,4 +1,7 @@
-use crate::{byte_configuration::ByteConfiguration, codec_positions::CodecPositions, Field};
+use crate::{
+    byte_configuration::ByteConfiguration, codec_positions::CodecPositions,
+    definitions::WhiteflagFields, Field,
+};
 use wf_codec::encoding::Encoding;
 use wf_validation::{Validation, ValidationError};
 
@@ -19,6 +22,13 @@ impl std::ops::Deref for FieldDefinition {
 impl FieldDefinition {
     pub fn get_name(&self) -> Option<&'static str> {
         self.name
+    }
+
+    pub const fn create_definition(name: &'static str, field: WhiteflagFields) -> Self {
+        Self {
+            name: Some(name),
+            positions: field.create_codec_position(),
+        }
     }
 
     /*

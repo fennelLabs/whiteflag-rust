@@ -110,10 +110,10 @@ macro_rules! message_fields {
                     module!(names, $( pub const $upp: &str = stringify!($name); )*);
 
                     $(
-                        pub const $upp: FieldDefinition = FieldDefinition {
-                            name: Some(names::$upp),
-                            positions: WhiteflagFields::[<$group $name>].create_codec_position()
-                        };
+                        pub const $upp: FieldDefinition = FieldDefinition::create_definition(
+                            names::$upp,
+                            WhiteflagFields::[<$group $name>]
+                        );
                     )*
 
                     pub const DEFINITIONS: &'static [FieldDefinition] = &[$( $upp, )*];
