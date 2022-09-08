@@ -1,7 +1,6 @@
 use hex::FromHexError;
 use wf_common::{
     common::{extract_bits, remove_hexadecimal_prefix},
-    constants::BYTE,
 };
 use wf_field::{Field, FieldDefinition};
 
@@ -26,21 +25,6 @@ pub struct WhiteflagBuffer {
 }
 
 impl WhiteflagBuffer {
-    pub fn from(buffer: Vec<u8>) -> Self {
-        let bit_length = buffer.len() * BYTE;
-        WhiteflagBuffer {
-            data: buffer,
-            bit_length,
-        }
-    }
-
-    pub fn new(buffer: Vec<u8>, bit_length: usize) -> Self {
-        WhiteflagBuffer {
-            data: buffer,
-            bit_length,
-        }
-    }
-
     pub fn append_field(&mut self, field: &Field) {
         self.append(field.into(), None);
     }
@@ -68,19 +52,6 @@ impl WhiteflagBuffer {
 
     pub fn bit_length(&self) -> usize {
         self.bit_length
-    }
-
-    pub fn as_hex(&self) -> String {
-        hex::encode(&self.data)
-    }
-
-    /**
-     * decodes a hexadecimal string into a buffer and includes bit_length
-     * java equivalent: WfBinaryBuffer.convertToByteArray
-     */
-    pub fn decode_from_hexadecimal<T: AsRef<str>>(hex: T) -> Result<WhiteflagBuffer, FromHexError> {
-        let buffer = decode_hex(hex)?;
-        Ok(buffer.into())
     }
 }
 

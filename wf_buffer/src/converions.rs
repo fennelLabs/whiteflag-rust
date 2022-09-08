@@ -1,5 +1,37 @@
-use crate::WhiteflagBuffer;
+use crate::{decode_hex, WhiteflagBuffer};
+use hex::FromHexError;
+use wf_common::constants::BYTE;
 use wf_field::Field;
+
+impl WhiteflagBuffer {
+    pub fn from(buffer: Vec<u8>) -> Self {
+        let bit_length = buffer.len() * BYTE;
+        WhiteflagBuffer {
+            data: buffer,
+            bit_length,
+        }
+    }
+
+    pub fn new(buffer: Vec<u8>, bit_length: usize) -> Self {
+        WhiteflagBuffer {
+            data: buffer,
+            bit_length,
+        }
+    }
+
+    pub fn as_hex(&self) -> String {
+        hex::encode(&self.data)
+    }
+
+    /**
+     * decodes a hexadecimal string into a buffer and includes bit_length
+     * java equivalent: WfBinaryBuffer.convertToByteArray
+     */
+    pub fn decode_from_hexadecimal<T: AsRef<str>>(hex: T) -> Result<WhiteflagBuffer, FromHexError> {
+        let buffer = decode_hex(hex)?;
+        Ok(buffer.into())
+    }
+}
 
 impl From<(Vec<u8>, usize)> for WhiteflagBuffer {
     fn from((buffer, bit_length): (Vec<u8>, usize)) -> Self {
