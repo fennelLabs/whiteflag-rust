@@ -7,11 +7,15 @@ pub struct CodecPositions {
     is_fixed: bool,
     /// (length * encoding.bit_length) unless is_fixed is true, then it is equal to encoding.bit_length
     bit_length: usize,
-    bit_start: usize,
-    bit_end: usize,
+    pub bit_start: usize,
+    pub bit_end: usize,
 }
 
 impl CodecPositions {
+    pub const fn start(config: ByteConfiguration) -> Self {
+        Self::new(config, 0)
+    }
+
     pub const fn new(config: ByteConfiguration, bit_start: usize) -> Self {
         let is_fixed = config.is_fixed();
         let bit_length = config.bit_length();

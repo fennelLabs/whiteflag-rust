@@ -1,7 +1,9 @@
 use crate::{
     byte_configuration::ByteConfiguration, codec_positions::CodecPositions, FieldDefinition,
 };
+use count_macro::count;
 use paste::paste;
+use seq_macro::seq;
 use wf_codec::encoding::{ByteLength, Encoding};
 
 pub enum FieldKind {
@@ -15,18 +17,45 @@ pub enum FieldKind {
     REQUEST,
 }
 
-/* pub const fn convert(configured_byte_positions: &'static [ByteConfiguration]) {
-    let mut i = 1;
-    let start = CodecPositions::new(configured_byte_positions[0], 0);
-    let length: usize = configured_byte_positions.len();
+/* pub const fn const_convert(i: usize, position: CodecPositions, configuration: &'static [ByteConfiguration]) -> CodecPositions {
+    let current = configuration[i];
+    let begin = current.to_position(0);
 
-    let s: [u32; length] = [0; 10];
+    position.next(config[i])
 
-    while i < configured_byte_positions.len() {
-        let current = configured_byte_positions[i];
-        start.next(current);
+    if i == 0 {
+        return begin;
+    }
+
+    if let Some(p) = position {
+        return const_convert(i, configuration, Some(p.next(current)));
+    } else {
+        return begin;
+    }
+
+    panic!("recursive solution failed!");
+} */
+
+/* pub const fn next_position(current_index: usize, config: ByteConfiguration, prev: Option<ByteConfiguration>) -> CodecPositions {
+    let mut begin = CodecPositions::start(config);
+    if current_index == 0 {
+        return begin;
+    }
+
+    if let Some(p) = prev {
+        return CodecPositions::new(config, p.);
+    }
+
+
+
+    let mut i = 0;
+    let mut position = 0;
+    while i < current_index {
+        //position += *all_config[i].bit_length();
+        begin = begin.next(*all_config[i]);
         i += 1;
     }
+    begin
 } */
 
 pub fn convert(configured_byte_positions: &[ByteConfiguration]) -> Vec<CodecPositions> {
@@ -44,7 +73,7 @@ pub fn convert(configured_byte_positions: &[ByteConfiguration]) -> Vec<CodecPosi
 
 // declarative macros
 // fragment specs: https://veykril.github.io/tlborm/decl-macros/minutiae/fragment-specifiers.html
-
+// https://docs.rs/paste/latest/paste/#case-conversion
 macro_rules! module {
     (
         $name:ident, $($code:item)*
@@ -52,6 +81,21 @@ macro_rules! module {
         pub mod $name {
             use super::*;
             $( $code )*
+        }
+    };
+}
+
+macro_rules! create_field_definition {
+    (
+        $count:literal, $prev:literal, $config:expr, $var_name:ident, $name:expr, $encoding:expr
+    ) => {
+        paste! {
+            pub const [<POS $count>]: CodecPositions = if $prev == 0 { POS0 } else { [<POS $prev>].next($config) };
+            pub const $var_name: FieldDefinition = FieldDefinition {
+                name: Some($name),
+                encoding: $encoding,
+                positions: [<POS $count>]
+            };
         }
     };
 }
@@ -69,13 +113,17 @@ macro_rules! message_fields {
                     use super::*;
 
                     module!(names, $( pub const $upp: &str = stringify!($name); )*);
-                    module!(positions, $( pub const $upp: ByteConfiguration = ByteConfiguration::new($start, $end, wf_codec::encoding::$encoding); )*);
+                    module!(config, $( pub const $upp: ByteConfiguration = ByteConfiguration::new($start, $end, wf_codec::encoding::$encoding); )*);
 
-                    $( pub const $upp: FieldDefinition = FieldDefinition {
-                        name: Some(names::$upp),
-                        encoding: wf_codec::encoding::$encoding,
-                        positions: CodecPositions::new(positions::$upp, 0),
-                    }; )*
+                    pub const BYTE_CONFIG: &'static [ByteConfiguration] = &[$( config::$upp, )*];
+
+                    count!{
+                        const POS_int_name_: CodecPositions = CodecPositions::start(BYTE_CONFIG[_int_]);
+
+                        $(
+                            create_field_definition!(_int_name_, _int_prev_, config::$upp, $upp, names::$upp, wf_codec::encoding::$encoding);
+                        )*
+                    }
 
                     pub const DEFINITIONS: &'static [FieldDefinition] = &[$( $upp, )*];
 
