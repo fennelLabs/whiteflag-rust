@@ -5,8 +5,15 @@ use wf_validation::{Validation, ValidationError};
 #[derive(Clone, Debug)]
 pub struct FieldDefinition {
     pub name: Option<&'static str>,
-    pub encoding: Encoding,
     pub positions: CodecPositions,
+}
+
+impl std::ops::Deref for FieldDefinition {
+    type Target = CodecPositions;
+
+    fn deref(&self) -> &Self::Target {
+        &self.positions
+    }
 }
 
 impl FieldDefinition {
@@ -29,7 +36,6 @@ impl FieldDefinition {
     ) -> FieldDefinition {
         FieldDefinition {
             name: Some(name),
-            encoding: encoding.kind.get_encoding(),
             positions: CodecPositions::new(
                 ByteConfiguration::new(start_byte, end_byte, encoding),
                 0,
@@ -44,7 +50,6 @@ impl FieldDefinition {
     ) -> FieldDefinition {
         FieldDefinition {
             name: None,
-            encoding: encoding.kind.get_encoding(),
             positions: CodecPositions::new(
                 ByteConfiguration::new(start_byte, end_byte, encoding),
                 0,
@@ -63,7 +68,7 @@ impl FieldDefinition {
     }
 
     pub fn decode(&self, data: &[u8]) -> String {
-        match self.encoding.decode(data, self.bit_length()) {
+        match self.bytes.encoding.decode(data, self.bit_length()) {
             Ok(r) => r,
             Err(e) => {
                 panic!("error: {}\n\t{:#?}", e, &self);
@@ -77,7 +82,7 @@ impl FieldDefinition {
     }
 
     pub fn encode(&self, data: String) -> Vec<u8> {
-        self.encoding.encode(data)
+        self.bytes.encoding.encode(data)
     }
 
     /// returns the byte length of the unencoded field value
@@ -97,6 +102,7 @@ impl FieldDefinition {
      */
     pub fn bit_length(&self) -> usize {
         return self
+            .bytes
             .encoding
             .convert_to_bit_length(self.expected_byte_length().unwrap_or(0));
     }
@@ -115,7 +121,7 @@ impl Validation for FieldDefinition {
                     self.get_name().unwrap_or(NULL_FIELD_NAME)
                 ),
             }),
-            _ => self.encoding.validate(value),
+            _ => self.bytes.encoding.validate(value),
         }
     }
 }

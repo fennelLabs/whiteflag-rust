@@ -41,7 +41,7 @@ impl Field {
     }
 
     pub fn encode(&self) -> Vec<u8> {
-        self.definition.encoding.encode(&self.value)
+        self.definition.bytes.encoding.encode(&self.value)
     }
 
     pub fn encode_as_hex(&self) -> String {
@@ -49,7 +49,12 @@ impl Field {
     }
 
     pub fn decode(&mut self, data: &[u8]) -> String {
-        let s = match self.definition.encoding.decode(data, self.bit_length()) {
+        let s = match self
+            .definition
+            .bytes
+            .encoding
+            .decode(data, self.bit_length())
+        {
             Ok(r) => r,
             Err(e) => {
                 panic!("error: {}\n\t{:#?}", e, &self);
@@ -78,6 +83,7 @@ impl Field {
     pub fn bit_length(&self) -> usize {
         return self
             .definition
+            .bytes
             .encoding
             .convert_to_bit_length(self.byte_length());
     }
@@ -99,7 +105,7 @@ impl Field {
             self.bit_length()
         } else {
             let mut bit_length = message_buffer_bit_length - start_bit;
-            bit_length -= bit_length % &self.definition.encoding.bit_length;
+            bit_length -= bit_length % &self.definition.bytes.encoding.bit_length;
             bit_length
         };
 

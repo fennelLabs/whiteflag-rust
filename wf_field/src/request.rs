@@ -33,13 +33,13 @@ pub fn create_request_fields<T: FieldDefinitionParser>(parser: &mut T) -> Vec<Fi
             start_byte = byte_end;
 
             let ot = FieldDefinition::new_without_name(
-                OBJECT_TYPE.encoding.kind.get_encoding(),
+                OBJECT_TYPE.bytes.encoding.kind.get_encoding(),
                 byte_start,
                 byte_split,
             );
 
             let oq = FieldDefinition::new_without_name(
-                OBJECT_TYPE_QUANT.encoding.kind.get_encoding(),
+                OBJECT_TYPE_QUANT.bytes.encoding.kind.get_encoding(),
                 byte_split,
                 byte_end,
             );

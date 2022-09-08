@@ -112,7 +112,6 @@ macro_rules! message_fields {
                     $(
                         pub const $upp: FieldDefinition = FieldDefinition {
                             name: Some(names::$upp),
-                            encoding: wf_codec::encoding::$encoding,
                             positions: WhiteflagFields::[<$group $name>].create_codec_position()
                         };
                     )*

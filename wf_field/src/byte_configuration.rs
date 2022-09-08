@@ -6,7 +6,7 @@ pub struct ByteConfiguration {
     pub start: usize,
     /// most fields will have an end byte, but some are unbounded
     pub end: Option<usize>,
-    encoding: Encoding,
+    pub encoding: Encoding,
     /// (end - start) unless the encoding has a fixed byte length or it is the last field and isn't bounded (end = 0 or None)
     pub length: ByteLength,
 }
