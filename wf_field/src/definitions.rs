@@ -4,17 +4,6 @@ use crate::{
 use count_macro::count;
 use paste::paste;
 
-pub enum FieldKind {
-    GENERIC,
-    AUTHENTICATION,
-    CRYPTO,
-    TEXT,
-    RESOURCE,
-    TEST,
-    SIGNAL,
-    REQUEST,
-}
-
 macro_rules! module {
     (
         $name:ident, $($code:item)*

@@ -11,7 +11,6 @@ mod crypted_buffer;
 pub mod error;
 pub mod message;
 mod segment;
-mod types;
 mod wf_message_builder;
 
 use message::Message;

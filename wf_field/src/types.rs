@@ -1,6 +1,6 @@
-use wf_field::{get_body_from_code_char, FieldDefinition};
+use crate::{definitions::*, get_body_from_code_char, Field, FieldDefinition};
 
-struct MessageType {
+/* struct MessageType {
     pub message_code: char,
     pub definitions: Vec<FieldDefinition>,
 }
@@ -17,9 +17,69 @@ impl MessageType {
             definitions: get_body_from_code_char(code),
         }
     }
+} */
+
+/* pub enum FieldKind {
+    GENERIC,
+    AUTHENTICATION,
+    CRYPTO,
+    TEXT,
+    RESOURCE,
+    TEST,
+    SIGNAL,
+    REQUEST,
+} */
+
+/*
+match code {
+        'A' => authentication::DEFINITIONS,
+        'K' => crypto::DEFINITIONS,
+        'T' => test::DEFINITIONS,
+        'R' => resource::DEFINITIONS,
+        'F' => freetext::DEFINITIONS,
+        'P' | 'E' | 'D' | 'S' | 'I' | 'M' | 'Q' => sign::DEFINITIONS,
+        _ => panic!("'{}' is not a valid message code", code),
+    } */
+
+impl MessageType {
+    pub fn from_code(code: char) -> Self {
+        match code {
+            'A' => MessageType::Authentication,
+            'K' => MessageType::Cryptographic,
+            'T' => MessageType::Test,
+            'R' => MessageType::Resource,
+            'F' => MessageType::FreeText,
+            'P' => MessageType::Protective,
+            'E' => MessageType::Emergency,
+            'D' => MessageType::Danger,
+            'S' => MessageType::Status,
+            'I' => MessageType::Infrastructure,
+            'M' => MessageType::Mission,
+            'Q' => MessageType::Request,
+            _ => MessageType::Any,
+        }
+    }
+
+    pub fn definitions(&self) -> &'static [FieldDefinition] {
+        match &self {
+            MessageType::Any => panic!("no definition fields for undefined message type"),
+            MessageType::Authentication => authentication::DEFINITIONS,
+            MessageType::Cryptographic => crypto::DEFINITIONS,
+            MessageType::Test => test::DEFINITIONS,
+            MessageType::Resource => resource::DEFINITIONS,
+            MessageType::FreeText => freetext::DEFINITIONS,
+            MessageType::Protective
+            | MessageType::Emergency
+            | MessageType::Danger
+            | MessageType::Status
+            | MessageType::Infrastructure
+            | MessageType::Mission
+            | MessageType::Request => sign::DEFINITIONS,
+        }
+    }
 }
 
-enum MessageTypeEnum {
+enum MessageType {
     /**
      * Undefined message type
      */
