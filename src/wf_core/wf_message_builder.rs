@@ -1,4 +1,3 @@
-use super::message::Message;
 use std::ops::Div;
 use wf_buffer::WhiteflagBuffer;
 use wf_field::{FieldDefinition, FieldDefinitionParser, FieldValue, Parser};
@@ -84,40 +83,23 @@ impl FieldDefinitionParser for EncodedMessageParser {
     }
 }
 
-pub struct WhiteflagMessageBuilder<F: FieldDefinitionParser> {
-    parser: F,
-}
-
-pub fn builder_from_field_values<T: FieldValue>(
-    data: &[T],
-) -> WhiteflagMessageBuilder<FieldValuesParser<T>> {
+pub fn builder_from_field_values<T: FieldValue>(data: &[T]) -> Parser {
     let parser = FieldValuesParser { data, index: 0 };
-    WhiteflagMessageBuilder { parser }
+    Parser::parse(parser)
 }
 
-pub fn builder_from_serialized<'a>(
-    message: &'a str,
-) -> WhiteflagMessageBuilder<SerializedMessageParser<'a>> {
+pub fn builder_from_serialized<'a>(message: &'a str) -> Parser {
     let parser = SerializedMessageParser {
         message,
         last_byte: 0,
     };
-    WhiteflagMessageBuilder { parser }
+    Parser::parse(parser)
 }
 
-pub fn builder_from_encoded(
-    message: WhiteflagBuffer,
-) -> WhiteflagMessageBuilder<EncodedMessageParser> {
+pub fn builder_from_encoded(message: WhiteflagBuffer) -> Parser {
     let parser = EncodedMessageParser {
         buffer: message,
         bit_cursor: 0,
     };
-    WhiteflagMessageBuilder { parser }
-}
-
-impl<F: FieldDefinitionParser> WhiteflagMessageBuilder<F> {
-    pub fn compile(self) -> Message {
-        let message = Parser::parse(self.parser);
-        Message::new(message.code, message.header, message.body, None, None)
-    }
+    Parser::parse(parser)
 }
