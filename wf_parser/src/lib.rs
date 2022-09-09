@@ -3,6 +3,11 @@ use wf_field::{definitions, Field, FieldDefinition};
 #[cfg(test)]
 mod test;
 
+mod header;
+mod parser;
+
+pub use parser::Parser;
+
 pub fn convert_definitions<F>(
     defs: &'static [FieldDefinition],
     convert: F,

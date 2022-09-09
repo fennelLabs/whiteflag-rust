@@ -1,7 +1,4 @@
-use crate::{
-    definitions, header::Header, request::create_request_fields, types::MessageType, Field,
-    FieldDefinition, MessageHeaderOrder,
-};
+use crate::{definitions, types::MessageType, Field, FieldDefinition, MessageHeaderOrder};
 
 pub trait FieldDefinitionParser {
     fn parse(&mut self, definition: &FieldDefinition) -> String;
@@ -11,7 +8,7 @@ pub trait FieldDefinitionParser {
 
 pub trait FieldDefinitionParserBase {
     fn parse_fields(&mut self, field_defs: Vec<FieldDefinition>) -> Vec<Field>;
-    fn parse_header(&mut self) -> Header;
+    fn parse_header(&mut self) -> Vec<Field>;
 }
 
 impl<T: FieldDefinitionParser> FieldDefinitionParserBase for T {
@@ -30,46 +27,10 @@ impl<T: FieldDefinitionParser> FieldDefinitionParserBase for T {
             .collect()
     }
 
-    fn parse_header(&mut self) -> Header {
+    fn parse_header(&mut self) -> Vec<Field> {
         let definitions = definitions::header::DEFINITIONS;
         let fields = self.parse_fields(definitions.to_vec());
-        let code: MessageType =
-            MessageType::get_message_code(fields[MessageHeaderOrder::MessageCode.as_usize()].get());
 
-        Header::new(fields, code)
-    }
-}
-
-pub struct Parser {
-    pub code: MessageType,
-    pub header: Vec<Field>,
-    pub body: Vec<Field>,
-}
-
-impl Parser {
-    pub fn parse<T: FieldDefinitionParser>(mut parser: T) -> Self {
-        let mut header = parser.parse_header();
-
-        let mut body = Vec::new();
-
-        // parses and adds pseudo code field to body if message type is 'T'
-        if let Some(pc) = header.check_for_pseudo_code(&mut parser) {
-            body.push(pc);
-        }
-
-        let code = header.code();
-
-        let body_defs = code.definitions().to_vec();
-        body.append(parser.parse_fields(body_defs).as_mut());
-
-        if code == MessageType::Request {
-            body.append(create_request_fields(&mut parser).as_mut());
-        }
-
-        Parser {
-            code,
-            header: header.fields(),
-            body,
-        }
+        fields
     }
 }

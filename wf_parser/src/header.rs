@@ -1,26 +1,5 @@
-use crate::{definitions, types::MessageType, Field, FieldDefinition, FieldDefinitionParser};
-
-#[repr(usize)]
-#[derive(Copy, Clone)]
-pub enum MessageHeaderOrder {
-    Prefix = 0,
-    Version = 1,
-    EncryptionIndicator = 2,
-    DuressIndicator = 3,
-    MessageCode = 4,
-    ReferenceIndicator = 5,
-    ReferencedMessage = 6,
-}
-
-impl<'a> MessageHeaderOrder {
-    pub fn as_usize(&self) -> usize {
-        *self as usize
-    }
-
-    pub fn get<'b>(&'a self, fields: &'b [Field]) -> &'b Field {
-        &fields[self.as_usize()]
-    }
-}
+use wf_field::MessageHeaderOrder;
+use wf_field::{definitions, Field, FieldDefinitionParser, MessageType};
 
 pub struct Header {
     fields: Vec<Field>,
@@ -29,7 +8,10 @@ pub struct Header {
 }
 
 impl Header {
-    pub fn new(fields: Vec<Field>, code: MessageType) -> Self {
+    pub fn new(fields: Vec<Field>) -> Self {
+        let code: MessageType =
+            MessageType::get_message_code(fields[MessageHeaderOrder::MessageCode.as_usize()].get());
+
         Self {
             fields,
             code,

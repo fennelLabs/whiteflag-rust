@@ -10,7 +10,8 @@ use fennel_lib::FennelCipher;
 use wf_account::test_impl::WhiteflagAccount;
 use wf_buffer::WhiteflagBuffer;
 use wf_crypto::encryption_method::WhiteflagEncryptionMethod;
-use wf_field::{Field, MessageType, Parser};
+use wf_field::{Field, MessageType};
+use wf_parser::Parser;
 
 const METAKEY_ORIGINATOR: &str = "originatorAddress";
 const METAKEY_RECIPIENT: &str = "recipientAddress";

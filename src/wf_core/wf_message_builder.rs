@@ -1,6 +1,7 @@
 use std::ops::Div;
 use wf_buffer::WhiteflagBuffer;
-use wf_field::{FieldDefinition, FieldDefinitionParser, FieldValue, Parser};
+use wf_field::{FieldDefinition, FieldDefinitionParser, FieldValue};
+use wf_parser::Parser;
 use wf_validation::Validation;
 
 pub struct SerializedMessageParser<'a> {
