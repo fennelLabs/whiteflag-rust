@@ -1,9 +1,8 @@
-use super::wf_message_builder::FieldDefinitionParser;
+use crate::{definitions::*, Field, FieldDefinition, FieldDefinitionParser};
 use std::ops::Mul;
-use wf_field::{definitions::*, Field, FieldDefinition};
 
-const OBJECT_TYPE: FieldDefinition = Request::OBJECT_TYPE;
-const OBJECT_TYPE_QUANT: FieldDefinition = Request::OBJECT_TYPE_QUANT;
+const OBJECT_TYPE: FieldDefinition = request::OBJECT_TYPE;
+const OBJECT_TYPE_QUANT: FieldDefinition = request::OBJECT_TYPE_QUANT;
 
 /// there can be any amount of request field pairs at the end of the message
 /// this function takes n number of request objects and parsers out the remaining request fields
@@ -20,7 +19,7 @@ pub fn create_request_fields<T: FieldDefinitionParser>(parser: &mut T) -> Vec<Fi
         .get_name()
         .expect("request::OBJECT_TYPE is misconfigured: should have a name");
 
-    let mut start_byte = OBJECT_TYPE.start_byte;
+    let mut start_byte = OBJECT_TYPE.positions.bytes.start;
     let n = parser.remaining();
 
     (0..(n.mul(2)))
@@ -34,13 +33,13 @@ pub fn create_request_fields<T: FieldDefinitionParser>(parser: &mut T) -> Vec<Fi
             start_byte = byte_end;
 
             let ot = FieldDefinition::new_without_name(
-                OBJECT_TYPE.encoding.kind.get_encoding(),
+                OBJECT_TYPE.bytes.encoding.kind.get_encoding(),
                 byte_start,
                 byte_split,
             );
 
             let oq = FieldDefinition::new_without_name(
-                OBJECT_TYPE_QUANT.encoding.kind.get_encoding(),
+                OBJECT_TYPE_QUANT.bytes.encoding.kind.get_encoding(),
                 byte_split,
                 byte_end,
             );

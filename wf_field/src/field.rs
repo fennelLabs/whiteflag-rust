@@ -1,5 +1,4 @@
 use super::field_definition::FieldDefinition;
-use wf_common::common::extract_bits;
 
 #[derive(Clone, Debug)]
 pub struct Field {
@@ -41,7 +40,7 @@ impl Field {
     }
 
     pub fn encode(&self) -> Vec<u8> {
-        self.definition.encoding.encode(&self.value)
+        self.definition.bytes.encoding.encode(&self.value)
     }
 
     pub fn encode_as_hex(&self) -> String {
@@ -49,7 +48,12 @@ impl Field {
     }
 
     pub fn decode(&mut self, data: &[u8]) -> String {
-        let s = match self.definition.encoding.decode(data, self.bit_length()) {
+        let s = match self
+            .definition
+            .bytes
+            .encoding
+            .decode(data, self.bit_length())
+        {
             Ok(r) => r,
             Err(e) => {
                 panic!("error: {}\n\t{:#?}", e, &self);
@@ -78,39 +82,9 @@ impl Field {
     pub fn bit_length(&self) -> usize {
         return self
             .definition
+            .bytes
             .encoding
             .convert_to_bit_length(self.byte_length());
-    }
-
-    /**
-     * Extracts and decodes a Whiteflag message field from the binary buffer
-     * @param field the message field to be extracted and decoded
-     * @param startBit the bit where the encoded field is located in the buffer
-     * @return String with the decoded field value
-     * @throws WfCoreException if field connot be decoded
-     */
-    pub fn extract_message_field(
-        &mut self,
-        message_buffer: &[u8],
-        message_buffer_bit_length: usize,
-        start_bit: usize,
-    ) -> String {
-        let bit_length = if self.bit_length() >= 1 {
-            self.bit_length()
-        } else {
-            let mut bit_length = message_buffer_bit_length - start_bit;
-            bit_length -= bit_length % &self.definition.encoding.bit_length;
-            bit_length
-        };
-
-        let field_buffer: Vec<u8> = extract_bits(
-            message_buffer,
-            message_buffer_bit_length,
-            start_bit,
-            bit_length,
-        );
-
-        self.decode(&field_buffer)
     }
 }
 

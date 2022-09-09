@@ -1,6 +1,6 @@
 use fennel_lib::FennelCipher;
 use wf_buffer::WhiteflagBuffer;
-use wf_parser::{MessageHeaderOrder, ParsedFieldDefinition};
+use wf_field::definitions::WhiteflagFields;
 
 pub struct CryptedBuffer {
     unencrypted_first_half: WhiteflagBuffer,
@@ -14,9 +14,12 @@ pub enum CryptMode {
 
 impl CryptedBuffer {
     pub fn new(buffer: WhiteflagBuffer) -> Self {
-        let indicator =
-            &ParsedFieldDefinition::header()[MessageHeaderOrder::EncryptionIndicator.as_usize()];
-        Self::new_split_at(buffer, indicator.end_bit)
+        Self::new_split_at(
+            buffer,
+            WhiteflagFields::HeaderEncryptionIndicator
+                .create_codec_position()
+                .bit_end,
+        )
     }
 
     fn new_split_at(buffer: WhiteflagBuffer, split_at: usize) -> Self {

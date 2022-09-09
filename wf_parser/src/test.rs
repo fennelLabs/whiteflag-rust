@@ -1,6 +1,13 @@
-use super::{message_header_parser::MessageHeaderParser, MessageHeader};
-use wf_buffer::WhiteflagBuffer;
+use wf_buffer::{BufferReader, WhiteflagBuffer};
 use wf_field::definitions;
+
+fn message_code() -> wf_field::FieldDefinition {
+    definitions::header::MESSAGE_CODE
+}
+
+fn psuedo_message_code() -> wf_field::FieldDefinition {
+    definitions::test::PSEUDO_MESSAGE_CODE
+}
 
 /// hexadecimal whiteflag authentication message
 /// the field values are below
@@ -47,7 +54,7 @@ const TEST_MESSAGE: &'static str = "57463130aa19f7da7067d41891592131a12a60c9053b
 
 #[test]
 fn extract_code_for_a_message() {
-    let def = definitions::message_code();
+    let def = message_code();
     let buffer = WhiteflagBuffer::decode_from_hexadecimal(AUTH_MESSAGE).unwrap();
 
     let field = buffer.extract_message_value(&def, 33);
@@ -58,24 +65,18 @@ fn extract_code_for_a_message() {
 #[test]
 fn extract_code_for_a_message_2() {
     let buffer = WhiteflagBuffer::decode_from_hexadecimal(AUTH_MESSAGE).unwrap();
-    let code = MessageHeaderParser::default()
-        .message_code()
-        .extract(&buffer);
+    let code = message_code().read(&buffer);
     assert_eq!("A", code, "extracted message code should be A");
 }
 
 #[test]
 fn extract_code_for_t_message() {
     let buffer = WhiteflagBuffer::decode_from_hexadecimal(TEST_MESSAGE).unwrap();
-    let code = MessageHeaderParser::default()
-        .message_code()
-        .extract(&buffer);
+    let code = message_code().read(&buffer);
 
     assert_eq!("T", code, "extracted message code should be T");
 
-    let test_code = MessageHeaderParser::default()
-        .test_message_code()
-        .extract(&buffer);
+    let test_code = psuedo_message_code().read(&buffer);
 
     assert_eq!("M", test_code, "extracted message code should be T");
 }

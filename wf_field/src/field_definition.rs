@@ -1,19 +1,42 @@
-use super::Field;
+use crate::{
+    byte_configuration::ByteConfiguration, codec_positions::CodecPositions,
+    definitions::WhiteflagFields, Field,
+};
 use wf_codec::encoding::Encoding;
 use wf_validation::{Validation, ValidationError};
 
 #[derive(Clone, Debug)]
 pub struct FieldDefinition {
     pub name: Option<&'static str>,
-    pub encoding: Encoding,
-    pub start_byte: usize,
-    pub end_byte: Option<usize>,
+    pub positions: CodecPositions,
+}
+
+impl std::ops::Deref for FieldDefinition {
+    type Target = CodecPositions;
+
+    fn deref(&self) -> &Self::Target {
+        &self.positions
+    }
 }
 
 impl FieldDefinition {
     pub fn get_name(&self) -> Option<&'static str> {
         self.name
     }
+
+    pub const fn create_definition(name: &'static str, field: WhiteflagFields) -> Self {
+        Self {
+            name: Some(name),
+            positions: field.create_codec_position(),
+        }
+    }
+
+    /*
+    /// used in the compiling process
+    pub fn read_from_values<'a, T: FieldValue>(&self, values: &'a [T]) -> &'a str {
+        values[self.index].as_ref()
+    }
+    */
 
     pub fn new(
         name: &'static str,
@@ -23,18 +46,10 @@ impl FieldDefinition {
     ) -> FieldDefinition {
         FieldDefinition {
             name: Some(name),
-            encoding,
-            start_byte,
-            end_byte: if end_byte < 1 { None } else { Some(end_byte) },
-        }
-    }
-
-    pub fn next(&self, end: Option<usize>) -> FieldDefinition {
-        FieldDefinition {
-            name: None,
-            encoding: self.encoding.kind.get_encoding(),
-            start_byte: self.end_byte.expect("next() assumes an end_byte"),
-            end_byte: end,
+            positions: CodecPositions::new(
+                ByteConfiguration::new(start_byte, end_byte, encoding),
+                0,
+            ),
         }
     }
 
@@ -45,18 +60,11 @@ impl FieldDefinition {
     ) -> FieldDefinition {
         FieldDefinition {
             name: None,
-            encoding,
-            start_byte,
-            end_byte: if end_byte < 1 { None } else { Some(end_byte) },
+            positions: CodecPositions::new(
+                ByteConfiguration::new(start_byte, end_byte, encoding),
+                0,
+            ),
         }
-    }
-
-    pub fn get_minimum_starting_position(&self) -> usize {
-        if let Some(e) = self.end_byte {
-            return e;
-        }
-
-        return self.start_byte;
     }
 
     /**
@@ -70,7 +78,7 @@ impl FieldDefinition {
     }
 
     pub fn decode(&self, data: &[u8]) -> String {
-        match self.encoding.decode(data, self.bit_length()) {
+        match self.positions.bytes.decode(data) {
             Ok(r) => r,
             Err(e) => {
                 panic!("error: {}\n\t{:#?}", e, &self);
@@ -84,14 +92,16 @@ impl FieldDefinition {
     }
 
     pub fn encode(&self, data: String) -> Vec<u8> {
-        self.encoding.encode(data)
+        self.bytes.encoding.encode(data)
     }
 
     /// returns the byte length of the unencoded field value
     /// if the field definition does not have a fixed length then it will return `0`
     pub fn expected_byte_length(&self) -> Option<usize> {
-        match self.end_byte {
-            Some(e) if e > 0 && e > self.start_byte => Some(e - self.start_byte),
+        match self.positions.bytes.end {
+            Some(e) if e > 0 && e > self.positions.bytes.start => {
+                Some(e - self.positions.bytes.start)
+            }
             _ => None,
         }
     }
@@ -102,6 +112,7 @@ impl FieldDefinition {
      */
     pub fn bit_length(&self) -> usize {
         return self
+            .bytes
             .encoding
             .convert_to_bit_length(self.expected_byte_length().unwrap_or(0));
     }
@@ -120,7 +131,7 @@ impl Validation for FieldDefinition {
                     self.get_name().unwrap_or(NULL_FIELD_NAME)
                 ),
             }),
-            _ => self.encoding.validate(value),
+            _ => self.bytes.encoding.validate(value),
         }
     }
 }

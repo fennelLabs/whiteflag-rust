@@ -10,14 +10,15 @@ use fennel_lib::FennelCipher;
 use wf_account::test_impl::WhiteflagAccount;
 use wf_buffer::WhiteflagBuffer;
 use wf_crypto::encryption_method::WhiteflagEncryptionMethod;
-use wf_field::Field;
+use wf_field::{Field, MessageType};
+use wf_parser::Parser;
 
 const METAKEY_ORIGINATOR: &str = "originatorAddress";
 const METAKEY_RECIPIENT: &str = "recipientAddress";
 const FIELD_ENCRYPTIONINDICATOR: &str = "EncryptionIndicator";
 
 pub struct Message {
-    message_code: char,
+    message_code: MessageType,
     header: MessageSegment,
     body: MessageSegment,
 
@@ -39,7 +40,7 @@ impl MessageSegment {
 
 impl Message {
     pub fn new(
-        message_code: char,
+        message_code: MessageType,
         header: Vec<Field>,
         body: Vec<Field>,
         originator: Option<WhiteflagAccount>,
@@ -62,14 +63,39 @@ impl Message {
         serial
     }
 
+    pub fn from_parser(parsed_message: Parser) -> Self {
+        Message::new(
+            parsed_message.code,
+            parsed_message.header,
+            parsed_message.body,
+            None,
+            None,
+        )
+    }
+
     /// construct Message from an array of field strings
     pub fn compile<T: FieldValue>(data: &[T]) -> Self {
-        builder_from_field_values(data).compile()
+        Self::from_parser(builder_from_field_values(data))
     }
 
     /// construct Message from a serialized string
     pub fn deserialize(message: &str) -> Message {
-        builder_from_serialized(message).compile()
+        Self::from_parser(builder_from_serialized(message))
+    }
+
+    /// decode a hexadecimal encoded whiteflag message
+    pub fn decode_from_hexadecimal<T: AsRef<str>>(message: T) -> Self {
+        let buffer = match WhiteflagBuffer::decode_from_hexadecimal(message) {
+            Ok(buffer) => buffer,
+            Err(e) => panic!("{}", e),
+        };
+
+        Self::from_parser(builder_from_encoded(buffer))
+    }
+
+    /// decode a hexadecimal encoded whiteflag message
+    pub fn decode_from_buffer(message: WhiteflagBuffer) -> Self {
+        Self::from_parser(builder_from_encoded(message))
     }
 
     pub fn encode_and_crypt<T: FennelCipher>(
@@ -114,21 +140,6 @@ impl Message {
 
     pub fn encode_as_hex(&self) -> String {
         hex::encode(self.encode())
-    }
-
-    /// decode a hexadecimal encoded whiteflag message
-    pub fn decode_from_hexadecimal<T: AsRef<str>>(message: T) -> Self {
-        let buffer = match WhiteflagBuffer::decode_from_hexadecimal(message) {
-            Ok(buffer) => buffer,
-            Err(e) => panic!("{}", e),
-        };
-
-        builder_from_encoded(buffer).compile()
-    }
-
-    /// decode a hexadecimal encoded whiteflag message
-    pub fn decode_from_buffer(message: WhiteflagBuffer) -> Self {
-        builder_from_encoded(message).compile()
     }
 
     pub fn get_fields(&self) -> Vec<&Field> {

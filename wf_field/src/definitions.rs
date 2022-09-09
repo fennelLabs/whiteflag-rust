@@ -1,51 +1,18 @@
-use super::field_definition::*;
+use crate::{
+    byte_configuration::ByteConfiguration, codec_positions::CodecPositions, FieldDefinition,
+};
+use count_macro::count;
+use paste::paste;
 
-pub fn get_body_from_code(code: &str) -> Vec<FieldDefinition> {
-    get_body_from_code_char(&convert_value_to_code(code)).to_vec()
-}
-
-pub fn get_body_from_code_char(code: &char) -> Vec<FieldDefinition> {
-    match code {
-        'A' => Authentication::DEFINITIONS,
-        'K' => Crypto::DEFINITIONS,
-        'T' => Test::DEFINITIONS,
-        'R' => Resource::DEFINITIONS,
-        'F' => FreeText::DEFINITIONS,
-        'P' | 'E' | 'D' | 'S' | 'I' | 'M' | 'Q' => Sign::DEFINITIONS,
-        _ => panic!("'{}' is not a valid message code", code),
-    }
-    .to_vec()
-}
-
-/// fields that are codes are single characters
-pub fn convert_value_to_code(value: &str) -> char {
-    value
-        .chars()
-        .nth(0)
-        .unwrap_or_else(|| panic!("invalid message code: {}", value))
-}
-
-pub fn generic_header_fields() -> &'static [FieldDefinition] {
-    Header::DEFINITIONS
-}
-
-pub fn message_code() -> &'static FieldDefinition {
-    &Header::MESSAGE_CODE
-}
-
-pub fn test_message_code() -> &'static FieldDefinition {
-    &Test::PSEUDO_MESSAGE_CODE
-}
-
-pub enum FieldKind {
-    GENERIC,
-    AUTHENTICATION,
-    CRYPTO,
-    TEXT,
-    RESOURCE,
-    TEST,
-    SIGNAL,
-    REQUEST,
+macro_rules! module {
+    (
+        $name:ident, $($code:item)*
+    ) => {
+        pub mod $name {
+            use super::*;
+            $( $code )*
+        }
+    };
 }
 
 macro_rules! message_fields {
@@ -55,47 +22,96 @@ macro_rules! message_fields {
             $( $name:ident, $upp:ident, $pat:expr, $encoding:ident, $start:expr, $end:expr );*
         )*
     ) => {
+        paste! {
 
+            pub const ALL_BYTE_CONFIG: &'static [ByteConfiguration] = &[$(
+                $( ByteConfiguration::new($start, $end, wf_codec::encoding::$encoding), )*
+            )*];
 
-        /*
-
-        pub enum MessageTypes {
-            $(
-                $group,
-            )*
-        } */
-
-        $(
-            pub mod $group {
-                use super::*;
-
-                pub mod names {
-                    $( pub const $upp: &str = stringify!($name); )*
-                }
-
-                $( pub const $upp: FieldDefinition = FieldDefinition {
-                    name: Some(names::$upp),
-                    encoding: wf_codec::encoding::$encoding,
-                    start_byte: $start,
-                    end_byte: if $end == 0 { None } else { Some($end) },
-                }; )*
-
-                pub const DEFINITIONS: &'static [FieldDefinition] = &[$( $upp, )*];
-
-                enum MessageFields {
-                    $(
-                        $name,
-                    )*
-                }
-
-                pub mod rx {
-                    use regex::Regex;
-                    lazy_static!{
-                        $( pub static ref $upp: Regex = Regex::new($pat).unwrap(); )*
-                    }
+            count! {
+                //#[repr(usize)]
+                #[derive(Copy, Clone)]
+                pub enum WhiteflagFields {
+                    $( $( [<$group $name>] = _int_, )* )*
                 }
             }
-        )*
+
+            impl WhiteflagFields {
+                pub const fn get_start_bit(&self) -> usize {
+                    let index = self.as_usize();
+                    // base case
+                    if index == 0 { 0 }
+                    else {
+                        // first field after last header field must begin at the last header
+                        let prev_index = if WhiteflagFields::is_first_in_group(&self) { WhiteflagFields::HeaderReferencedMessage.as_usize() } else { index - 1 };
+                        let prev_field = WhiteflagFields::as_enum(prev_index);
+                        ALL_BYTE_CONFIG[prev_index].bit_length() + WhiteflagFields::get_start_bit(&prev_field)
+                    }
+                }
+
+                pub const fn as_usize(&self) -> usize {
+                    *self as usize
+                }
+
+                pub const fn as_enum(i: usize) -> Self {
+                    count! {
+                        match i {
+                            $( $( _int_ => WhiteflagFields::[<$group $name>], )* )*
+                            _ => panic!("number is not supported!"),
+                        }
+                    }
+                }
+
+                pub const fn get_byte_config(&self) -> ByteConfiguration {
+                    ALL_BYTE_CONFIG[self.as_usize()]
+                }
+
+                pub const fn is_first_in_group(&self) -> bool {
+                    match &self {
+                        WhiteflagFields::HeaderPrefix => true,
+                        WhiteflagFields::AuthenticationVerificationMethod => true,
+                        WhiteflagFields::CryptoCryptoDataType => true,
+                        WhiteflagFields::FreeTextText => true,
+                        WhiteflagFields::ResourceResourceMethod => true,
+                        WhiteflagFields::TestPseudoMessageCode => true,
+                        WhiteflagFields::SignSubjectCode => true,
+                        WhiteflagFields::RequestObjectType => true,
+                        _ => false,
+                    }
+                }
+
+                pub const fn create_codec_position(&self) -> CodecPositions {
+                    CodecPositions::new(
+                        WhiteflagFields::get_byte_config(self),
+                        WhiteflagFields::get_start_bit(self)
+                    )
+                }
+            }
+
+            $(
+                pub mod [<$group:lower>] {
+                    use super::*;
+
+                    module!(names, $( pub const $upp: &str = stringify!($name); )*);
+
+                    $(
+                        pub const $upp: FieldDefinition = FieldDefinition::create_definition(
+                            names::$upp,
+                            WhiteflagFields::[<$group $name>]
+                        );
+                    )*
+
+                    pub const DEFINITIONS: &'static [FieldDefinition] = &[$( $upp, )*];
+
+                    /* pub mod rx {
+                        use regex::Regex;
+                        lazy_static!{
+                            $( pub static ref $upp: Regex = Regex::new($pat).unwrap(); )*
+                        }
+                    } */
+                }
+            )*
+        }
     }
 }
 

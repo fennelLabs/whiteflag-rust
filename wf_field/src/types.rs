@@ -1,25 +1,63 @@
-use wf_field::{definitions::get_body_from_code_char, FieldDefinition};
-
-struct MessageType {
-    pub message_code: char,
-    pub definitions: Vec<FieldDefinition>,
-}
+use crate::{definitions::*, FieldDefinition};
+/* pub enum FieldKind {
+    GENERIC,
+    AUTHENTICATION,
+    CRYPTO,
+    TEXT,
+    RESOURCE,
+    TEST,
+    SIGNAL,
+    REQUEST,
+} */
 
 impl MessageType {
-    pub fn from_code_option(code: Option<&char>) -> MessageType {
-        let c = code.unwrap_or(&' ');
-        Self::from_code(c)
+    pub fn from_code(code: char) -> Self {
+        match code {
+            'A' => MessageType::Authentication,
+            'K' => MessageType::Cryptographic,
+            'T' => MessageType::Test,
+            'R' => MessageType::Resource,
+            'F' => MessageType::FreeText,
+            'P' => MessageType::Protective,
+            'E' => MessageType::Emergency,
+            'D' => MessageType::Danger,
+            'S' => MessageType::Status,
+            'I' => MessageType::Infrastructure,
+            'M' => MessageType::Mission,
+            'Q' => MessageType::Request,
+            _ => MessageType::Any,
+        }
     }
 
-    pub fn from_code(code: &char) -> MessageType {
-        MessageType {
-            message_code: *code,
-            definitions: get_body_from_code_char(code),
+    pub fn definitions(&self) -> &'static [FieldDefinition] {
+        match &self {
+            MessageType::Any => panic!("no definition fields for undefined message type"),
+            MessageType::Authentication => authentication::DEFINITIONS,
+            MessageType::Cryptographic => crypto::DEFINITIONS,
+            MessageType::Test => test::DEFINITIONS,
+            MessageType::Resource => resource::DEFINITIONS,
+            MessageType::FreeText => freetext::DEFINITIONS,
+            MessageType::Protective
+            | MessageType::Emergency
+            | MessageType::Danger
+            | MessageType::Status
+            | MessageType::Infrastructure
+            | MessageType::Mission
+            | MessageType::Request => sign::DEFINITIONS,
         }
+    }
+
+    pub fn get_message_code(code: &str) -> Self {
+        Self::from_code(
+            code.chars()
+                .nth(0)
+                .unwrap_or_else(|| panic!("invalid message code: {}", code)),
+        )
     }
 }
 
-enum MessageTypeEnum {
+#[derive(Clone, Copy, PartialEq)]
+pub enum MessageType {
     /**
      * Undefined message type
      */

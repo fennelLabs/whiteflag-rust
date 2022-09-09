@@ -7,16 +7,26 @@ mod codec_tests;
 #[cfg(test)]
 mod validation_test;
 
+mod byte_configuration;
+mod codec_positions;
 #[allow(dead_code)]
 pub mod definitions;
 mod field;
 mod field_definition;
+mod field_definition_parser;
+mod request;
+mod types;
 
-pub use definitions::{generic_header_fields, get_body_from_code, message_code, test_message_code};
-pub use field::Field;
-pub use field_definition::FieldDefinition;
+#[cfg(test)]
+mod test_field_definition;
 
-use definitions::get_body_from_code_char;
+pub use {
+    field::Field,
+    field_definition::FieldDefinition,
+    field_definition_parser::{FieldDefinitionParser, FieldDefinitionParserBase},
+    request::create_request_fields,
+    types::MessageType,
+};
 
 pub const FIELD_PREFIX: &'static str = "Prefix";
 pub const FIELD_VERSION: &'static str = "Version";
@@ -32,40 +42,36 @@ impl From<&Field> for Vec<u8> {
     }
 }
 
-/**
- * Gets the value of the field specified by name
- * @param fieldname the name of the requested field
- * @return the field value, or NULL if field does not exist
- */
-pub fn get_field_value_from_array<T: AsRef<str>>(
-    fields: &[Field],
-    field_name: T,
-) -> Option<&String> {
-    fields
-        .iter()
-        .find(|f| f.get_name() == field_name.as_ref())
-        .map(|s| s.get())
+pub trait MessageHeader {
+    type Target: ?Sized;
+
+    fn prefix(&self) -> &Self::Target;
+    fn version(&self) -> &Self::Target;
+    fn encryption_indicator(&self) -> &Self::Target;
+    fn duress_indicator(&self) -> &Self::Target;
+    fn message_code(&self) -> &Self::Target;
+    fn reference_indicator(&self) -> &Self::Target;
+    fn referenced_message(&self) -> &Self::Target;
 }
 
-pub fn get_message_code(fields: &[Field]) -> char {
-    get_message_code_base(fields, FIELD_MESSAGETYPE)
+#[repr(usize)]
+#[derive(Copy, Clone)]
+pub enum MessageHeaderOrder {
+    Prefix = 0,
+    Version = 1,
+    EncryptionIndicator = 2,
+    DuressIndicator = 3,
+    MessageCode = 4,
+    ReferenceIndicator = 5,
+    ReferencedMessage = 6,
 }
 
-pub fn get_test_message_code(fields: &[Field]) -> char {
-    get_message_code_base(fields, FIELD_TESTMESSAGETYPE)
-}
-
-fn get_message_code_base(fields: &[Field], name: &'static str) -> char {
-    match get_field_value_from_array(fields, name) {
-        Some(x) => x.chars().next(),
-        _ => None,
+impl<'a> MessageHeaderOrder {
+    pub fn as_usize(&self) -> usize {
+        *self as usize
     }
-    .expect("expected message code but none was found")
-}
 
-pub fn get_message_body(fields: &[Field]) -> (Vec<FieldDefinition>, char) {
-    let message_code = get_message_code(fields);
-    let body = get_body_from_code_char(&message_code);
-
-    (body, message_code)
+    pub fn get<'b>(&'a self, fields: &'b [Field]) -> &'b Field {
+        &fields[self.as_usize()]
+    }
 }
