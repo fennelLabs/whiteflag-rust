@@ -1,24 +1,4 @@
-use crate::{definitions::*, get_body_from_code_char, Field, FieldDefinition};
-
-/* struct MessageType {
-    pub message_code: char,
-    pub definitions: Vec<FieldDefinition>,
-}
-
-impl MessageType {
-    pub fn from_code_option(code: Option<&char>) -> MessageType {
-        let c = code.unwrap_or(&' ');
-        Self::from_code(c)
-    }
-
-    pub fn from_code(code: &char) -> MessageType {
-        MessageType {
-            message_code: *code,
-            definitions: get_body_from_code_char(code),
-        }
-    }
-} */
-
+use crate::{definitions::*, FieldDefinition};
 /* pub enum FieldKind {
     GENERIC,
     AUTHENTICATION,
@@ -29,17 +9,6 @@ impl MessageType {
     SIGNAL,
     REQUEST,
 } */
-
-/*
-match code {
-        'A' => authentication::DEFINITIONS,
-        'K' => crypto::DEFINITIONS,
-        'T' => test::DEFINITIONS,
-        'R' => resource::DEFINITIONS,
-        'F' => freetext::DEFINITIONS,
-        'P' | 'E' | 'D' | 'S' | 'I' | 'M' | 'Q' => sign::DEFINITIONS,
-        _ => panic!("'{}' is not a valid message code", code),
-    } */
 
 impl MessageType {
     pub fn from_code(code: char) -> Self {
@@ -77,9 +46,18 @@ impl MessageType {
             | MessageType::Request => sign::DEFINITIONS,
         }
     }
+
+    pub fn get_message_code(code: &str) -> Self {
+        Self::from_code(
+            code.chars()
+                .nth(0)
+                .unwrap_or_else(|| panic!("invalid message code: {}", code)),
+        )
+    }
 }
 
-enum MessageType {
+#[derive(Clone, Copy, PartialEq)]
+pub enum MessageType {
     /**
      * Undefined message type
      */

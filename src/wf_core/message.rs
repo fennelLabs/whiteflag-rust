@@ -10,14 +10,14 @@ use fennel_lib::FennelCipher;
 use wf_account::test_impl::WhiteflagAccount;
 use wf_buffer::WhiteflagBuffer;
 use wf_crypto::encryption_method::WhiteflagEncryptionMethod;
-use wf_field::{Field, Parser};
+use wf_field::{Field, MessageType, Parser};
 
 const METAKEY_ORIGINATOR: &str = "originatorAddress";
 const METAKEY_RECIPIENT: &str = "recipientAddress";
 const FIELD_ENCRYPTIONINDICATOR: &str = "EncryptionIndicator";
 
 pub struct Message {
-    message_code: char,
+    message_code: MessageType,
     header: MessageSegment,
     body: MessageSegment,
 
@@ -39,7 +39,7 @@ impl MessageSegment {
 
 impl Message {
     pub fn new(
-        message_code: char,
+        message_code: MessageType,
         header: Vec<Field>,
         body: Vec<Field>,
         originator: Option<WhiteflagAccount>,

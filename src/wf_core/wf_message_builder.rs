@@ -1,7 +1,6 @@
 use std::ops::Div;
 use wf_buffer::WhiteflagBuffer;
 use wf_field::{FieldDefinition, FieldDefinitionParser, FieldValue, Parser};
-use wf_parser::MessageCodeParser;
 use wf_validation::Validation;
 
 pub struct SerializedMessageParser<'a> {
@@ -22,10 +21,6 @@ impl FieldDefinitionParser for SerializedMessageParser<'_> {
 
     fn remaining(&self) -> usize {
         (self.message.len() - self.last_byte).div(4)
-    }
-
-    fn body_field_definitions(&self) -> Vec<FieldDefinition> {
-        MessageCodeParser::parse_from_serialized(&self.message).get_field_definitions()
     }
 }
 
@@ -54,10 +49,6 @@ impl<T: FieldValue> FieldDefinitionParser for FieldValuesParser<'_, T> {
     fn remaining(&self) -> usize {
         (self.data.len() - self.index) / 2
     }
-
-    fn body_field_definitions(&self) -> Vec<FieldDefinition> {
-        MessageCodeParser::parse_for_encode(self.data).get_field_definitions()
-    }
 }
 
 pub struct EncodedMessageParser {
@@ -76,10 +67,6 @@ impl FieldDefinitionParser for EncodedMessageParser {
 
     fn remaining(&self) -> usize {
         (self.buffer.bit_length() - self.bit_cursor) / 16
-    }
-
-    fn body_field_definitions(&self) -> Vec<FieldDefinition> {
-        MessageCodeParser::parse_for_decode(&self.buffer).get_field_definitions()
     }
 }
 

@@ -1,5 +1,13 @@
 use wf_buffer::{BufferReader, WhiteflagBuffer};
-use wf_field::{message_code, test_message_code};
+use wf_field::definitions;
+
+fn message_code() -> wf_field::FieldDefinition {
+    definitions::header::MESSAGE_CODE
+}
+
+fn psuedo_message_code() -> wf_field::FieldDefinition {
+    definitions::test::PSEUDO_MESSAGE_CODE
+}
 
 /// hexadecimal whiteflag authentication message
 /// the field values are below
@@ -46,7 +54,7 @@ const TEST_MESSAGE: &'static str = "57463130aa19f7da7067d41891592131a12a60c9053b
 
 #[test]
 fn extract_code_for_a_message() {
-    let def = wf_field::message_code();
+    let def = message_code();
     let buffer = WhiteflagBuffer::decode_from_hexadecimal(AUTH_MESSAGE).unwrap();
 
     let field = buffer.extract_message_value(&def, 33);
@@ -68,7 +76,7 @@ fn extract_code_for_t_message() {
 
     assert_eq!("T", code, "extracted message code should be T");
 
-    let test_code = test_message_code().read(&buffer);
+    let test_code = psuedo_message_code().read(&buffer);
 
     assert_eq!("M", test_code, "extracted message code should be T");
 }

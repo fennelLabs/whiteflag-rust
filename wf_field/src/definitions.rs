@@ -39,6 +39,7 @@ macro_rules! message_fields {
             impl WhiteflagFields {
                 pub const fn get_start_bit(&self) -> usize {
                     let index = self.as_usize();
+                    // base case
                     if index == 0 { 0 }
                     else {
                         // first field after last header field must begin at the last header
