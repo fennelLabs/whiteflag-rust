@@ -262,7 +262,7 @@ fn message_encryption_2() {
 
     key.set_context(&address.to_byte_array());
 
-    let iv = fennel_lib::generate_random_buffer(16);
+    let iv = aes_tools::generate_random_buffer(16);
     let cipher = key.aes_256_ctr_cipher(&iv);
 
     let message1 = Message::deserialize(message_serialized);
@@ -287,7 +287,7 @@ fn message_encryption_3() {
 
     key.set_context(&address.to_byte_array());
 
-    let iv = fennel_lib::generate_random_buffer(16);
+    let iv = aes_tools::generate_random_buffer(16);
     let cipher = key.aes_256_ctr_cipher(&iv);
 
     let message1 = Message::deserialize(message_serialized);

@@ -1,5 +1,5 @@
-use fennel_lib::dh_tools::{get_session_public_key, get_session_secret, get_shared_secret};
-use fennel_lib::AESCipher;
+use aes_tools::AESCipher;
+use dh_tools::{get_session_public_key, get_session_secret, get_shared_secret};
 use x25519_dalek::{PublicKey, SharedSecret, StaticSecret};
 
 /// Whiteflag ECDH Key Pair class

@@ -10,4 +10,3 @@ wf_field = { path = "../wf_field" }
 wf_codec = { path = "../wf_codec" }
 wf_common = { path = "../wf_common" }
 hex = "0.4.3"
-fennel-lib = { git = "https://github.com/fennelLabs/fennel-lib", branch = "master", package = "fennel-lib" }

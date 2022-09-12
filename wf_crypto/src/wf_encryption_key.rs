@@ -1,6 +1,6 @@
 use super::ecdh_keypair::WhiteflagECDHKeyPair;
 use super::encryption_method::WhiteflagEncryptionMethod;
-use fennel_lib::{AESCipher, AES256CTR};
+use aes_tools::{AESCipher, AES256CTR};
 use x25519_dalek::PublicKey;
 
 ///This class represents a Whiteflag encryption key. Instances of this

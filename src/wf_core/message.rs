@@ -6,7 +6,7 @@ use super::{
     },
     FieldValue,
 };
-use fennel_lib::FennelCipher;
+use aes_tools::FennelCipher;
 use wf_account::test_impl::WhiteflagAccount;
 use wf_buffer::WhiteflagBuffer;
 use wf_crypto::encryption_method::WhiteflagEncryptionMethod;

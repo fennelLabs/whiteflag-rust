@@ -1,4 +1,4 @@
-use fennel_lib::FennelCipher;
+use aes_tools::FennelCipher;
 use wf_buffer::WhiteflagBuffer;
 use wf_field::definitions::WhiteflagFields;
 
