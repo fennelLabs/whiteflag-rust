@@ -1,5 +1,5 @@
-use super::{ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey};
-use fennel_lib::FennelCipher;
+use crate::{ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey};
+use aes_tools::FennelCipher;
 
 /**
  * Whiteflag cipher test class

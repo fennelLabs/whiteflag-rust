@@ -1,5 +1,5 @@
 use super::ecdh_keypair::WhiteflagECDHKeyPair;
-use fennel_lib::{get_session_public_key, get_session_secret, get_shared_secret};
+use dh_tools::{get_session_public_key, get_session_secret, get_shared_secret};
 
 fn assert_array_eq<T: PartialEq + std::fmt::Debug>(l: &[T], r: &[T], msg: Option<&str>) {
     let success = l.iter().eq(r.iter());
