@@ -7,7 +7,7 @@ use super::{
     FieldValue,
 };
 use aes_tools::FennelCipher;
-use wf_account::test_impl::WhiteflagAccount;
+use wf_account::whiteflag_account::WhiteflagAccount;
 use wf_buffer::WhiteflagBuffer;
 use wf_crypto::encryption_method::WhiteflagEncryptionMethod;
 use wf_field::{Field, MessageType};
