@@ -36,18 +36,6 @@ struct WhiteflagAuthMethod {
 }
 
 impl WhiteflagAuthMethod {
-    pub fn new(
-        value: AuthenticationMethod,
-        length: usize,
-        hkdf_salt: Vec<u8>,
-    ) -> WhiteflagAuthMethod {
-        WhiteflagAuthMethod {
-            value,
-            length,
-            hkdf_salt,
-        }
-    }
-
     pub fn get_preshared_token() -> Self {
         WhiteflagAuthMethod {
             value: AuthenticationMethod::PresharedToken,

@@ -5,6 +5,7 @@ mod codec_tests;
 mod validation_test;
 
 mod byte_configuration;
+#[allow(dead_code)]
 mod codec_positions;
 #[allow(dead_code)]
 pub mod definitions;

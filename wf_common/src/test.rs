@@ -1,8 +1,4 @@
-use super::{
-    common::{concatinate_bits, extract_bits},
-    constants::BYTE,
-    *,
-};
+use super::{common::extract_bits, constants::BYTE, *};
 
 fn assert_array_eq<T: PartialEq + std::fmt::Debug>(l: Vec<T>, r: Vec<T>) {
     let success = l.iter().eq(r.iter());

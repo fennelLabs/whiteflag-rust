@@ -7,8 +7,10 @@ mod crypto_util_tests;
 #[cfg(test)]
 mod cipher_tests;
 
+#[allow(dead_code)]
 mod crypto_util;
 pub mod ecdh_keypair;
+#[allow(dead_code)]
 pub mod encryption_method;
 mod error;
 pub mod wf_encryption_key;

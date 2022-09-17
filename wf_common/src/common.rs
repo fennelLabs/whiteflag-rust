@@ -15,10 +15,6 @@ pub fn remove_hexadecimal_prefix(data: &str) -> &str {
     data
 }
 
-pub fn remove_hexadecimal_prefix_mut(mut data: &str) {
-    data = remove_hexadecimal_prefix(data);
-}
-
 /// Calculates the number of bytes required to hold the given number of bits
 /// java equivalent: WfBinaryBuffer.byteLength
 pub fn byte_length(bit_length: usize) -> usize {
