@@ -67,11 +67,9 @@ impl FieldDefinition {
         }
     }
 
-    /**
-     * Sets the value of the message field if not already set
-     * @param data the data representing the field value
-     * @return TRUE if field value is set, FALSE if field already set or data is invalid
-     */
+    /// Sets the value of the message field if not already set
+    /// @param data the data representing the field value
+    /// @return TRUE if field value is set, FALSE if field already set or data is invalid
     pub fn set<T: AsRef<str> + Into<String>>(self, data: T) -> Result<Field, ValidationError> {
         self.validate(data.as_ref())?;
         Ok(Field::new(self, data.into()))
@@ -106,10 +104,8 @@ impl FieldDefinition {
         }
     }
 
-    /**
-     * Gets the bit length of the encoded field
-     * @return the bit length of the compressed encoded field value
-     */
+    /// Gets the bit length of the encoded field
+    /// @return the bit length of the compressed encoded field value
     pub fn bit_length(&self) -> usize {
         self.bytes
             .encoding
