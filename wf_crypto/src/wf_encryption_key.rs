@@ -6,7 +6,7 @@ use x25519_dalek::PublicKey;
 /// This class represents a Whiteflag encryption key. Instances of this
 /// class represent the raw key, either pre-shared or negotiated, from which
 /// the actual key material for encryption methods 1 and 2 is created.
-/// 
+///
 /// Whiteflag Specification 5.2.3 Key and Token Derivation
 /// Whiteflag Specification 5.2.4 Message Encryption
 #[derive(Clone)]
