@@ -51,7 +51,7 @@ impl ByteConfiguration {
     }
 }
 
-struct ByteCursorTracker {
+/* struct ByteCursorTracker {
     cursor: usize,
 }
 
@@ -71,4 +71,4 @@ impl ByteCursorTracker {
 
         Ok(())
     }
-}
+} */

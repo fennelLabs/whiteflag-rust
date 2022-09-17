@@ -9,7 +9,6 @@ macro_rules! module {
         $name:ident, $($code:item)*
     ) => {
         pub mod $name {
-            use super::*;
             $( $code )*
         }
     };
