@@ -30,7 +30,7 @@ impl MessageSegment {
     pub fn serialize(&self) -> String {
         let mut serial: String = String::new();
         for f in self.iter() {
-            let value: &str = &f.get();
+            let value: &str = f.get();
             serial.push_str(value);
         }
 

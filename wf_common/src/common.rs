@@ -39,7 +39,7 @@ pub fn crop_bits(buffer: &mut Vec<u8>, bit_length: usize) {
 
     /* Clear unused bits in last byte */
     let clear_bits = BYTE - (bit_length % BYTE);
-    if !(clear_bits < BYTE) {
+    if clear_bits >= BYTE {
         return;
     }
 
@@ -167,7 +167,7 @@ pub fn append_bits(
     }
 
     /* Add bits to the end of the buffer */
-    let new_buffer = concatinate_bits(&buffer_1, len_1, &buffer_2, len_2);
+    let new_buffer = concatinate_bits(buffer_1, len_1, buffer_2, len_2);
 
     (new_buffer, len_1 + len_2)
 }
@@ -202,7 +202,7 @@ pub fn concatinate_bits(
     let byte_length = byte_length(bit_length);
 
     /* Prepare byte arrays */
-    let byte_array_2_shift = shift_right(&byte_array_2, shift as isize);
+    let byte_array_2_shift = shift_right(byte_array_2, shift as isize);
     let mut new_byte_array = vec![0; byte_length as usize];
 
     /* Concatination */

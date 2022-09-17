@@ -34,12 +34,11 @@ impl<T: FieldValue> FieldDefinitionParser for FieldValuesParser<'_, T> {
     fn parse(&mut self, definition: &FieldDefinition) -> String {
         let value = self.data[self.index].as_ref();
 
-        match definition.validate(value) {
-            Err(e) => panic!(
+        if let Err(e) = definition.validate(value) {
+            panic!(
                 "{} error while converting array of strings into fields\n{0:?}",
                 e
-            ),
-            _ => (),
+            )
         };
 
         self.index += 1;
@@ -76,7 +75,7 @@ pub fn builder_from_field_values<T: FieldValue>(data: &[T]) -> Parser {
     Parser::parse(parser)
 }
 
-pub fn builder_from_serialized<'a>(message: &'a str) -> Parser {
+pub fn builder_from_serialized(message: &str) -> Parser {
     let parser = SerializedMessageParser {
         message,
         last_byte: 0,

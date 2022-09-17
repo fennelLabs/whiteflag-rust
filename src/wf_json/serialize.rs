@@ -12,7 +12,7 @@ impl Serialize for Message {
         let mut state = serializer.serialize_struct("BasicMessage", length)?;
 
         for f in fields {
-            let json_name = name_map(f.get_name()).map_err(|e| serde::ser::Error::custom(e))?;
+            let json_name = name_map(f.get_name()).map_err(serde::ser::Error::custom)?;
             state.serialize_field(json_name, f.get())?;
         }
 
