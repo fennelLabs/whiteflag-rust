@@ -9,14 +9,14 @@ impl WhiteflagBuffer {
     /// * `field_defs` - field definitions required to decode the buffer
     /// * `start_bit` - the bit position where this segment starts in the encoded buffer
     pub fn decode(&self, field_defs: &[FieldDefinition], start_bit: usize) -> (usize, Vec<Field>) {
-        if field_defs.len() < 1 {
+        if field_defs.is_empty() {
             panic!("field definition vector should not be empty")
         }
 
         let mut bit_cursor = start_bit;
 
         let fields = field_defs
-            .into_iter()
+            .iter()
             .map(|f| {
                 let field = self.extract_message_field(f, bit_cursor);
                 bit_cursor += field.bit_length();

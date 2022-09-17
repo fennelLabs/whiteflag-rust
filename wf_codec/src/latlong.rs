@@ -4,8 +4,8 @@ use wf_common::{
     constants::QUADBIT,
 };
 
-const PLUS: &'static str = "+";
-const MINUS: &'static str = "-";
+const PLUS: &str = "+";
+const MINUS: &str = "-";
 
 /**
  * Encodes a datum string into binary buffer

@@ -65,7 +65,7 @@ where
         let mut okm: Vec<u8> = vec![0; key_length];
         self.hk
             .expand(info, &mut okm)
-            .map_err(|e| CryptoError::HkdfOutput(e))?;
+            .map_err(CryptoError::HkdfOutput)?;
         Ok(okm)
     }
 }
@@ -78,7 +78,7 @@ where
     type Error = CryptoError;
 
     fn try_from(prk: &[u8]) -> Result<Self, Self::Error> {
-        let hk = hkdf::Hkdf::<H, I>::from_prk(prk).map_err(|e| CryptoError::HkdfInput(e))?;
+        let hk = hkdf::Hkdf::<H, I>::from_prk(prk).map_err(CryptoError::HkdfInput)?;
         Ok(WhiteflagHkdf {
             hk,
             prk: prk.to_vec(),

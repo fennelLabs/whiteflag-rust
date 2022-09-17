@@ -151,7 +151,7 @@ impl Encoding {
     }
 
     pub fn is_fixed_length(&self) -> bool {
-        self.byte_length.as_opt() != None
+        self.byte_length.as_opt().is_some()
     }
 
     /// Returns the bit length of a field for a given encoding and unencoded field byte length

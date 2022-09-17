@@ -30,9 +30,6 @@ impl<T: FieldDefinitionParser> FieldDefinitionParserBase for T {
     }
 
     fn parse_header(&mut self) -> Vec<Field> {
-        let definitions = definitions::header::DEFINITIONS;
-        let fields = self.parse_fields(definitions.to_vec());
-
-        fields
+        self.parse_fields(definitions::header::DEFINITIONS.to_vec())
     }
 }

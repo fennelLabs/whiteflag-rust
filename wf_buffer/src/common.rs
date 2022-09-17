@@ -17,7 +17,7 @@ impl WhiteflagBuffer {
     }
 
     pub fn append(&mut self, mut buffer: WhiteflagBuffer, bits: Option<usize>) {
-        let bit_length_to_extract = bits.unwrap_or_else(|| buffer.bit_length);
+        let bit_length_to_extract = bits.unwrap_or(buffer.bit_length);
         let (buffer, length) = append_bits(
             &self.data,
             self.bit_length,
@@ -35,7 +35,7 @@ impl WhiteflagBuffer {
 
     /// Returns the Whiteflag encoded message as a byte array
     /// @return a byte array with an encoded message
-    pub fn to_byte_array<'a>(&'a mut self) -> &'a [u8] {
+    pub fn to_byte_array(&mut self) -> &[u8] {
         crop_bits(self.data.as_mut(), self.bit_length);
         &self.data
     }

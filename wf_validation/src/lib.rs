@@ -3,7 +3,7 @@
 /// - [Encoding] invalid character set according to encoding
 /// - [FieldDefinition].{end_byte - start_byte} invalid length according to field definition
 /// - [FieldDefinition] invalid value according to field definition
-#[derive(thiserror::Error, Debug, PartialEq)]
+#[derive(thiserror::Error, Debug, PartialEq, Eq)]
 pub enum ValidationError {
     #[error("{specification_level}\nunencoded byte length is invalid\nunencoded value: {data}\nexpected byte_length to be {expected_length} but was {}", .data.len())]
     InvalidLength {

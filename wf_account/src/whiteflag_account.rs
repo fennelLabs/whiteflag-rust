@@ -20,7 +20,7 @@ pub struct WhiteflagAccount {
 impl WfAccount for WhiteflagAccount {
     fn new(owned: bool) -> Self {
         WhiteflagAccount {
-            owned: owned,
+            owned,
             address: None,
             auth_url: None,
             auth_token: None,
@@ -82,7 +82,7 @@ impl WfAccount for WhiteflagAccount {
             Err(WhiteflagAccountError::CantSetECDHPair)
         } else {
             self.ecdh_keypair = Some(ecdh_keypair.clone());
-            self.ecdh_public_key = Some(ecdh_keypair.as_ref().clone());
+            self.ecdh_public_key = Some(*ecdh_keypair.as_ref());
             Ok(())
         }
     }

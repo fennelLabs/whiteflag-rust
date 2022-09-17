@@ -8,8 +8,8 @@ pub fn remove_all_invalid_hex_characters<T: AsRef<str>>(data: T) -> String {
 }
 
 pub fn remove_hexadecimal_prefix(data: &str) -> &str {
-    if data.starts_with("0x") {
-        return &data[2..];
+    if let Some(x) = data.strip_prefix("0x") {
+        return x;
     }
 
     data
