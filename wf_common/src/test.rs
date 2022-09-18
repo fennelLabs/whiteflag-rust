@@ -1,5 +1,5 @@
 use super::{
-    common::{concatinate_bits, extract_bits},
+    common::{extract_bits},
     constants::BYTE,
     *,
 };
