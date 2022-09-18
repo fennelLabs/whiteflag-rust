@@ -39,7 +39,7 @@ impl WhiteflagBuffer {
             field_bit_length
         } else {
             let mut bit_length = self.bit_length - start_bit;
-            bit_length -= bit_length % &definition.bytes.encoding.bit_length;
+            bit_length -= bit_length % definition.bytes.encoding.bit_length;
             bit_length
         };
 
