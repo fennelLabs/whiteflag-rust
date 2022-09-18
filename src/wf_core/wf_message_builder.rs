@@ -34,12 +34,11 @@ impl<T: FieldValue> FieldDefinitionParser for FieldValuesParser<'_, T> {
     fn parse(&mut self, definition: &FieldDefinition) -> String {
         let value = self.data[self.index].as_ref();
 
-        match definition.validate(value) {
-            Err(e) => panic!(
+        if let Err(e) = definition.validate(value) {
+            panic!(
                 "{} error while converting array of strings into fields\n{0:?}",
                 e
-            ),
-            _ => (),
+            )
         };
 
         self.index += 1;
