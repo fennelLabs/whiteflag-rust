@@ -82,7 +82,7 @@ impl WfAccount for WhiteflagAccount {
             Err(WhiteflagAccountError::CantSetECDHPair)
         } else {
             self.ecdh_keypair = Some(ecdh_keypair.clone());
-            self.ecdh_public_key = Some(ecdh_keypair.as_ref().clone());
+            self.ecdh_public_key = Some(*ecdh_keypair.as_ref());
             Ok(())
         }
     }
