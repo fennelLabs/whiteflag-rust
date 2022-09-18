@@ -46,8 +46,7 @@ impl WhiteflagECDHKeyPair {
 
     /// Calculates the negotiated shared key with an originator
     pub fn negotiate_as_shared_secret(&self, other: &PublicKey) -> SharedSecret {
-        let secret = get_shared_secret(self.session_secret.clone(), other);
-        secret
+        get_shared_secret(self.session_secret.clone(), other)
     }
 
     pub fn create_aes_cipher(&self, public_key: &PublicKey) -> AESCipher {
