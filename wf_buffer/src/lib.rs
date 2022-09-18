@@ -29,6 +29,6 @@ pub trait BufferReader {
 impl BufferReader for FieldDefinition {
     /// used in the decoding process
     fn read(&self, buffer: &WhiteflagBuffer) -> String {
-        buffer.extract_message_value(&self, self.positions.bit_start)
+        buffer.extract_message_value(self, self.positions.bit_start)
     }
 }
