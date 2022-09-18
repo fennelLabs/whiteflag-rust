@@ -50,7 +50,7 @@ impl MessageType {
     pub fn get_message_code(code: &str) -> Self {
         Self::from_code(
             code.chars()
-                .nth(0)
+                .next()
                 .unwrap_or_else(|| panic!("invalid message code: {}", code)),
         )
     }
