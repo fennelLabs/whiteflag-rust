@@ -67,15 +67,6 @@ impl From<Vec<u8>> for WhiteflagBuffer {
     }
 }
 
-impl Default for WhiteflagBuffer {
-    fn default() -> Self {
-        Self {
-            data: Default::default(),
-            bit_length: Default::default(),
-        }
-    }
-}
-
 impl From<WhiteflagBuffer> for Vec<u8> {
     fn from(buffer: WhiteflagBuffer) -> Self {
         buffer.data

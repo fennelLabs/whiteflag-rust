@@ -1,6 +1,6 @@
 use std::str::Utf8Error;
 
-#[derive(thiserror::Error, Debug, PartialEq)]
+#[derive(thiserror::Error, Debug, PartialEq, Eq)]
 pub enum CodecError {
     #[error("the buffer is not UTF8 formatted")]
     UTF8(#[from] Utf8Error),

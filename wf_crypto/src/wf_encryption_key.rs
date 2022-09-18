@@ -3,25 +3,22 @@ use super::encryption_method::WhiteflagEncryptionMethod;
 use aes_tools::{AESCipher, AES256CTR};
 use x25519_dalek::PublicKey;
 
-///This class represents a Whiteflag encryption key. Instances of this
-///class represent the raw key, either pre-shared or negotiated, from which
-///the actual key material for encryption methods 1 and 2 is created.
+/// This class represents a Whiteflag encryption key. Instances of this
+/// class represent the raw key, either pre-shared or negotiated, from which
+/// the actual key material for encryption methods 1 and 2 is created.
 ///
-///Whiteflag Specification 5.2.3 Key and Token Derivation
-///Whiteflag Specification 5.2.4 Message Encryption
+/// Whiteflag Specification 5.2.3 Key and Token Derivation
+/// Whiteflag Specification 5.2.4 Message Encryption
 #[derive(Clone)]
 pub struct WhiteflagEncryptionKey {
-    /* The encryption method and keys */
-    /**
-    ///The encryption method for which this key is valid
-     */
+    /// The encryption method for which this key is valid
     method: WhiteflagEncryptionMethod,
-    /* The raw key materials */
+    /// The raw key materials
     secret_key: Vec<u8>,
 }
 
 impl WhiteflagEncryptionKey {
-    ///Constructs a new Whiteflag encryption key through ECDH key negotiation
+    /// Constructs a new Whiteflag encryption key through ECDH key negotiation
     pub fn from_ecdh_key(public_key: &PublicKey, ecdh_key_pair: &WhiteflagECDHKeyPair) -> Self {
         WhiteflagEncryptionKey {
             secret_key: ecdh_key_pair.negotiate(public_key),

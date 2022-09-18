@@ -8,7 +8,7 @@ impl WhiteflagBuffer {
     ///
     /// * `fields` - array of fields to append and encode into the buffer
     pub fn encode(&mut self, fields: &[Field]) {
-        fields.into_iter().for_each(|f| self.append_field(f));
+        fields.iter().for_each(|f| self.append_field(f));
     }
 
     pub fn append_field(&mut self, field: &Field) {

@@ -1,5 +1,4 @@
 use thiserror::Error;
-pub type WhiteflagResult<T> = Result<T, WhiteflagError>;
 
 #[derive(Error, Debug)]
 pub enum WhiteflagError {

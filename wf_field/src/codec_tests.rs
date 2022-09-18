@@ -1,4 +1,4 @@
-use super::{Field, FieldDefinition};
+use super::FieldDefinition;
 use wf_codec::encoding::*;
 
 const FIELDNAME: &str = "TESTFIELD";

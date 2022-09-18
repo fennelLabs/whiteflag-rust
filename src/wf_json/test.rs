@@ -1,6 +1,4 @@
-use crate::{
-    decode_from_hex, wf_core::message::Message, wf_json::deserialize::WhiteflagFieldValues,
-};
+use crate::{decode_from_hex, wf_json::deserialize::WhiteflagFieldValues};
 use serde_json::json;
 
 #[test]

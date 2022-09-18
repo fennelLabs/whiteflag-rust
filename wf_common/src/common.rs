@@ -1,39 +1,29 @@
 use super::constants::*;
 
-/**
- * removes characters from string that are invalid in hexadecimal format
- * java equivalent: N/A
- */
+/// removes characters from string that are invalid in hexadecimal format
+/// java equivalent: N/A
 pub fn remove_all_invalid_hex_characters<T: AsRef<str>>(data: T) -> String {
     let re = regex::Regex::new("[-+:.A-Z]").unwrap();
     re.replace_all(data.as_ref(), "").to_string()
 }
 
 pub fn remove_hexadecimal_prefix(data: &str) -> &str {
-    if data.starts_with("0x") {
-        return &data[2..];
+    if let Some(x) = data.strip_prefix("0x") {
+        return x;
     }
 
     data
 }
 
-pub fn remove_hexadecimal_prefix_mut(mut data: &str) {
-    data = remove_hexadecimal_prefix(data);
-}
-
-/**
- * Calculates the number of bytes required to hold the given number of bits
- * java equivalent: WfBinaryBuffer.byteLength
- */
+/// Calculates the number of bytes required to hold the given number of bits
+/// java equivalent: WfBinaryBuffer.byteLength
 pub fn byte_length(bit_length: usize) -> usize {
     let i_byte = BYTE;
     (bit_length / i_byte) + (if (bit_length % i_byte) > 0 { 1 } else { 0 })
 }
 
-/**
- * Shortens the byte array to fit the length of the used bits
- * java equivalent: WfBinaryBuffer.cropBits
- */
+/// Shortens the byte array to fit the length of the used bits
+/// java equivalent: WfBinaryBuffer.cropBits
 pub fn crop_bits(buffer: &mut Vec<u8>, bit_length: usize) {
     if bit_length == 0 {
         return;
@@ -49,7 +39,7 @@ pub fn crop_bits(buffer: &mut Vec<u8>, bit_length: usize) {
 
     /* Clear unused bits in last byte */
     let clear_bits = BYTE - (bit_length % BYTE);
-    if !(clear_bits < BYTE) {
+    if clear_bits >= BYTE {
         return;
     }
 
@@ -58,10 +48,8 @@ pub fn crop_bits(buffer: &mut Vec<u8>, bit_length: usize) {
     }
 }
 
-/**
- * Shifts bits in a byte array to the right modulo 8
- * java equivalent: WfBinaryBuffer.shiftRight
- */
+/// Shifts bits in a byte array to the right modulo 8
+/// java equivalent: WfBinaryBuffer.shiftRight
 pub fn shift_right(buffer: &[u8], shift: isize) -> Vec<u8> {
     if shift < 0 {
         return shift_left(buffer, -shift);
@@ -86,10 +74,8 @@ pub fn shift_right(buffer: &[u8], shift: isize) -> Vec<u8> {
     new_buffer
 }
 
-/**
- * Shifts bits in a byte array to the left modulo 8
- * java equivalent: WfBinaryBuffer.shiftLeft
- */
+/// Shifts bits in a byte array to the left modulo 8
+/// java equivalent: WfBinaryBuffer.shiftLeft
 pub fn shift_left(buffer: &[u8], shift: isize) -> Vec<u8> {
     if shift < 0 {
         return shift_right(buffer, -shift);
@@ -115,13 +101,11 @@ pub fn shift_left(buffer: &[u8], shift: isize) -> Vec<u8> {
     new_buffer
 }
 
-/**
- * Returns a byte array with a subset of the bits in the buffer
- * @param startBit the first bit of the subset to extract
- * @param bitLength the length of the subset, i.e. the number of bits to extract
- * @return a byte array with the extracted bits
- * java equivalent: WfBinaryBuffer.extractBits
- */
+/// Returns a byte array with a subset of the bits in the buffer
+/// @param startBit the first bit of the subset to extract
+/// @param bitLength the length of the subset, i.e. the number of bits to extract
+/// @return a byte array with the extracted bits
+/// java equivalent: WfBinaryBuffer.extractBits
 pub fn extract_bits(
     buffer: &[u8],
     buffer_bit_length: usize,
@@ -165,14 +149,11 @@ pub fn extract_bits(
     new_byte_array
 }
 
-/**
- * Appends the specified number of bits from a bytes array to the binary buffer
- * @param byteArray the byte array with the bits to be appended
- * @param nBits the number of bits to be appended from the byte array
- * @return this binary buffer
- * @throws IllegalStateException if the buffer is marked complete and cannot be altered
- * java equivalent: WfBinaryBuffer.appendBits
- */
+/// Appends the specified number of bits from a bytes array to the binary buffer
+/// @param byteArray the byte array with the bits to be appended
+/// @param nBits the number of bits to be appended from the byte array
+/// @return this binary buffer
+/// java equivalent: WfBinaryBuffer.appendBits
 pub fn append_bits(
     buffer_1: &[u8],
     len_1: usize,
@@ -186,20 +167,18 @@ pub fn append_bits(
     }
 
     /* Add bits to the end of the buffer */
-    let new_buffer = concatinate_bits(&buffer_1, len_1, &buffer_2, len_2);
+    let new_buffer = concatinate_bits(buffer_1, len_1, buffer_2, len_2);
 
     (new_buffer, len_1 + len_2)
 }
 
-/**
- * Concatinates two bitsets
- * @param byte_array_1 byte array containing the first bitset
- * @param n_bits_1 number of bits in the first bitset, i.e. which bits to take from the first byte array
- * @param byte_array_2 byte array containing the second bitset
- * @param n_bits_2 number of bits in the second bitset, i.e. which bits to take from the second byte array
- * @return a new byte array with the concatinated bits
- * java equivalent: WfBinaryBuffer.concatinateBits
- */
+/// Concatinates two bitsets
+/// @param byte_array_1 byte array containing the first bitset
+/// @param n_bits_1 number of bits in the first bitset, i.e. which bits to take from the first byte array
+/// @param byte_array_2 byte array containing the second bitset
+/// @param n_bits_2 number of bits in the second bitset, i.e. which bits to take from the second byte array
+/// @return a new byte array with the concatinated bits
+/// java equivalent: WfBinaryBuffer.concatinateBits
 pub fn concatinate_bits(
     byte_array_1: &[u8],
     mut n_bits_1: usize,
@@ -223,7 +202,7 @@ pub fn concatinate_bits(
     let byte_length = byte_length(bit_length);
 
     /* Prepare byte arrays */
-    let byte_array_2_shift = shift_right(&byte_array_2, shift as isize);
+    let byte_array_2_shift = shift_right(byte_array_2, shift as isize);
     let mut new_byte_array = vec![0; byte_length as usize];
 
     /* Concatination */

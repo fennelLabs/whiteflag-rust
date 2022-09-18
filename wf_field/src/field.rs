@@ -63,10 +63,8 @@ impl Field {
         s
     }
 
-    /**
-     * Gets the byte length of the unencoded field value
-     * @return the byte length of the unencoded field value
-     */
+    /// Gets the byte length of the unencoded field value
+    /// @return the byte length of the unencoded field value
     pub fn byte_length(&self) -> usize {
         if let Some(len) = self.definition.expected_byte_length() {
             return len;
@@ -75,16 +73,13 @@ impl Field {
         self.value.len()
     }
 
-    /**
-     * Gets the bit length of the encoded field
-     * @return the bit length of the compressed encoded field value
-     */
+    /// Gets the bit length of the encoded field
+    /// @return the bit length of the compressed encoded field value
     pub fn bit_length(&self) -> usize {
-        return self
-            .definition
+        self.definition
             .bytes
             .encoding
-            .convert_to_bit_length(self.byte_length());
+            .convert_to_bit_length(self.byte_length())
     }
 }
 

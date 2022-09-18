@@ -1,6 +1,3 @@
-#[macro_use]
-extern crate lazy_static;
-
 #[cfg(test)]
 mod codec_tests;
 
@@ -8,6 +5,7 @@ mod codec_tests;
 mod validation_test;
 
 mod byte_configuration;
+#[allow(dead_code)]
 mod codec_positions;
 #[allow(dead_code)]
 pub mod definitions;
@@ -27,11 +25,6 @@ pub use {
     request::create_request_fields,
     types::MessageType,
 };
-
-pub const FIELD_PREFIX: &'static str = "Prefix";
-pub const FIELD_VERSION: &'static str = "Version";
-pub const FIELD_MESSAGETYPE: &'static str = "MessageCode";
-pub const FIELD_TESTMESSAGETYPE: &'static str = "PseudoMessageCode";
 
 pub trait FieldValue: AsRef<str> + Into<String> + std::fmt::Debug {}
 impl<T> FieldValue for T where T: AsRef<str> + Into<String> + std::fmt::Debug {}

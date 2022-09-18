@@ -26,7 +26,5 @@ brew install openssl cmake llvm
 
 ## Windows
 
-```
 - [openssl on windows](https://github.com/fennelLabs/fennel-lib/issues/1)
 - [llvm on windows](https://community.chocolatey.org/packages/llvm)
-```

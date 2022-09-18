@@ -79,37 +79,12 @@ impl From<ConfiguredByteLength> for ByteLength {
     }
 }
 
-/* impl EncodingKind {
-    pub fn get_charset(&self) -> &'static str {
-        match self {
-            EncodingKind::BIN => "[01]",
-            _ => "",
-        }
-    }
-} */
-
 impl Encoding {
-    fn new(
-        charset: &'static str,
-        bit_length: usize,
-        byte_length: ConfiguredByteLength,
-        kind: EncodingKind,
-    ) -> Encoding {
-        Encoding {
-            charset,
-            bit_length,
-            byte_length,
-            kind,
-        }
-    }
-
-    /**
-     * Encodes a Whiteflag message field to compressed binary representation
-     * @since 1.1
-     * @param field the message field to be encoded
-     * @return a binary buffer with the encoded field
-     * java equivalent: WfMessageCodec.encodeField
-     */
+    /// Encodes a Whiteflag message field to compressed binary representation
+    /// @since 1.1
+    /// @param field the message field to be encoded
+    /// @return a binary buffer with the encoded field
+    /// java equivalent: WfMessageCodec.encodeField
     pub fn encode<T: AsRef<str> + std::fmt::Display>(&self, value: T) -> Vec<u8> {
         match &self.kind {
             EncodingKind::UTF8 => value.as_ref().as_bytes().to_vec(),
@@ -122,14 +97,12 @@ impl Encoding {
         }
     }
 
-    /**
-     * Sets the field value from a binary buffer
-     * @since 1.1
-     * @param field the field for which to decode the binary value
-     * @param buffer a binary buffer with the compressed binary encoded field data
-     * @return the uncompressed value of the field
-     * java equivalent: WfMessageCodec.decodeField
-     */
+    /// Sets the field value from a binary buffer
+    /// @since 1.1
+    /// @param field the field for which to decode the binary value
+    /// @param buffer a binary buffer with the compressed binary encoded field data
+    /// @return the uncompressed value of the field
+    /// java equivalent: WfMessageCodec.decodeField
     pub fn decode(&self, buffer: &[u8], bit_length: usize) -> CodecResult<String> {
         let mut s = String::new();
 
@@ -178,15 +151,13 @@ impl Encoding {
     }
 
     pub fn is_fixed_length(&self) -> bool {
-        self.byte_length.as_opt() != None
+        self.byte_length.as_opt().is_some()
     }
 
-    /**
-     * Returns the bit length of a field for a given encoding and unencoded field byte length
-     * @param byteLength the number of bytes in the unencoded field
-     * @return the number of bits in a compressed encoded field
-     * java equivalent: Encoding.bitLength (WfMessageCodec.java)
-     */
+    /// Returns the bit length of a field for a given encoding and unencoded field byte length
+    /// @param byteLength the number of bytes in the unencoded field
+    /// @return the number of bits in a compressed encoded field
+    /// java equivalent: Encoding.bitLength (WfMessageCodec.java)
     pub fn convert_to_bit_length(&self, byte_length: usize) -> usize {
         if self.is_fixed_length() {
             return self.bit_length;
@@ -195,10 +166,7 @@ impl Encoding {
     }
 }
 
-/**
- * The equivalent of following constants can be found as an enum called "Encoding" in WfMessageCodec.java
- */
-
+/// The equivalent of following constants can be found as an enum called "Encoding" in WfMessageCodec.java
 macro_rules! encoding {
     (
         $( $name:ident, $charset:expr, $bit_length:expr, $byte_length:expr );*

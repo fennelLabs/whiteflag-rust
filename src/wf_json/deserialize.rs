@@ -31,7 +31,7 @@ impl<'de> de::Visitor<'de> for FieldValuesVisitor {
         let mut fields: HashMap<usize, String> = HashMap::new();
 
         while let Some((key, value)) = map.next_entry::<String, String>()? {
-            let index = name_map(&key).map_err(|e| serde::de::Error::custom(e))?;
+            let index = name_map(&key).map_err(serde::de::Error::custom)?;
             fields.insert(index, value);
         }
 

@@ -31,7 +31,7 @@ impl Header {
         parser: &mut T,
     ) -> Option<Field> {
         // if this is a test message, then we need to parse the pseudo code
-        if &self.code == &MessageType::Test {
+        if self.code == MessageType::Test {
             let def = definitions::test::PSEUDO_MESSAGE_CODE;
             let pseudo_code = parser.parse(&def);
             self.psuedo_code = Some(MessageType::get_message_code(&pseudo_code));

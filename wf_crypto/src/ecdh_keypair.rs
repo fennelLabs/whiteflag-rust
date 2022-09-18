@@ -26,8 +26,7 @@ impl WhiteflagECDHKeyPair {
     /// Creates a new random ECDH key with the curve specified for Whiteflag key negotiation
     pub fn new() -> Self {
         let secret: StaticSecret = get_session_secret();
-        let pair = Self::from_secret(secret);
-        pair
+        Self::from_secret(secret)
     }
 
     /// Creates an ECDH key pair from an existing private key with the curve specified for Whiteflag key negotiation
@@ -46,8 +45,7 @@ impl WhiteflagECDHKeyPair {
 
     /// Calculates the negotiated shared key with an originator
     pub fn negotiate_as_shared_secret(&self, other: &PublicKey) -> SharedSecret {
-        let secret = get_shared_secret(self.session_secret.clone(), other);
-        secret
+        get_shared_secret(self.session_secret.clone(), other)
     }
 
     pub fn create_aes_cipher(&self, public_key: &PublicKey) -> AESCipher {

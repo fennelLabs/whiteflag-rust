@@ -11,6 +11,7 @@ mod conversions;
 mod decode;
 mod encode;
 
+#[derive(Default)]
 pub struct WhiteflagBuffer {
     data: Vec<u8>,
     bit_length: usize,
@@ -29,6 +30,6 @@ pub trait BufferReader {
 impl BufferReader for FieldDefinition {
     /// used in the decoding process
     fn read(&self, buffer: &WhiteflagBuffer) -> String {
-        buffer.extract_message_value(&self, self.positions.bit_start)
+        buffer.extract_message_value(self, self.positions.bit_start)
     }
 }
