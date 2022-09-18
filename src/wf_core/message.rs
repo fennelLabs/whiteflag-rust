@@ -106,7 +106,7 @@ impl Message {
         let encryption_indicator_index = 2_usize;
         let encryption_indicator = &self.header[encryption_indicator_index]; // the encryption indicator is the 3rd index in the header
 
-        let method = WhiteflagEncryptionMethod::from_str(&encryption_indicator.get()).unwrap();
+        let method = WhiteflagEncryptionMethod::from_str(encryption_indicator.get()).unwrap();
         let encoded: WhiteflagBuffer = self.encode().into();
 
         match method {
