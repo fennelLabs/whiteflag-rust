@@ -110,7 +110,7 @@ impl Message {
         let encoded: WhiteflagBuffer = self.encode().into();
 
         if let WhiteflagEncryptionMethod::NoEncryption = method {
-            return encoded
+            return encoded;
         }
 
         let position = self

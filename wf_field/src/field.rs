@@ -80,11 +80,10 @@ impl Field {
      * @return the bit length of the compressed encoded field value
      */
     pub fn bit_length(&self) -> usize {
-        return self
-            .definition
+        self.definition
             .bytes
             .encoding
-            .convert_to_bit_length(self.byte_length());
+            .convert_to_bit_length(self.byte_length())
     }
 }
 
