@@ -28,11 +28,6 @@ pub use {
     types::MessageType,
 };
 
-pub const FIELD_PREFIX: &'static str = "Prefix";
-pub const FIELD_VERSION: &'static str = "Version";
-pub const FIELD_MESSAGETYPE: &'static str = "MessageCode";
-pub const FIELD_TESTMESSAGETYPE: &'static str = "PseudoMessageCode";
-
 pub trait FieldValue: AsRef<str> + Into<String> + std::fmt::Debug {}
 impl<T> FieldValue for T where T: AsRef<str> + Into<String> + std::fmt::Debug {}
 
