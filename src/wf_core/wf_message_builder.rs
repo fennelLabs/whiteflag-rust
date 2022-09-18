@@ -75,7 +75,7 @@ pub fn builder_from_field_values<T: FieldValue>(data: &[T]) -> Parser {
     Parser::parse(parser)
 }
 
-pub fn builder_from_serialized<'a>(message: &'a str) -> Parser {
+pub fn builder_from_serialized(message: &str) -> Parser {
     let parser = SerializedMessageParser {
         message,
         last_byte: 0,
