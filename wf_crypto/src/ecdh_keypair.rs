@@ -26,8 +26,7 @@ impl WhiteflagECDHKeyPair {
     /// Creates a new random ECDH key with the curve specified for Whiteflag key negotiation
     pub fn new() -> Self {
         let secret: StaticSecret = get_session_secret();
-        let pair = Self::from_secret(secret);
-        pair
+        Self::from_secret(secret)
     }
 
     /// Creates an ECDH key pair from an existing private key with the curve specified for Whiteflag key negotiation
