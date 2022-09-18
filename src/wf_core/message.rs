@@ -109,10 +109,9 @@ impl Message {
         let method = WhiteflagEncryptionMethod::from_str(encryption_indicator.get()).unwrap();
         let encoded: WhiteflagBuffer = self.encode().into();
 
-        match method {
-            WhiteflagEncryptionMethod::NoEncryption => return encoded,
-            _ => (),
-        };
+        if let WhiteflagEncryptionMethod::NoEncryption = method {
+            return encoded
+        }
 
         let position = self
             .header
