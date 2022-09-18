@@ -65,7 +65,7 @@ where
         let mut okm: Vec<u8> = vec![0; key_length];
         self.hk
             .expand(info, &mut okm)
-            .map_err(|e| CryptoError::HkdfOutput(e))?;
+            .map_err(CryptoError::HkdfOutput)?;
         Ok(okm)
     }
 }
