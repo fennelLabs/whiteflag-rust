@@ -45,27 +45,3 @@ impl CryptedBuffer {
         buffer
     }
 }
-
-impl CryptMode {
-    pub fn crypt<T: FennelCipher>(
-        &self,
-        cipher: &T,
-        input: WhiteflagBuffer,
-        position: usize,
-    ) -> WhiteflagBuffer {
-        let mut buffer = WhiteflagBuffer::default();
-        // add unencrypted part
-        buffer.append(input.extract_bits(0, position), None);
-
-        let second_half = input.extract_bits_from(position);
-
-        let crypted_half = match self {
-            CryptMode::Encrypt => cipher.encrypt(second_half),
-            CryptMode::Decrypt => cipher.decrypt(second_half),
-        };
-
-        // add decrypted/encrypted part
-        buffer.append(crypted_half.into(), None);
-        buffer
-    }
-}

@@ -105,20 +105,13 @@ impl Message {
     ) -> WhiteflagBuffer {
         let encryption_indicator_index = 2_usize;
         let encryption_indicator = &self.header[encryption_indicator_index]; // the encryption indicator is the 3rd index in the header
-
         let method = WhiteflagEncryptionMethod::from_str(&encryption_indicator.get()).unwrap();
         let encoded: WhiteflagBuffer = self.encode().into();
 
         match method {
-            WhiteflagEncryptionMethod::NoEncryption => return encoded,
-            _ => (),
-        };
-
-        let position = self
-            .header
-            .bit_length_of_field(encryption_indicator_index as isize);
-
-        mode.crypt(cipher, encoded, position)
+            WhiteflagEncryptionMethod::NoEncryption => encoded,
+            _ => CryptedBuffer::new(encoded).crypt(cipher, mode),
+        }
     }
 
     /// decode a hexadecimal encoded and encrypted whiteflag message
