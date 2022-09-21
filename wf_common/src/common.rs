@@ -67,8 +67,8 @@ pub fn shift_right(buffer: &[u8], shift: isize) -> Vec<u8> {
 
     for i in (1..length).rev() {
         let b = &buffer[i - 1];
-        new_buffer[i] |= (0xFF & b & mask) << (BYTE - modulate);
-        new_buffer[i - 1] = (0xFF & b) >> modulate;
+        new_buffer[i] |= (b & mask) << (BYTE - modulate);
+        new_buffer[i - 1] = b >> modulate;
     }
 
     new_buffer
@@ -92,9 +92,9 @@ pub fn shift_left(buffer: &[u8], shift: isize) -> Vec<u8> {
     let mut new_buffer = vec![0; length];
 
     for i in 0..length {
-        new_buffer[i] = (0xFF & buffer[i]) << modulate;
+        new_buffer[i] = buffer[i] << modulate;
         if i < length - 1 {
-            new_buffer[i] |= (0xFF & buffer[i + 1] & mask) >> (BYTE - modulate);
+            new_buffer[i] |= (buffer[i + 1] & mask) >> (BYTE - modulate);
         }
     }
 
@@ -124,13 +124,12 @@ pub fn extract_bits(
     let mut new_byte_array: Vec<u8> = vec![0; byte_length];
     if shift == 0 {
         /* Faster loop if no shift needed */
-        for byte_index in 0..byte_length {
-            new_byte_array[byte_index] = buffer[start_byte + byte_index];
-        }
+        new_byte_array[..byte_length]
+            .copy_from_slice(&buffer[start_byte..(byte_length + start_byte)]);
     } else {
         /* Loop through bytes to shift */
         for byte_index in 0..byte_length {
-            new_byte_array[byte_index] = (0xFF & buffer[start_byte + byte_index]) << shift;
+            new_byte_array[byte_index] = buffer[start_byte + byte_index] << shift;
         }
 
         let end_byte = if byte_length < (buffer.len() - start_byte) {
@@ -141,7 +140,7 @@ pub fn extract_bits(
 
         for byte_index in 0..end_byte {
             new_byte_array[byte_index] |=
-                (0xFF & buffer[start_byte + byte_index + 1] & mask) >> (BYTE - shift);
+                (buffer[start_byte + byte_index + 1] & mask) >> (BYTE - shift);
         }
     }
 
@@ -225,7 +224,11 @@ pub fn concatinate_bits(
     /* Add the rest of the second byte array */
     let end_byte_2 = start_byte_2 + byte_length - byte_cursor;
 
-    for item in byte_array_2_shift.into_iter().take(end_byte_2).skip(start_byte_2) {
+    for item in byte_array_2_shift
+        .into_iter()
+        .take(end_byte_2)
+        .skip(start_byte_2)
+    {
         new_byte_array[byte_cursor] = item;
         byte_cursor += 1;
     }
