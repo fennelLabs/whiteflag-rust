@@ -231,7 +231,7 @@ fn message_encryption_1() {
     )
     .unwrap();
 
-    key.set_context(&address.to_byte_array());
+    key.set_context(address.to_byte_array());
 
     //40aa85015d24e4601448c1ba8d7bf1aa
     let iv = vec![
@@ -260,7 +260,7 @@ fn message_encryption_2() {
     )
     .unwrap();
 
-    key.set_context(&address.to_byte_array());
+    key.set_context(address.to_byte_array());
 
     let iv = aes_tools::generate_random_buffer(16);
     let cipher = key.aes_256_ctr_cipher(&iv);
@@ -285,7 +285,7 @@ fn message_encryption_3() {
     )
     .unwrap();
 
-    key.set_context(&address.to_byte_array());
+    key.set_context(address.to_byte_array());
 
     let iv = aes_tools::generate_random_buffer(16);
     let cipher = key.aes_256_ctr_cipher(&iv);

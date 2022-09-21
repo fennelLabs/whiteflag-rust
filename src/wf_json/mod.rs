@@ -13,6 +13,6 @@ impl Message {
     pub fn deserialize_from_json<T: AsRef<str>>(json: T) -> Result<Self, WhiteflagError> {
         let message: WhiteflagFieldValues =
             serde_json::from_str(json.as_ref()).map_err(WhiteflagError::Serde)?;
-        Ok(Message::compile(message.fields.as_ref()))
+        Ok(Self::compile(message.fields.as_ref()))
     }
 }

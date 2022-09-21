@@ -39,7 +39,7 @@ impl<'de> de::Visitor<'de> for FieldValuesVisitor {
         sortable.sort_by_key(|p| p.0);
 
         Ok(WhiteflagFieldValues {
-            fields: sortable.iter().map(|p| p.1.to_owned()).collect(),
+            fields: sortable.iter().map(|p| p.1.clone()).collect(),
         })
     }
 }

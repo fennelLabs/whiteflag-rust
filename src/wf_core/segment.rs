@@ -34,7 +34,7 @@ impl MessageSegment {
     }
 
     /// Returns the bit length up to and including the specified field, excluding the last variable length field if not set
-    /// field_index the index of the field up to which the segment length is calculated; negative index counts back from last field
+    /// `field_index` the index of the field up to which the segment length is calculated; negative index counts back from last field
     /// returns the bit length of this segment up to and including the specified field, or 0 if the field does not exist
     pub fn bit_length_of_field(&self, field_index: isize) -> usize {
         /* converts potential negative index into a positive */
@@ -86,6 +86,6 @@ impl DerefMut for MessageSegment {
 
 impl From<Vec<Field>> for MessageSegment {
     fn from(fields: Vec<Field>) -> Self {
-        MessageSegment { fields }
+        Self { fields }
     }
 }

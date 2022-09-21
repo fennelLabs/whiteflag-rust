@@ -12,9 +12,9 @@ impl std::error::Error for WhiteflagError {}
 impl fmt::Display for WhiteflagError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            WhiteflagError::InvalidPattern => write!(f, "pattern was invalid"),
-            WhiteflagError::InvalidLength => write!(f, "length was too short"),
-            WhiteflagError::CannotRetrieveKey => {
+            Self::InvalidPattern => write!(f, "pattern was invalid"),
+            Self::InvalidLength => write!(f, "length was too short"),
+            Self::CannotRetrieveKey => {
                 write!(f, "cannot retrieve encryption key for method")
             }
         }

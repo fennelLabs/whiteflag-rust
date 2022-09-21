@@ -45,8 +45,8 @@ impl Message {
         body: Vec<Field>,
         originator: Option<WhiteflagAccount>,
         recipient: Option<WhiteflagAccount>,
-    ) -> Message {
-        Message {
+    ) -> Self {
+        Self {
             message_code,
             header: header.into(),
             body: body.into(),
@@ -64,7 +64,7 @@ impl Message {
     }
 
     pub fn from_parser(parsed_message: Parser) -> Self {
-        Message::new(
+        Self::new(
             parsed_message.code,
             parsed_message.header,
             parsed_message.body,
@@ -79,7 +79,7 @@ impl Message {
     }
 
     /// construct Message from a serialized string
-    pub fn deserialize(message: &str) -> Message {
+    pub fn deserialize(message: &str) -> Self {
         Self::from_parser(builder_from_serialized(message))
     }
 
@@ -105,7 +105,7 @@ impl Message {
     ) -> WhiteflagBuffer {
         let encryption_indicator_index = 2_usize;
         let encryption_indicator = &self.header[encryption_indicator_index]; // the encryption indicator is the 3rd index in the header
-        let method = WhiteflagEncryptionMethod::from_str(&encryption_indicator.get()).unwrap();
+        let method = WhiteflagEncryptionMethod::from_str(encryption_indicator.get()).unwrap();
         let encoded: WhiteflagBuffer = self.encode().into();
 
         match method {
@@ -145,6 +145,6 @@ impl Message {
 
 impl<T: FieldValue> From<&[T]> for Message {
     fn from(data: &[T]) -> Self {
-        Message::compile(data)
+        Self::compile(data)
     }
 }
