@@ -95,8 +95,8 @@ impl AsRef<String> for Field {
     }
 }
 
-impl Into<String> for Field {
-    fn into(self) -> String {
-        self.value
+impl From<Field> for String {
+    fn from(f: Field) -> Self {
+        f.value
     }
 }

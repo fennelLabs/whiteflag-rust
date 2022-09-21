@@ -19,7 +19,7 @@ pub fn remove_hexadecimal_prefix(data: &str) -> &str {
 /// java equivalent: WfBinaryBuffer.byteLength
 pub fn byte_length(bit_length: usize) -> usize {
     let i_byte = BYTE;
-    (bit_length / i_byte) + (if (bit_length % i_byte) > 0 { 1 } else { 0 })
+    (bit_length / i_byte) + usize::from((bit_length % i_byte) > 0)
 }
 
 /// Shortens the byte array to fit the length of the used bits
@@ -205,12 +205,12 @@ pub fn concatinate_bits(
     let byte_array_2_shift = shift_right(byte_array_2, shift as isize);
     let mut new_byte_array = vec![0; byte_length as usize];
 
-    /* Concatination */
+    /* Concatenation */
     let mut byte_cursor = 0;
     let mut start_byte_2 = 0;
     if byte_length_1 != 0 {
         /* Add first byte array */
-        for byte_index in 0..byte_length_1 {
+        for (byte_index, _) in byte_array_1.iter().enumerate().take(byte_length_1) {
             byte_cursor = byte_index;
             new_byte_array[byte_cursor] = byte_array_1[byte_index];
         }
@@ -225,8 +225,8 @@ pub fn concatinate_bits(
     /* Add the rest of the second byte array */
     let end_byte_2 = start_byte_2 + byte_length - byte_cursor;
 
-    for byte_index in start_byte_2..end_byte_2 {
-        new_byte_array[byte_cursor] = byte_array_2_shift[byte_index];
+    for item in byte_array_2_shift.into_iter().take(end_byte_2).skip(start_byte_2) {
+        new_byte_array[byte_cursor] = item;
         byte_cursor += 1;
     }
 
