@@ -37,12 +37,16 @@ pub enum WhiteflagEncryptionMethod {
     Aes512IegPsk,
 }
 
-impl WhiteflagEncryptionMethod {
-    pub fn from_str(number: &str) -> CryptoResult<Self> {
-        let n = number.parse::<usize>().unwrap();
+impl std::str::FromStr for WhiteflagEncryptionMethod {
+    type Err = CryptoError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let n = s.parse::<usize>().unwrap();
         Self::from_number(n)
     }
+}
 
+impl WhiteflagEncryptionMethod {
     pub fn from_number(number: usize) -> CryptoResult<Self> {
         let method = match number {
             0 => Self::NoEncryption,
