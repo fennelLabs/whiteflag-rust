@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use super::{
     crypted_buffer::{CryptMode, CryptedBuffer},
     segment::MessageSegment,
@@ -105,7 +107,7 @@ impl Message {
     ) -> WhiteflagBuffer {
         let encryption_indicator_index = 2_usize;
         let encryption_indicator = &self.header[encryption_indicator_index]; // the encryption indicator is the 3rd index in the header
-        let method = WhiteflagEncryptionMethod::from_str(&encryption_indicator.get()).unwrap();
+        let method = WhiteflagEncryptionMethod::from_str(encryption_indicator.get()).unwrap();
         let encoded: WhiteflagBuffer = self.encode().into();
 
         match method {

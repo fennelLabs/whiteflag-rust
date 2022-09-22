@@ -24,7 +24,7 @@ pub fn create_request_fields<T: FieldDefinitionParser>(parser: &mut T) -> Vec<Fi
 
     (0..(n.mul(2)))
         .step_by(2)
-        .map(|i| {
+        .flat_map(|i| {
             let n_field = (i / 2) + 1;
             let byte_start = start_byte;
             let byte_split = byte_start + ot_size;
@@ -49,6 +49,5 @@ pub fn create_request_fields<T: FieldDefinitionParser>(parser: &mut T) -> Vec<Fi
                 Field::new_with_name(parser.parse(&oq), format!("{}{}Quant", name, n_field), oq),
             ]
         })
-        .flatten()
         .collect()
 }
