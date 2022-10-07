@@ -14,6 +14,7 @@ mod field_definition;
 mod field_definition_parser;
 mod request;
 mod types;
+mod error;
 
 #[cfg(test)]
 mod test_field_definition;

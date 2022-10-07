@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::{definitions::*, FieldDefinition};
 /* pub enum FieldKind {
     GENERIC,
@@ -127,4 +129,48 @@ pub enum MessageType {
     /// @wfref 4.3.1 Functional Messages: Signs/Signals
     /// @wfref 4.3.1.2.7 Request Signals
     Request,
+}
+
+impl FromStr for MessageType {
+    type Err = super::error::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let t = match s {
+            "A" => MessageType::Authentication,
+            "K" => MessageType::Cryptographic,
+            "T" => MessageType::Test,
+            "R" => MessageType::Resource,
+            "F" => MessageType::FreeText,
+            "P" => MessageType::Protective,
+            "E" => MessageType::Emergency,
+            "D" => MessageType::Danger,
+            "S" => MessageType::Status,
+            "I" => MessageType::Infrastructure,
+            "M" => MessageType::Mission,
+            "Q" => MessageType::Request,
+            _ => MessageType::Any,
+        };
+
+        Ok(t)
+    }
+}
+
+impl ToString for MessageType {
+    fn to_string(&self) -> String {
+        match &self {
+            MessageType::Any => "_",
+            MessageType::Authentication => "A",
+            MessageType::Cryptographic => "K",
+            MessageType::Test => "T",
+            MessageType::Resource => "R",
+            MessageType::FreeText => "F",
+            MessageType::Protective => "P",
+            MessageType::Emergency => "E",
+            MessageType::Danger => "D",
+            MessageType::Status => "S",
+            MessageType::Infrastructure => "I",
+            MessageType::Mission => "M",
+            MessageType::Request => "Q",
+        }.to_string()
+    }
 }
