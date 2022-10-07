@@ -1,4 +1,7 @@
-use crate::Field;
+use crate::{
+    message_body_type::{Authentication, MessageBodyType},
+    Field, MessageCodeType,
+};
 use serde::{Deserialize, Serialize};
 
 const EMPTY_MESSAGE: &str = "0000000000000000000000000000000000000000000000000000000000000000";
@@ -24,6 +27,19 @@ impl Header {
             message_code: code,
             reference_indicator: 0,
             referenced_message: EMPTY_MESSAGE.to_string(),
+        }
+    }
+
+    pub fn code(&self) -> MessageCodeType {
+        MessageCodeType::get_message_code(&self.message_code)
+    }
+
+    pub fn to_body(self) -> MessageBodyType {
+        match &self.code() {
+            MessageCodeType::Authentication => {
+                MessageBodyType::AUTHENTICATION(Authentication::new(self))
+            }
+            _ => MessageBodyType::GENERIC,
         }
     }
 }

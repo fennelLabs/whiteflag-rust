@@ -1,6 +1,6 @@
 use clap::{AppSettings, Parser, Subcommand};
-use std::{error::Error, str::FromStr};
-use wf_field::{Header, MessageCodeType};
+use std::error::Error;
+use wf_field::Header;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
@@ -12,7 +12,11 @@ fn main() -> Result<(), Box<dyn Error>> {
             let keypair = wf_crypto::ecdh_keypair::WhiteflagECDHKeyPair::default();
             serde_json::json!({"something": "" }).to_string()
         }
-        Commands::Message { code } => serde_json::to_string(&Header::new(code))?,
+        Commands::Message { code } => {
+            let header = Header::new(code);
+            let body = header.to_body();
+            body.to_string()?
+        }
     };
 
     println!("{}", result);
