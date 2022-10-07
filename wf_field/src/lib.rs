@@ -24,7 +24,7 @@ pub use {
     field_definition::FieldDefinition,
     field_definition_parser::{FieldDefinitionParser, FieldDefinitionParserBase},
     request::create_request_fields,
-    types::MessageType,
+    types::MessageCodeType,
 };
 
 pub trait FieldValue: AsRef<str> + Into<String> + std::fmt::Debug {}
