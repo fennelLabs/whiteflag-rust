@@ -1,16 +1,6 @@
 use std::str::FromStr;
 
 use crate::{definitions::*, FieldDefinition};
-pub enum MessageBodyType {
-    //GENERIC,
-    AUTHENTICATION,
-    /* CRYPTO,
-    TEXT,
-    RESOURCE,
-    TEST,
-    SIGNAL,
-    REQUEST, */
-}
 
 impl MessageCodeType {
     pub fn from_code(code: char) -> Self {
@@ -171,6 +161,7 @@ impl ToString for MessageCodeType {
             MessageCodeType::Infrastructure => "I",
             MessageCodeType::Mission => "M",
             MessageCodeType::Request => "Q",
-        }.to_string()
+        }
+        .to_string()
     }
 }

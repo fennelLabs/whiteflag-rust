@@ -9,8 +9,9 @@ pub struct Header {
 
 impl Header {
     pub fn new(fields: Vec<Field>) -> Self {
-        let code: MessageCodeType =
-            MessageCodeType::get_message_code(fields[MessageHeaderOrder::MessageCode.as_usize()].get());
+        let code: MessageCodeType = MessageCodeType::get_message_code(
+            fields[MessageHeaderOrder::MessageCode.as_usize()].get(),
+        );
 
         Self {
             fields,
