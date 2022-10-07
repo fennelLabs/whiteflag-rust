@@ -7,6 +7,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     let result = match args.command {
         Commands::Encode { json } => fennel_whiteflag::encode_from_json(json),
         Commands::Decode { hex } => fennel_whiteflag::decode_from_hex(hex),
+        Commands::Authenticate => {
+            let keypair = wf_crypto::ecdh_keypair::WhiteflagECDHKeyPair::default();
+            Ok(serde_json::json!({"something": "" }).to_string())
+        },
     }?;
 
     println!("{}", result);
@@ -28,6 +32,8 @@ pub enum Commands {
 
     #[clap(setting(AppSettings::ArgRequiredElseHelp))]
     Decode { hex: String },
+
+    Authenticate
     /* #[clap(setting(AppSettings::ArgRequiredElseHelp))]
     Encrypt { plaintext: String, identity: u32 },
     #[clap(setting(AppSettings::ArgRequiredElseHelp))]

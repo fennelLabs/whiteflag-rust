@@ -7,4 +7,6 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "3.0.10", features = ["derive"] }
+serde_json = "1.0.81"
 fennel-whiteflag = {path = "../"}
+wf_crypto = {path = "../wf_crypto"}
