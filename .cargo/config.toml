@@ -1,2 +1,3 @@
 [alias]
 t = "test --workspace --lib"
+wf = "run -p wf_cli --"
