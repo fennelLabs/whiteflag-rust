@@ -1,12 +1,9 @@
+mod auth;
 #[cfg(test)]
 mod test;
 
 use clap::{AppSettings, Parser, Subcommand};
-use std::{
-    error::Error,
-    fs::{self, File},
-    path::Path,
-};
+use std::error::Error;
 use wf_field::Header;
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -28,31 +25,6 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     println!("{}", result);
     Ok(())
-}
-
-/// Generates an authentication lock.
-fn acquire_auth_lock() {
-    // Some good, old-fashioned semaphore action.
-    match File::create(Path::new(".authlock")) {
-        Err(why) => panic!("couldn't create .authlock file: {}", why),
-        Ok(file) => file,
-    };
-}
-
-/// Removes the authentication lock.
-fn release_auth_lock() -> bool {
-    match fs::remove_file(".authlock") {
-        Err(_) => false,
-        Ok(_) => true,
-    }
-}
-
-/// Checks whether a lockfile exists.
-fn check_auth_lock() -> bool {
-    match File::open(Path::new(".authlock")) {
-        Err(_) => false,
-        Ok(_) => true,
-    }
 }
 
 #[derive(Parser)]
