@@ -39,17 +39,17 @@ impl Header {
     pub fn to_body(self) -> MessageBodyType {
         match &self.code() {
             MessageCodeType::Authentication => {
-                MessageBodyType::AUTHENTICATION(Authentication::new(self))
+                MessageBodyType::Authentication(Authentication::new(self))
             }
-            MessageCodeType::Resource => MessageBodyType::RESOURCE(Resource::new(self)),
+            MessageCodeType::Resource => MessageBodyType::Resource(Resource::new(self)),
             MessageCodeType::Protective
             | MessageCodeType::Emergency
             | MessageCodeType::Danger
             | MessageCodeType::Status
             | MessageCodeType::Infrastructure
             | MessageCodeType::Mission
-            | MessageCodeType::Request => MessageBodyType::SIGNAL(Signal::new(self)),
-            _ => MessageBodyType::GENERIC,
+            | MessageCodeType::Request => MessageBodyType::Signal(Signal::new(self)),
+            _ => MessageBodyType::Generic,
         }
     }
 }

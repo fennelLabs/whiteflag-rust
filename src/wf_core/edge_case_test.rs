@@ -1,9 +1,9 @@
 use crate::wf_core::message::Message;
 
 mod test_message {
-    pub const SERIALIZED: &'static str = "WF101T33efb4e0cfa83122b242634254c1920a769d615dfcc4c670bb53eb6f12843c3aeM802013-08-31T04:29:15ZP00D00H00M22+30.79658-037.8260287653210042";
+    pub const SERIALIZED: &str = "WF101T33efb4e0cfa83122b242634254c1920a769d615dfcc4c670bb53eb6f12843c3aeM802013-08-31T04:29:15ZP00D00H00M22+30.79658-037.8260287653210042";
     //pub const ENCODED: &'static str = "57463130aa19f7da7067d41891592131a12a60c9053b4eb0aefe6263385da9f5b789421e1d726c01009841882148a800000114c1e596006f04c050eca6420084";
-    pub const VALUES: &'static [&'static str] = &[
+    pub const VALUES: &[&str] = &[
         "WF",
         "1",
         "0",
@@ -25,9 +25,9 @@ mod test_message {
 }
 
 mod request_signal_message {
-    pub const SERIALIZED: &'static str= "WF101Q13efb4e0cfa83122b242634254c1920a769d615dfcc4c670bb53eb6f12843c3ae802013-08-31T04:29:15ZP01D00H00M22+31.79658-033.826028799321000010022003";
+    pub const SERIALIZED: &str= "WF101Q13efb4e0cfa83122b242634254c1920a769d615dfcc4c670bb53eb6f12843c3ae802013-08-31T04:29:15ZP01D00H00M22+31.79658-033.826028799321000010022003";
     //pub const ENCODED: &'static str = "";
-    pub const VALUES: &'static [&'static str] = &[
+    pub const VALUES: &[&str] = &[
         "WF",
         "1",
         "0",

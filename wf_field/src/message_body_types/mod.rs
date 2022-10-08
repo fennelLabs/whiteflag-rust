@@ -9,24 +9,24 @@ pub use {authentication::Authentication, crypto::Crypto, resource::Resource, sig
 
 /// 4.3 Message Body
 pub enum MessageBodyType {
-    GENERIC,
-    AUTHENTICATION(Authentication),
-    CRYPTO(Crypto),
-    TEXT,
+    Generic,
+    Authentication(Authentication),
+    Crypto(Crypto),
+    Text,
     // TEST,
-    RESOURCE(Resource),
-    SIGNAL(Signal),
+    Resource(Resource),
+    Signal(Signal),
     //REQUEST,
 }
 
 impl MessageBodyType {
     pub fn to_string(&self) -> Result<String, Error> {
         Ok(match &self {
-            MessageBodyType::GENERIC => "".to_string(),
-            MessageBodyType::AUTHENTICATION(a) => serde_json::to_string(a)?,
-            MessageBodyType::CRYPTO(c) => serde_json::to_string(c)?,
-            MessageBodyType::RESOURCE(r) => serde_json::to_string(r)?,
-            MessageBodyType::SIGNAL(s) => serde_json::to_string(s)?,
+            MessageBodyType::Generic => "".to_string(),
+            MessageBodyType::Authentication(a) => serde_json::to_string(a)?,
+            MessageBodyType::Crypto(c) => serde_json::to_string(c)?,
+            MessageBodyType::Resource(r) => serde_json::to_string(r)?,
+            MessageBodyType::Signal(s) => serde_json::to_string(s)?,
             _ => todo!(),
         })
     }
