@@ -1,6 +1,5 @@
 use crate::{
     definitions::*,
-    message_body_types::{Authentication, MessageBodyType},
     FieldDefinition, Header,
 };
 use std::str::FromStr;

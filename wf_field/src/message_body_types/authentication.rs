@@ -1,4 +1,4 @@
-use crate::{Header, MessageCodeType};
+use crate::Header;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]

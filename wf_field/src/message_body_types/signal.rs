@@ -1,4 +1,4 @@
-use crate::{Header, MessageCodeType};
+use crate::Header;
 use serde::{Deserialize, Serialize};
 
 /// 4.3.1.1 Signs & Signals Message Fields
@@ -20,7 +20,7 @@ pub struct Signal {
     object_longitude: String,
     /// Specifies the size of the object’s first dimension in meters
     object_size_dim1: String,
-    ///  	Specifies the size of the object’s second dimension in meters
+    /// Specifies the size of the object’s second dimension in meters
     object_size_dim2: String,
     /// Specifies the object’s orientation in degrees
     object_orientation: String,
