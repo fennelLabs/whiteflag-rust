@@ -24,6 +24,7 @@ mod message_body_types;
 mod test_field_definition;
 
 pub use {
+    error::Error,
     field::Field,
     field_definition::FieldDefinition,
     field_definition_parser::{FieldDefinitionParser, FieldDefinitionParserBase},

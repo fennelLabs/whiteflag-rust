@@ -4,33 +4,16 @@ mod test;
 
 use clap::{AppSettings, Parser, Subcommand};
 use std::error::Error;
-use wf_field::Header;
-
-use crate::auth::UserAuthenticationState;
+use wf_cli::WhiteflagCLICommands;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
 
     let result = match args.command {
-        Commands::Encode { json } => fennel_whiteflag::encode_from_json(json)?,
-        Commands::Decode { hex } => fennel_whiteflag::decode_from_hex(hex)?,
-        Commands::Auth { logout } => {
-            if logout {
-                UserAuthenticationState::logout()
-            } else {
-                UserAuthenticationState::login()
-            }
-            .to_string()
-        }
-        Commands::Message { code } => {
-            if UserAuthenticationState::is_authenticated() == false {
-                "error: must authenticate using `wf auth`".to_string()
-            } else {
-                let header = Header::new(code);
-                let body = header.to_body();
-                body.to_string()?
-            }
-        }
+        Commands::Encode { json } => WhiteflagCLICommands::encode(json)?,
+        Commands::Decode { hex } => WhiteflagCLICommands::decode(hex)?,
+        Commands::Auth { logout } => WhiteflagCLICommands::auth(logout)?,
+        Commands::Message { code } => WhiteflagCLICommands::message(code)?,
     };
 
     println!("{}", result);
