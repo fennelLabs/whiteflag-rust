@@ -27,3 +27,29 @@ pub fn check_auth_lock() -> bool {
         Ok(_) => true,
     }
 }
+
+pub struct UserAuthenticationState;
+
+impl UserAuthenticationState {
+    pub fn is_authenticated() -> bool {
+        check_auth_lock()
+    }
+
+    pub fn login() -> &'static str {
+        if check_auth_lock() {
+            return "already logged in";
+        }
+
+        acquire_auth_lock();
+        "success!"
+    }
+
+    pub fn logout() -> &'static str {
+        if check_auth_lock() {
+            release_auth_lock();
+            return "success!";
+        }
+
+        "error: no active session to logout from"
+    }
+}
