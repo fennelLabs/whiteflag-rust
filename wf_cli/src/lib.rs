@@ -8,11 +8,11 @@ pub struct WhiteflagCLICommands;
 pub type WhiteflagCLIResult<T> = Result<T, error::WhiteflagCLIError>;
 
 impl WhiteflagCLICommands {
-    pub fn encode(json: String) -> WhiteflagCLIResult<String> {
+    pub fn encode<T: AsRef<str>>(json: T) -> WhiteflagCLIResult<String> {
         Ok(fennel_whiteflag::encode_from_json(json)?)
     }
 
-    pub fn decode(hex: String) -> WhiteflagCLIResult<String> {
+    pub fn decode<T: AsRef<str>>(hex: T) -> WhiteflagCLIResult<String> {
         Ok(fennel_whiteflag::decode_from_hex(hex)?)
     }
 
