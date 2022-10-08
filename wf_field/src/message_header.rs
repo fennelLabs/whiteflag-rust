@@ -14,6 +14,7 @@ pub struct Header {
     encryption_indicator: usize,
     duress_indicator: usize,
     message_code: String,
+    /// 4.2.1.7 Reference Indicator Field
     reference_indicator: usize,
     referenced_message: String,
 }

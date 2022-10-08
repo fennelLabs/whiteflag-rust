@@ -1,7 +1,4 @@
-use crate::{
-    definitions::*,
-    FieldDefinition, Header,
-};
+use crate::{definitions::*, FieldDefinition, Header};
 use std::str::FromStr;
 
 impl MessageCodeType {
