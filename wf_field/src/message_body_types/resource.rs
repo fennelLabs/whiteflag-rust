@@ -32,9 +32,3 @@ impl Resource {
         }
     }
 }
-
-impl Default for Resource {
-    fn default() -> Self {
-        Self::new(Header::new(MessageCodeType::Resource.to_string()))
-    }
-}

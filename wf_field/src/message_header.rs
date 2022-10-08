@@ -1,5 +1,5 @@
 use crate::{
-    message_body_types::{Authentication, MessageBodyType, Resource},
+    message_body_types::{Authentication, MessageBodyType, Resource, Signal},
     Field, MessageCodeType,
 };
 use serde::{Deserialize, Serialize};
@@ -41,6 +41,13 @@ impl Header {
                 MessageBodyType::AUTHENTICATION(Authentication::new(self))
             }
             MessageCodeType::Resource => MessageBodyType::RESOURCE(Resource::new(self)),
+            MessageCodeType::Protective
+            | MessageCodeType::Emergency
+            | MessageCodeType::Danger
+            | MessageCodeType::Status
+            | MessageCodeType::Infrastructure
+            | MessageCodeType::Mission
+            | MessageCodeType::Request => MessageBodyType::SIGNAL(Signal::new(self)),
             _ => MessageBodyType::GENERIC,
         }
     }

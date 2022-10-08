@@ -1,7 +1,7 @@
 use crate::{
     definitions::*,
     message_body_types::{Authentication, MessageBodyType},
-    FieldDefinition,
+    FieldDefinition, Header,
 };
 use std::str::FromStr;
 
@@ -50,13 +50,17 @@ impl MessageCodeType {
         )
     }
 
-    pub fn to_body(&self) -> MessageBodyType {
+    /* pub fn to_body(&self) -> MessageBodyType {
         match &self {
             MessageCodeType::Authentication => {
                 MessageBodyType::AUTHENTICATION(Authentication::default())
             }
             _ => MessageBodyType::GENERIC,
         }
+    } */
+
+    pub fn to_header(&self) -> Header {
+        Header::new(self.to_string())
     }
 }
 

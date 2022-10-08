@@ -20,9 +20,3 @@ impl Authentication {
         }
     }
 }
-
-impl Default for Authentication {
-    fn default() -> Self {
-        Self::new(Header::new(MessageCodeType::Authentication.to_string()))
-    }
-}
