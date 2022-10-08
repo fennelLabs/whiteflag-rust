@@ -45,40 +45,40 @@ impl<'de> de::Visitor<'de> for FieldValuesVisitor {
 }
 
 fn name_map(name: &str) -> Result<usize, String> {
-    let index = match name.to_lowercase().as_str() {
+    let index = match name {
         /* headers */
         "prefix" => 0,
         "version" => 1,
-        "encryptionindicator" => 2,
-        "duressindicator" => 3,
-        "messagecode" => 4,
-        "referenceindicator" => 5,
-        "referencedmessage" => 6,
+        "encryptionIndicator" => 2,
+        "duressIndicator" => 3,
+        "messageCode" => 4,
+        "referenceIndicator" => 5,
+        "referencedMessage" => 6,
         /* authentication */
-        "verificationmethod" => 7,
-        "verificationdata" => 8,
+        "verificationMethod" => 7,
+        "verificationData" => 8,
         /* crypto */
-        "cryptodatatype" => 9,
-        "cryptodata" => 10,
+        "cryptoDataType" => 9,
+        "cryptoData" => 10,
         /* free text */
         "text" => 11,
         /* resource */
-        "resourcemethod" => 12,
-        "resourcedata" => 13,
+        "resourceMethod" => 12,
+        "resourceData" => 13,
         /* test */
-        "pseudomessagecode" => 14,
+        "pseudoMessageCode" => 14,
         /* sign signal */
-        "subjectcode" => 15,
+        "subjectCode" => 15,
         "datetime" => 16,
         "duration" => 17,
-        "objecttype" => 18,
-        "objectlatitude" => 19,
-        "objectlongitude" => 20,
-        "objectsizedim1" => 21,
-        "objectsizedim2" => 22,
-        "objectorientation" => 23,
+        "objectType" => 18,
+        "objectLatitude" => 19,
+        "objectLongitude" => 20,
+        "objectSizeDim1" => 21,
+        "objectSizeDim2" => 22,
+        "objectOrientation" => 23,
         /* request */
-        "objecttypequant" => 24,
+        "objectTypeQuant" => 24,
         _ => return Err(format!("missing index for field: {}", &name)),
     };
 

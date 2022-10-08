@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 /// 4.3.1.1 Signs & Signals Message Fields
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Signal {
     #[serde(flatten)]
     header: Header,
