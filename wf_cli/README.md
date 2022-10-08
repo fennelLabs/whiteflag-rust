@@ -52,12 +52,12 @@ cargo run -- message A
 
 Supported Message Codes:
 
-- A => Authentication,
-- R => Resource,
-- F => FreeText,
-- P => Protective,
-- E => Emergency,
-- D => Danger,
-- S => Status,
-- I => Infrastructure,
-- M => Mission,
+- A => Authentication
+- R => Resource
+- F => FreeText
+- P => Protective
+- E => Emergency
+- D => Danger
+- S => Status
+- I => Infrastructure
+- M => Mission
