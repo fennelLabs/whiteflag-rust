@@ -25,6 +25,7 @@ impl EncryptionAlgorithm {
 /// No implementation specific properties and methods are defined by this class.
 ///
 /// Whiteflag Specification 5.2.3 Key and Token Derivation
+/// 4.2.1.4 Encryption Indicator Field
 #[derive(Clone)]
 pub enum WhiteflagEncryptionMethod {
     /// Encryption Method 0: no encryption

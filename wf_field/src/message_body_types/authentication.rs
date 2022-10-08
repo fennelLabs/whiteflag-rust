@@ -1,25 +1,5 @@
-use crate::{error::Error, Header, MessageCodeType};
+use crate::{Header, MessageCodeType};
 use serde::{Deserialize, Serialize};
-
-pub enum MessageBodyType {
-    GENERIC,
-    AUTHENTICATION(Authentication),
-    /* CRYPTO,
-    TEXT,
-    RESOURCE,
-    TEST,
-    SIGNAL,
-    REQUEST, */
-}
-
-impl MessageBodyType {
-    pub fn to_string(&self) -> Result<String, Error> {
-        Ok(match &self {
-            MessageBodyType::GENERIC => "".to_string(),
-            MessageBodyType::AUTHENTICATION(a) => serde_json::to_string(a)?,
-        })
-    }
-}
 
 #[derive(Serialize, Deserialize)]
 pub struct Authentication {

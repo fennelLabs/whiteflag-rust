@@ -1,11 +1,12 @@
 use crate::{
-    message_body_type::{Authentication, MessageBodyType},
+    message_body_types::{Authentication, MessageBodyType, Resource},
     Field, MessageCodeType,
 };
 use serde::{Deserialize, Serialize};
 
 const EMPTY_MESSAGE: &str = "0000000000000000000000000000000000000000000000000000000000000000";
 
+/// 4.2.1.1 Generic Message Header Fields
 #[derive(Serialize, Deserialize)]
 pub struct Header {
     prefix: String,
@@ -39,6 +40,7 @@ impl Header {
             MessageCodeType::Authentication => {
                 MessageBodyType::AUTHENTICATION(Authentication::new(self))
             }
+            MessageCodeType::Resource => MessageBodyType::RESOURCE(Resource::new(self)),
             _ => MessageBodyType::GENERIC,
         }
     }

@@ -13,10 +13,12 @@ mod error;
 mod field;
 mod field_definition;
 mod field_definition_parser;
-mod message_body_type;
+
 mod message_header;
 mod request;
 mod types;
+
+mod message_body_types;
 
 #[cfg(test)]
 mod test_field_definition;
