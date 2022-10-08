@@ -8,14 +8,15 @@ const EMPTY_MESSAGE: &str = "000000000000000000000000000000000000000000000000000
 
 /// 4.2.1.1 Generic Message Header Fields
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Header {
     prefix: String,
     version: String,
-    encryption_indicator: usize,
-    duress_indicator: usize,
+    encryption_indicator: String,
+    duress_indicator: String,
     message_code: String,
     /// 4.2.1.7 Reference Indicator Field
-    reference_indicator: usize,
+    reference_indicator: String,
     referenced_message: String,
 }
 
@@ -24,10 +25,10 @@ impl Header {
         Self {
             prefix: "WF".to_string(),
             version: "1".to_string(),
-            encryption_indicator: 0,
-            duress_indicator: 0,
+            encryption_indicator: "0".to_string(),
+            duress_indicator: "0".to_string(),
             message_code: code,
-            reference_indicator: 0,
+            reference_indicator: "0".to_string(),
             referenced_message: EMPTY_MESSAGE.to_string(),
         }
     }

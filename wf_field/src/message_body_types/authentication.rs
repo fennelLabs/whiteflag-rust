@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 /// 4.3.4.1 Authentication Message Fields
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Authentication {
     #[serde(flatten)]
     header: Header,
@@ -12,7 +13,7 @@ pub struct Authentication {
     /// 4.3.4.2 Verification Method Field
     /// 1 = Internet Resource
     /// 2 = Shared Token
-    verification_method: usize,
+    verification_method: String,
 
     /// Provides the data required for authentication
     ///
@@ -25,7 +26,7 @@ impl Authentication {
     pub fn new(header: Header) -> Self {
         Self {
             header,
-            verification_method: 1,
+            verification_method: "1".to_string(),
             verification_data: "https://organisation.int/whiteflag".to_string(),
         }
     }

@@ -2,6 +2,7 @@ use crate::Header;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Crypto {
     #[serde(flatten)]
     header: Header,

@@ -13,7 +13,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         Commands::Encode { json } => WhiteflagCLICommands::encode(json)?,
         Commands::Decode { hex } => WhiteflagCLICommands::decode(hex)?,
         Commands::Auth { logout } => WhiteflagCLICommands::auth(logout)?,
-        Commands::Message { code } => WhiteflagCLICommands::message(code)?.as_json(),
+        Commands::Message { code } => {
+            let hex = WhiteflagCLICommands::message(code)?.as_hex()?;
+            hex
+        }
     };
 
     println!("{}", result);
