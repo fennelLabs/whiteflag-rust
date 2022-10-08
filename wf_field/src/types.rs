@@ -1,49 +1,40 @@
-use crate::{definitions::*, FieldDefinition};
-/* pub enum FieldKind {
-    GENERIC,
-    AUTHENTICATION,
-    CRYPTO,
-    TEXT,
-    RESOURCE,
-    TEST,
-    SIGNAL,
-    REQUEST,
-} */
+use crate::{definitions::*, FieldDefinition, Header};
+use std::str::FromStr;
 
-impl MessageType {
+impl MessageCodeType {
     pub fn from_code(code: char) -> Self {
         match code {
-            'A' => MessageType::Authentication,
-            'K' => MessageType::Cryptographic,
-            'T' => MessageType::Test,
-            'R' => MessageType::Resource,
-            'F' => MessageType::FreeText,
-            'P' => MessageType::Protective,
-            'E' => MessageType::Emergency,
-            'D' => MessageType::Danger,
-            'S' => MessageType::Status,
-            'I' => MessageType::Infrastructure,
-            'M' => MessageType::Mission,
-            'Q' => MessageType::Request,
-            _ => MessageType::Any,
+            'A' => MessageCodeType::Authentication,
+            'K' => MessageCodeType::Cryptographic,
+            'T' => MessageCodeType::Test,
+            'R' => MessageCodeType::Resource,
+            'F' => MessageCodeType::FreeText,
+            'P' => MessageCodeType::Protective,
+            'E' => MessageCodeType::Emergency,
+            'D' => MessageCodeType::Danger,
+            'S' => MessageCodeType::Status,
+            'I' => MessageCodeType::Infrastructure,
+            'M' => MessageCodeType::Mission,
+            'Q' => MessageCodeType::Request,
+            _ => MessageCodeType::Any,
         }
     }
 
     pub fn definitions(&self) -> &'static [FieldDefinition] {
         match &self {
-            MessageType::Any => panic!("no definition fields for undefined message type"),
-            MessageType::Authentication => authentication::DEFINITIONS,
-            MessageType::Cryptographic => crypto::DEFINITIONS,
-            MessageType::Test => test::DEFINITIONS,
-            MessageType::Resource => resource::DEFINITIONS,
-            MessageType::FreeText => freetext::DEFINITIONS,
-            MessageType::Protective
-            | MessageType::Emergency
-            | MessageType::Danger
-            | MessageType::Status
-            | MessageType::Infrastructure
-            | MessageType::Mission
-            | MessageType::Request => sign::DEFINITIONS,
+            MessageCodeType::Any => panic!("no definition fields for undefined message type"),
+            MessageCodeType::Authentication => authentication::DEFINITIONS,
+            MessageCodeType::Cryptographic => crypto::DEFINITIONS,
+            MessageCodeType::Test => test::DEFINITIONS,
+            MessageCodeType::Resource => resource::DEFINITIONS,
+            MessageCodeType::FreeText => freetext::DEFINITIONS,
+            MessageCodeType::Protective
+            | MessageCodeType::Emergency
+            | MessageCodeType::Danger
+            | MessageCodeType::Status
+            | MessageCodeType::Infrastructure
+            | MessageCodeType::Mission
+            | MessageCodeType::Request => sign::DEFINITIONS,
         }
     }
 
@@ -54,10 +45,23 @@ impl MessageType {
                 .unwrap_or_else(|| panic!("invalid message code: {}", code)),
         )
     }
+
+    /* pub fn to_body(&self) -> MessageBodyType {
+        match &self {
+            MessageCodeType::Authentication => {
+                MessageBodyType::AUTHENTICATION(Authentication::default())
+            }
+            _ => MessageBodyType::GENERIC,
+        }
+    } */
+
+    pub fn to_header(&self) -> Header {
+        Header::new(self.to_string())
+    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
-pub enum MessageType {
+pub enum MessageCodeType {
     /// Undefined message type
     Any,
 
@@ -127,4 +131,49 @@ pub enum MessageType {
     /// @wfref 4.3.1 Functional Messages: Signs/Signals
     /// @wfref 4.3.1.2.7 Request Signals
     Request,
+}
+
+impl FromStr for MessageCodeType {
+    type Err = super::error::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let t = Self::get_message_code(s); /* match s {
+                                               "A" => MessageCodeType::Authentication,
+                                               "K" => MessageCodeType::Cryptographic,
+                                               "T" => MessageCodeType::Test,
+                                               "R" => MessageCodeType::Resource,
+                                               "F" => MessageCodeType::FreeText,
+                                               "P" => MessageCodeType::Protective,
+                                               "E" => MessageCodeType::Emergency,
+                                               "D" => MessageCodeType::Danger,
+                                               "S" => MessageCodeType::Status,
+                                               "I" => MessageCodeType::Infrastructure,
+                                               "M" => MessageCodeType::Mission,
+                                               "Q" => MessageCodeType::Request,
+                                               _ => MessageCodeType::Any,
+                                           }; */
+
+        Ok(t)
+    }
+}
+
+impl ToString for MessageCodeType {
+    fn to_string(&self) -> String {
+        match &self {
+            MessageCodeType::Any => "_",
+            MessageCodeType::Authentication => "A",
+            MessageCodeType::Cryptographic => "K",
+            MessageCodeType::Test => "T",
+            MessageCodeType::Resource => "R",
+            MessageCodeType::FreeText => "F",
+            MessageCodeType::Protective => "P",
+            MessageCodeType::Emergency => "E",
+            MessageCodeType::Danger => "D",
+            MessageCodeType::Status => "S",
+            MessageCodeType::Infrastructure => "I",
+            MessageCodeType::Mission => "M",
+            MessageCodeType::Request => "Q",
+        }
+        .to_string()
+    }
 }

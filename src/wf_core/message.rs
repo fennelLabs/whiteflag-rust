@@ -12,7 +12,7 @@ use aes_tools::FennelCipher;
 use wf_account::whiteflag_account::WhiteflagAccount;
 use wf_buffer::WhiteflagBuffer;
 use wf_crypto::encryption_method::WhiteflagEncryptionMethod;
-use wf_field::{Field, MessageType};
+use wf_field::{Field, MessageCodeType};
 use wf_parser::Parser;
 
 const METAKEY_ORIGINATOR: &str = "originatorAddress";
@@ -20,7 +20,7 @@ const METAKEY_RECIPIENT: &str = "recipientAddress";
 const FIELD_ENCRYPTIONINDICATOR: &str = "EncryptionIndicator";
 
 pub struct Message {
-    message_code: MessageType,
+    message_code: MessageCodeType,
     header: MessageSegment,
     body: MessageSegment,
 
@@ -42,7 +42,7 @@ impl MessageSegment {
 
 impl Message {
     pub fn new(
-        message_code: MessageType,
+        message_code: MessageCodeType,
         header: Vec<Field>,
         body: Vec<Field>,
         originator: Option<WhiteflagAccount>,

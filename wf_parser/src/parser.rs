@@ -1,11 +1,11 @@
 use wf_field::{
-    create_request_fields, Field, FieldDefinitionParser, FieldDefinitionParserBase, MessageType,
+    create_request_fields, Field, FieldDefinitionParser, FieldDefinitionParserBase, MessageCodeType,
 };
 
 use crate::header::Header;
 
 pub struct Parser {
-    pub code: MessageType,
+    pub code: MessageCodeType,
     pub header: Vec<Field>,
     pub body: Vec<Field>,
 }
@@ -26,7 +26,7 @@ impl Parser {
         let body_defs = code.definitions().to_vec();
         body.append(parser.parse_fields(body_defs).as_mut());
 
-        if code == MessageType::Request {
+        if code == MessageCodeType::Request {
             body.append(create_request_fields(&mut parser).as_mut());
         }
 

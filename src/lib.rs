@@ -1,4 +1,4 @@
-use error::WhiteflagError;
+pub use error::WhiteflagError;
 
 mod error;
 #[allow(dead_code)]
