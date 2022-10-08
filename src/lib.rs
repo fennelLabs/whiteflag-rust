@@ -1,4 +1,5 @@
 pub use error::WhiteflagError;
+use wf_field::{Header, MessageBodyType};
 
 mod error;
 #[allow(dead_code)]
@@ -58,4 +59,28 @@ pub fn decode_from_hex<T: AsRef<str>>(hex: T) -> Result<String, WhiteflagError> 
     let json = serde_json::to_string(&message).map_err(WhiteflagError::Serde)?;
 
     Ok(json)
+}
+
+pub struct WhiteflagMessage {
+    body: MessageBodyType,
+    json: String,
+}
+
+impl WhiteflagMessage {
+    pub fn new(code: String) -> Result<Self, WhiteflagError> {
+        let header = Header::new(code);
+        let body = header.to_body();
+        Ok(Self {
+            json: body.to_string()?,
+            body,
+        })
+    }
+
+    pub fn as_json(self) -> String {
+        self.json
+    }
+
+    pub fn as_hex(&self) -> Result<String, WhiteflagError> {
+        encode_from_json(&self.json)
+    }
 }

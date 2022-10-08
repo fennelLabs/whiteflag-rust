@@ -2,7 +2,7 @@ mod auth;
 mod error;
 
 use crate::auth::UserAuthenticationState;
-use wf_field::Header;
+pub use fennel_whiteflag::WhiteflagMessage;
 
 pub struct WhiteflagCLICommands;
 pub type WhiteflagCLIResult<T> = Result<T, error::WhiteflagCLIError>;
@@ -25,13 +25,11 @@ impl WhiteflagCLICommands {
         .to_string())
     }
 
-    pub fn message(code: String) -> WhiteflagCLIResult<String> {
+    pub fn message(code: String) -> WhiteflagCLIResult<WhiteflagMessage> {
         if UserAuthenticationState::is_authenticated() == false {
-            Ok("error: must authenticate using `wf auth`".to_string())
+            Err(error::WhiteflagCLIError::AuthenticationRequired)
         } else {
-            let header = Header::new(code);
-            let body = header.to_body();
-            Ok(body.to_string()?)
+            Ok(WhiteflagMessage::new(code)?)
         }
     }
 }

@@ -28,6 +28,7 @@ pub use {
     field::Field,
     field_definition::FieldDefinition,
     field_definition_parser::{FieldDefinitionParser, FieldDefinitionParserBase},
+    message_body_types::MessageBodyType,
     message_header::{Header, MessageHeaderOrder},
     request::create_request_fields,
     types::MessageCodeType,
