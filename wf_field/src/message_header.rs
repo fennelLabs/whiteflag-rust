@@ -33,6 +33,18 @@ impl Header {
         }
     }
 
+    pub fn new_discontinue(code: String, reference_indicator: String) -> Self {
+        Self {
+            prefix: "WF".to_string(),
+            version: "1".to_string(),
+            encryption_indicator: "0".to_string(),
+            duress_indicator: "0".to_string(),
+            message_code: code,
+            reference_indicator: reference_indicator,
+            referenced_message: EMPTY_MESSAGE.to_string(),
+        }
+    }
+
     pub fn code(&self) -> MessageCodeType {
         MessageCodeType::get_message_code(&self.message_code)
     }
