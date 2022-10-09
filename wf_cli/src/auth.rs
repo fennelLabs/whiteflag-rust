@@ -3,6 +3,8 @@ use std::{
     path::Path,
 };
 
+use fennel_whiteflag::WhiteflagMessage;
+
 /// Generates an authentication lock.
 pub fn acquire_auth_lock() {
     // Some good, old-fashioned semaphore action.
@@ -35,21 +37,26 @@ impl UserAuthenticationState {
         check_auth_lock()
     }
 
-    pub fn login() -> &'static str {
+    pub fn login() -> String {
         if check_auth_lock() {
-            return "already logged in";
+            return "already logged in".to_owned();
         }
 
         acquire_auth_lock();
-        "success!"
+        WhiteflagMessage::new("A".to_string())
+            .unwrap()
+            .as_hex()
+            .unwrap()
     }
 
-    pub fn logout() -> &'static str {
+    pub fn logout() -> String {
         if check_auth_lock() {
             release_auth_lock();
-            return "success!";
+            return WhiteflagMessage::new_discontinue("A".to_owned(), "4".to_owned())
+                .unwrap()
+                .as_json();
         }
 
-        "error: no active session to logout from"
+        "error: no active session to logout from".to_owned()
     }
 }

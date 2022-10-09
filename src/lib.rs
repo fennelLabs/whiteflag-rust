@@ -76,6 +76,15 @@ impl WhiteflagMessage {
         })
     }
 
+    pub fn new_discontinue(code: String, reference_indicator: String) -> Result<Self, WhiteflagError> {
+        let header = Header::new_discontinue(code, reference_indicator);
+        let body = header.to_body();
+        Ok(Self {
+            json: body.to_string()?,
+            body,
+        })
+    }
+
     pub fn as_json(self) -> String {
         self.json
     }
