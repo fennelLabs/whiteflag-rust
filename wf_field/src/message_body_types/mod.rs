@@ -2,17 +2,21 @@ use crate::error::Error;
 
 mod authentication;
 mod crypto;
+mod freetext;
 mod resource;
 mod signal;
 
-pub use {authentication::Authentication, crypto::Crypto, resource::Resource, signal::Signal};
+pub use {
+    authentication::Authentication, crypto::Crypto, freetext::FreeText, resource::Resource,
+    signal::Signal,
+};
 
 /// 4.3 Message Body
 pub enum MessageBodyType {
     Generic,
     Authentication(Authentication),
     Crypto(Crypto),
-    Text,
+    Text(freetext::FreeText),
     // TEST,
     Resource(Resource),
     Signal(Signal),
@@ -27,6 +31,7 @@ impl MessageBodyType {
             MessageBodyType::Crypto(c) => serde_json::to_string(c)?,
             MessageBodyType::Resource(r) => serde_json::to_string(r)?,
             MessageBodyType::Signal(s) => serde_json::to_string(s)?,
+            MessageBodyType::Text(s) => serde_json::to_string(s)?,
             _ => todo!(),
         })
     }
