@@ -43,9 +43,7 @@ impl UserAuthenticationState {
         }
 
         acquire_auth_lock();
-        WhiteflagMessage::new("A".to_string())
-            .unwrap()
-            .as_json()
+        WhiteflagMessage::new("A".to_string()).unwrap().as_json()
     }
 
     pub fn logout() -> String {
