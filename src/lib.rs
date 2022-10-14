@@ -76,7 +76,7 @@ impl WhiteflagMessage {
         })
     }
 
-    pub fn new_discontinue(
+    pub fn new_with_reference(
         code: String,
         reference_indicator: String,
     ) -> Result<Self, WhiteflagError> {

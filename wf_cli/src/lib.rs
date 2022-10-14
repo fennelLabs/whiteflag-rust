@@ -26,10 +26,18 @@ impl WhiteflagCLICommands {
     }
 
     pub fn message(code: String) -> WhiteflagCLIResult<WhiteflagMessage> {
-        if UserAuthenticationState::is_authenticated() == false {
+        if !UserAuthenticationState::is_authenticated() {
             Err(error::WhiteflagCLIError::AuthenticationRequired)
         } else {
             Ok(WhiteflagMessage::new(code)?)
+        }
+    }
+
+    pub fn message_with_reference(code: String, reference_code: String) -> WhiteflagCLIResult<WhiteflagMessage> {
+        if !UserAuthenticationState::is_authenticated() {
+            Err(error::WhiteflagCLIError::AuthenticationRequired)
+        } else {
+            Ok(WhiteflagMessage::new_with_reference(code, reference_code)?)
         }
     }
 }
