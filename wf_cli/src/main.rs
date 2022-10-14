@@ -16,10 +16,11 @@ fn main() -> Result<(), Box<dyn Error>> {
         Commands::Message { code } => {
             let hex = WhiteflagCLICommands::message(code)?.as_hex()?;
             hex
-        },
-        Commands::MessageWithReferenceCode { code, reference_code } => {
-            WhiteflagCLICommands::message_with_reference(code, reference_code)?.as_hex()?
         }
+        Commands::MessageWithReferenceCode {
+            code,
+            reference_code,
+        } => WhiteflagCLICommands::message_with_reference(code, reference_code)?.as_hex()?,
     };
 
     println!("{}", result);
@@ -49,5 +50,8 @@ pub enum Commands {
     Message { code: String },
 
     #[clap()]
-    MessageWithReferenceCode { code: String, reference_code: String },
+    MessageWithReferenceCode {
+        code: String,
+        reference_code: String,
+    },
 }
