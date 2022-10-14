@@ -49,7 +49,7 @@ impl UserAuthenticationState {
     pub fn logout() -> String {
         if check_auth_lock() {
             release_auth_lock();
-            return WhiteflagMessage::new_discontinue("A".to_owned(), "4".to_owned())
+            return WhiteflagMessage::new_with_reference("A".to_owned(), "4".to_owned())
                 .unwrap()
                 .as_json();
         }
