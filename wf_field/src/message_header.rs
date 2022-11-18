@@ -1,5 +1,5 @@
 use crate::{
-    message_body_types::{Authentication, FreeText, MessageBodyType, Resource, Signal},
+    message_body_types::{Authentication, FreeText, MessageBodyType, Resource, Signal, Test},
     Field, MessageCodeType,
 };
 use serde::{Deserialize, Serialize};
@@ -56,6 +56,7 @@ impl Header {
             }
             MessageCodeType::Resource => MessageBodyType::Resource(Resource::new(self)),
             MessageCodeType::FreeText => MessageBodyType::Text(FreeText::new(self)),
+            MessageCodeType::Test => MessageBodyType::Test(Test::new(self)),
             MessageCodeType::Protective
             | MessageCodeType::Emergency
             | MessageCodeType::Danger

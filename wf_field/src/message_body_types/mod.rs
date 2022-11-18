@@ -5,10 +5,11 @@ mod crypto;
 mod freetext;
 mod resource;
 mod signal;
+mod test;
 
 pub use {
     authentication::Authentication, crypto::Crypto, freetext::FreeText, resource::Resource,
-    signal::Signal,
+    signal::Signal, test::Test,
 };
 
 /// 4.3 Message Body
@@ -16,8 +17,8 @@ pub enum MessageBodyType {
     Generic,
     Authentication(Authentication),
     Crypto(Crypto),
-    Text(freetext::FreeText),
-    // TEST,
+    Text(FreeText),
+    Test(Test),
     Resource(Resource),
     Signal(Signal),
     //REQUEST,
@@ -32,6 +33,7 @@ impl MessageBodyType {
             MessageBodyType::Resource(r) => serde_json::to_string(r)?,
             MessageBodyType::Signal(s) => serde_json::to_string(s)?,
             MessageBodyType::Text(s) => serde_json::to_string(s)?,
+            MessageBodyType::Test(s) => serde_json::to_string(s)?,
             _ => todo!(),
         })
     }
