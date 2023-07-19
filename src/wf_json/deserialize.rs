@@ -69,7 +69,7 @@ fn name_map(name: &str) -> Result<usize, String> {
         "pseudoMessageCode" => 14,
         /* sign signal */
         "subjectCode" => 15,
-        "datetime" => 16,
+        "dateTime" => 16,
         "duration" => 17,
         "objectType" => 18,
         "objectLatitude" => 19,
