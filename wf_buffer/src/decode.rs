@@ -9,7 +9,11 @@ impl WhiteflagBuffer {
     /// # Arguments
     /// * `field_defs` - field definitions required to decode the buffer
     /// * `start_bit` - the bit position where this segment starts in the encoded buffer
-    pub fn decode(&self, field_defs: &[FieldDefinition], start_bit: usize) -> Result<(usize, Vec<Field>), CodecError> {
+    pub fn decode(
+        &self,
+        field_defs: &[FieldDefinition],
+        start_bit: usize,
+    ) -> Result<(usize, Vec<Field>), CodecError> {
         if field_defs.is_empty() {
             return Err(CodecError::EmptyFieldDefinition());
         }
@@ -30,12 +34,20 @@ impl WhiteflagBuffer {
         Ok((bit_cursor, fields))
     }
 
-    pub fn extract_message_field(&self, definition: &FieldDefinition, start_bit: usize) -> Result<Field, CodecError> {
+    pub fn extract_message_field(
+        &self,
+        definition: &FieldDefinition,
+        start_bit: usize,
+    ) -> Result<Field, CodecError> {
         let value = self.extract_message_value(definition, start_bit)?;
         Ok(Field::new(definition.clone(), value))
     }
 
-    pub fn extract_message_value(&self, definition: &FieldDefinition, start_bit: usize) -> Result<String, CodecError> {
+    pub fn extract_message_value(
+        &self,
+        definition: &FieldDefinition,
+        start_bit: usize,
+    ) -> Result<String, CodecError> {
         let field_bit_length = definition.bit_length();
         let bit_length = if field_bit_length >= 1 {
             field_bit_length

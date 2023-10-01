@@ -16,11 +16,10 @@ pub enum HexDecodeError {
     InvalidHexDigit(char),
 }
 
-
 impl From<HexDecodeError> for CodecError {
     fn from(_: HexDecodeError) -> Self {
         Self::Hexadecimal()
     }
-} 
+}
 
 pub type CodecResult<T> = Result<T, CodecError>;

@@ -45,8 +45,16 @@ pub fn create_request_fields<T: FieldDefinitionParser>(parser: &mut T) -> Vec<Fi
             );
 
             [
-                Field::new_with_name(parser.parse(&ot).unwrap(), format!("{}{}", name, n_field), ot),
-                Field::new_with_name(parser.parse(&oq).unwrap(), format!("{}{}Quant", name, n_field), oq),
+                Field::new_with_name(
+                    parser.parse(&ot).unwrap(),
+                    format!("{}{}", name, n_field),
+                    ot,
+                ),
+                Field::new_with_name(
+                    parser.parse(&oq).unwrap(),
+                    format!("{}{}Quant", name, n_field),
+                    oq,
+                ),
             ]
         })
         .collect()

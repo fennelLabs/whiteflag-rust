@@ -1,4 +1,4 @@
-use crate::{definitions::*, FieldDefinition, Header, Error};
+use crate::{definitions::*, Error, FieldDefinition, Header};
 use std::str::FromStr;
 
 impl MessageCodeType {
@@ -137,20 +137,20 @@ impl FromStr for MessageCodeType {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let t = Self::get_message_code(s)?; /* match s {
-                                               "A" => MessageCodeType::Authentication,
-                                               "K" => MessageCodeType::Cryptographic,
-                                               "T" => MessageCodeType::Test,
-                                               "R" => MessageCodeType::Resource,
-                                               "F" => MessageCodeType::FreeText,
-                                               "P" => MessageCodeType::Protective,
-                                               "E" => MessageCodeType::Emergency,
-                                               "D" => MessageCodeType::Danger,
-                                               "S" => MessageCodeType::Status,
-                                               "I" => MessageCodeType::Infrastructure,
-                                               "M" => MessageCodeType::Mission,
-                                               "Q" => MessageCodeType::Request,
-                                               _ => MessageCodeType::Any,
-                                           }; */
+                                                "A" => MessageCodeType::Authentication,
+                                                "K" => MessageCodeType::Cryptographic,
+                                                "T" => MessageCodeType::Test,
+                                                "R" => MessageCodeType::Resource,
+                                                "F" => MessageCodeType::FreeText,
+                                                "P" => MessageCodeType::Protective,
+                                                "E" => MessageCodeType::Emergency,
+                                                "D" => MessageCodeType::Danger,
+                                                "S" => MessageCodeType::Status,
+                                                "I" => MessageCodeType::Infrastructure,
+                                                "M" => MessageCodeType::Mission,
+                                                "Q" => MessageCodeType::Request,
+                                                _ => MessageCodeType::Any,
+                                            }; */
 
         Ok(t)
     }

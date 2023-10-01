@@ -78,5 +78,9 @@ fn extract_code_for_t_message() {
 
     let test_code = psuedo_message_code().read(&buffer);
 
-    assert_eq!("M", test_code.unwrap(), "extracted message code should be T");
+    assert_eq!(
+        "M",
+        test_code.unwrap(),
+        "extracted message code should be T"
+    );
 }

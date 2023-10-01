@@ -1,4 +1,4 @@
-use crate::error::{CodecResult, CodecError};
+use crate::error::{CodecError, CodecResult};
 
 use super::{
     binary::{decode_to_binary, encode_from_binary},
@@ -116,7 +116,7 @@ impl Encoding {
             EncodingKind::DEC | EncodingKind::HEX => {
                 return match decode_to_bdx(buffer, bit_length) {
                     Ok(s) => Ok(s),
-                    Err(_) => Err(CodecError::Hexadecimal())
+                    Err(_) => Err(CodecError::Hexadecimal()),
                 }
             }
             EncodingKind::DATETIME => {

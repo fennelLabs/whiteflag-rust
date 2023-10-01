@@ -13,9 +13,9 @@ pub mod message;
 mod segment;
 mod wf_message_builder;
 
+use crate::error::WhiteflagError;
 use message::Message;
 use wf_field::FieldValue;
-use crate::error::WhiteflagError;
 
 /// encode an array of values, ordered according to the WF specification, into a hexadecimal string
 pub fn encode<T: FieldValue>(fields: &[T]) -> String {

@@ -1,6 +1,6 @@
 use crate::{
     message_body_types::{Authentication, FreeText, MessageBodyType, Resource, Signal},
-    Field, MessageCodeType, Error,
+    Error, Field, MessageCodeType,
 };
 use serde::{Deserialize, Serialize};
 

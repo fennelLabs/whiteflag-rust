@@ -1,5 +1,5 @@
-use wf_common::constants::QUADBIT;
 use crate::error::HexDecodeError;
+use wf_common::constants::QUADBIT;
 
 /// encodes a hexadecimal string into a binary buffer
 ///

@@ -87,7 +87,7 @@ impl Message {
     }
 
     /// decode a hexadecimal encoded whiteflag message
-    pub fn decode_from_hexadecimal<T: AsRef<str>>(message: T) -> Result<Self, WhiteflagError>  {
+    pub fn decode_from_hexadecimal<T: AsRef<str>>(message: T) -> Result<Self, WhiteflagError> {
         let buffer = match WhiteflagBuffer::decode_from_hexadecimal(message) {
             Ok(buffer) => buffer,
             Err(e) => Err(e)?,
@@ -118,7 +118,10 @@ impl Message {
     }
 
     /// decode a hexadecimal encoded and encrypted whiteflag message
-    pub fn decode_and_crypt<T: FennelCipher>(message: WhiteflagBuffer, cipher: &T) -> Result<Self, WhiteflagError> {
+    pub fn decode_and_crypt<T: FennelCipher>(
+        message: WhiteflagBuffer,
+        cipher: &T,
+    ) -> Result<Self, WhiteflagError> {
         let buffer = CryptedBuffer::new(message).crypt(cipher, CryptMode::Decrypt);
 
         Self::decode_from_buffer(buffer)
