@@ -1,4 +1,4 @@
-use crate::{definitions::*, FieldDefinition, Header};
+use crate::{definitions::*, FieldDefinition, Header, Error};
 use std::str::FromStr;
 
 impl MessageCodeType {
@@ -20,30 +20,29 @@ impl MessageCodeType {
         }
     }
 
-    pub fn definitions(&self) -> &'static [FieldDefinition] {
+    pub fn definitions(&self) -> Result<&'static [FieldDefinition], Error> {
         match &self {
-            MessageCodeType::Any => panic!("no definition fields for undefined message type"),
-            MessageCodeType::Authentication => authentication::DEFINITIONS,
-            MessageCodeType::Cryptographic => crypto::DEFINITIONS,
-            MessageCodeType::Test => test::DEFINITIONS,
-            MessageCodeType::Resource => resource::DEFINITIONS,
-            MessageCodeType::FreeText => freetext::DEFINITIONS,
+            MessageCodeType::Any => Err(Error::UndefinedMessageType),
+            MessageCodeType::Authentication => Ok(authentication::DEFINITIONS),
+            MessageCodeType::Cryptographic => Ok(crypto::DEFINITIONS),
+            MessageCodeType::Test => Ok(test::DEFINITIONS),
+            MessageCodeType::Resource => Ok(resource::DEFINITIONS),
+            MessageCodeType::FreeText => Ok(freetext::DEFINITIONS),
             MessageCodeType::Protective
             | MessageCodeType::Emergency
             | MessageCodeType::Danger
             | MessageCodeType::Status
             | MessageCodeType::Infrastructure
             | MessageCodeType::Mission
-            | MessageCodeType::Request => sign::DEFINITIONS,
+            | MessageCodeType::Request => Ok(sign::DEFINITIONS),
         }
     }
 
-    pub fn get_message_code(code: &str) -> Self {
-        Self::from_code(
-            code.chars()
-                .next()
-                .unwrap_or_else(|| panic!("invalid message code: {}", code)),
-        )
+    pub fn get_message_code(code: &str) -> Result<Self, Error> {
+        match Self::from_code(code.chars().next().unwrap()) {
+            MessageCodeType::Any => Err(Error::InvalidMessageCode),
+            t => Ok(t),
+        }
     }
 
     /* pub fn to_body(&self) -> MessageBodyType {
@@ -137,7 +136,7 @@ impl FromStr for MessageCodeType {
     type Err = super::error::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let t = Self::get_message_code(s); /* match s {
+        let t = Self::get_message_code(s)?; /* match s {
                                                "A" => MessageCodeType::Authentication,
                                                "K" => MessageCodeType::Cryptographic,
                                                "T" => MessageCodeType::Test,

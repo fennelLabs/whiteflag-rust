@@ -32,7 +32,6 @@ impl MessageBodyType {
             MessageBodyType::Resource(r) => serde_json::to_string(r)?,
             MessageBodyType::Signal(s) => serde_json::to_string(s)?,
             MessageBodyType::Text(s) => serde_json::to_string(s)?,
-            _ => todo!(),
         })
     }
 }

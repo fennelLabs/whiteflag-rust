@@ -55,7 +55,7 @@ pub fn encode_from_json<T: AsRef<str>>(json: T) -> Result<String, WhiteflagError
 /// assert_eq!(json.as_object().unwrap(), &serde_json::from_str::<serde_json::Map<String, serde_json::Value>>(&wf_message).unwrap());
 /// ```
 pub fn decode_from_hex<T: AsRef<str>>(hex: T) -> Result<String, WhiteflagError> {
-    let message = wf_core::decode(hex);
+    let message = wf_core::decode(hex)?;
     let json = serde_json::to_string(&message).map_err(WhiteflagError::Serde)?;
 
     Ok(json)
@@ -69,7 +69,7 @@ pub struct WhiteflagMessage {
 impl WhiteflagMessage {
     pub fn new(code: String) -> Result<Self, WhiteflagError> {
         let header = Header::new(code);
-        let body = header.to_body();
+        let body = header.to_body()?;
         Ok(Self {
             json: body.to_string()?,
             body,
@@ -81,7 +81,7 @@ impl WhiteflagMessage {
         reference_indicator: String,
     ) -> Result<Self, WhiteflagError> {
         let header = Header::new_discontinue(code, reference_indicator);
-        let body = header.to_body();
+        let body = header.to_body()?;
         Ok(Self {
             json: body.to_string()?,
             body,

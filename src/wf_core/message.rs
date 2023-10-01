@@ -8,6 +8,7 @@ use super::{
     },
     FieldValue,
 };
+use crate::error::WhiteflagError;
 use aes_tools::FennelCipher;
 use wf_account::whiteflag_account::WhiteflagAccount;
 use wf_buffer::WhiteflagBuffer;
@@ -76,28 +77,28 @@ impl Message {
     }
 
     /// construct Message from an array of field strings
-    pub fn compile<T: FieldValue>(data: &[T]) -> Self {
-        Self::from_parser(builder_from_field_values(data))
+    pub fn compile<T: FieldValue>(data: &[T]) -> Result<Self, WhiteflagError> {
+        Ok(Self::from_parser(builder_from_field_values(data)?))
     }
 
     /// construct Message from a serialized string
-    pub fn deserialize(message: &str) -> Message {
-        Self::from_parser(builder_from_serialized(message))
+    pub fn deserialize(message: &str) -> Result<Message, WhiteflagError> {
+        Ok(Self::from_parser(builder_from_serialized(message)?))
     }
 
     /// decode a hexadecimal encoded whiteflag message
-    pub fn decode_from_hexadecimal<T: AsRef<str>>(message: T) -> Self {
+    pub fn decode_from_hexadecimal<T: AsRef<str>>(message: T) -> Result<Self, WhiteflagError>  {
         let buffer = match WhiteflagBuffer::decode_from_hexadecimal(message) {
             Ok(buffer) => buffer,
-            Err(e) => panic!("{}", e),
+            Err(e) => Err(e)?,
         };
 
-        Self::from_parser(builder_from_encoded(buffer))
+        Ok(Self::from_parser(builder_from_encoded(buffer)?))
     }
 
     /// decode a hexadecimal encoded whiteflag message
-    pub fn decode_from_buffer(message: WhiteflagBuffer) -> Self {
-        Self::from_parser(builder_from_encoded(message))
+    pub fn decode_from_buffer(message: WhiteflagBuffer) -> Result<Self, WhiteflagError> {
+        Ok(Self::from_parser(builder_from_encoded(message)?))
     }
 
     pub fn encode_and_crypt<T: FennelCipher>(
@@ -117,7 +118,7 @@ impl Message {
     }
 
     /// decode a hexadecimal encoded and encrypted whiteflag message
-    pub fn decode_and_crypt<T: FennelCipher>(message: WhiteflagBuffer, cipher: &T) -> Self {
+    pub fn decode_and_crypt<T: FennelCipher>(message: WhiteflagBuffer, cipher: &T) -> Result<Self, WhiteflagError> {
         let buffer = CryptedBuffer::new(message).crypt(cipher, CryptMode::Decrypt);
 
         Self::decode_from_buffer(buffer)
@@ -147,6 +148,6 @@ impl Message {
 
 impl<T: FieldValue> From<&[T]> for Message {
     fn from(data: &[T]) -> Self {
-        Message::compile(data)
+        Message::compile(data).unwrap()
     }
 }

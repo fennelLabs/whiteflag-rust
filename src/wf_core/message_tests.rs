@@ -51,7 +51,7 @@ fn decode_sign_signal_message() {
         "042",
     ];
 
-    let message = decode(encoding_result);
+    let message = decode(encoding_result).unwrap();
 
     assert_eq!(field_values.concat(), message.serialize());
 }
@@ -94,7 +94,7 @@ fn decode_auth_message() {
         "https://organisation.int/whiteflag",
     ];
 
-    let message = decode("5746313020800000000000000000000000000000000000000000000000000000000000000000b43a3a38399d1797b7b933b0b734b9b0ba34b7b71734b73a17bbb434ba32b33630b380");
+    let message = decode("5746313020800000000000000000000000000000000000000000000000000000000000000000b43a3a38399d1797b7b933b0b734b9b0ba34b7b71734b73a17bbb434ba32b33630b380").unwrap();
 
     assert_eq!(field_values.concat(), message.serialize());
 }

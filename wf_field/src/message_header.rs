@@ -1,6 +1,6 @@
 use crate::{
     message_body_types::{Authentication, FreeText, MessageBodyType, Resource, Signal},
-    Field, MessageCodeType,
+    Field, MessageCodeType, Error,
 };
 use serde::{Deserialize, Serialize};
 
@@ -45,25 +45,25 @@ impl Header {
         }
     }
 
-    pub fn code(&self) -> MessageCodeType {
+    pub fn code(&self) -> Result<MessageCodeType, Error> {
         MessageCodeType::get_message_code(&self.message_code)
     }
 
-    pub fn to_body(self) -> MessageBodyType {
-        match &self.code() {
+    pub fn to_body(self) -> Result<MessageBodyType, Error> {
+        match &self.code()? {
             MessageCodeType::Authentication => {
-                MessageBodyType::Authentication(Authentication::new(self))
+                Ok(MessageBodyType::Authentication(Authentication::new(self)))
             }
-            MessageCodeType::Resource => MessageBodyType::Resource(Resource::new(self)),
-            MessageCodeType::FreeText => MessageBodyType::Text(FreeText::new(self)),
+            MessageCodeType::Resource => Ok(MessageBodyType::Resource(Resource::new(self))),
+            MessageCodeType::FreeText => Ok(MessageBodyType::Text(FreeText::new(self))),
             MessageCodeType::Protective
             | MessageCodeType::Emergency
             | MessageCodeType::Danger
             | MessageCodeType::Status
             | MessageCodeType::Infrastructure
             | MessageCodeType::Mission
-            | MessageCodeType::Request => MessageBodyType::Signal(Signal::new(self)),
-            _ => MessageBodyType::Generic,
+            | MessageCodeType::Request => Ok(MessageBodyType::Signal(Signal::new(self))),
+            _ => Ok(MessageBodyType::Generic),
         }
     }
 }

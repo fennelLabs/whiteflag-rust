@@ -1,4 +1,4 @@
-use crate::error::CodecResult;
+use crate::error::{CodecResult, CodecError};
 
 use super::{
     binary::{decode_to_binary, encode_from_binary},
@@ -114,10 +114,13 @@ impl Encoding {
                 return Ok(decode_to_binary(buffer, bit_length));
             }
             EncodingKind::DEC | EncodingKind::HEX => {
-                return Ok(decode_to_bdx(buffer, bit_length));
+                return match decode_to_bdx(buffer, bit_length) {
+                    Ok(s) => Ok(s),
+                    Err(_) => Err(CodecError::Hexadecimal())
+                }
             }
             EncodingKind::DATETIME => {
-                s.push_str(&decode_to_bdx(buffer, bit_length));
+                s.push_str(&decode_to_bdx(buffer, bit_length)?);
 
                 s.insert(4, '-');
                 s.insert(7, '-');
@@ -127,7 +130,7 @@ impl Encoding {
                 s.insert(19, 'Z');
             }
             EncodingKind::DURATION => {
-                s.push_str(&decode_to_bdx(buffer, bit_length));
+                s.push_str(&decode_to_bdx(buffer, bit_length)?);
 
                 s.insert(0, 'P');
                 s.insert(3, 'D');
@@ -142,7 +145,7 @@ impl Encoding {
                 };
 
                 s.push(sign);
-                s.push_str(decode_to_bdx(&shift_left(buffer, 1), bit_length - 1).as_str());
+                s.push_str(decode_to_bdx(&shift_left(buffer, 1), bit_length - 1)?.as_str());
                 s.insert(s.len() - 5, '.');
             }
         }
