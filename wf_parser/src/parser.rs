@@ -11,8 +11,8 @@ pub struct Parser {
 }
 
 impl Parser {
-    pub fn parse<T: FieldDefinitionParser>(mut parser: T) -> Self {
-        let mut header = Header::new(parser.parse_header());
+    pub fn parse<T: FieldDefinitionParser>(mut parser: T) -> Result<Self, wf_field::Error> {
+        let mut header = Header::new(parser.parse_header())?;
 
         let mut body = Vec::new();
 
@@ -23,17 +23,17 @@ impl Parser {
 
         let code = header.code();
 
-        let body_defs = code.definitions().to_vec();
+        let body_defs = code.definitions()?.to_vec();
         body.append(parser.parse_fields(body_defs).as_mut());
 
         if code == MessageCodeType::Request {
             body.append(create_request_fields(&mut parser).as_mut());
         }
 
-        Parser {
+        Ok(Parser {
             code,
             header: header.fields(),
             body,
-        }
+        })
     }
 }

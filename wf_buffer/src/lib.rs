@@ -1,3 +1,4 @@
+use wf_codec::CodecError;
 use wf_field::FieldDefinition;
 
 #[cfg(test)]
@@ -24,12 +25,12 @@ impl WhiteflagBuffer {
 }
 
 pub trait BufferReader {
-    fn read(&self, buffer: &WhiteflagBuffer) -> String;
+    fn read(&self, buffer: &WhiteflagBuffer) -> Result<String, CodecError>;
 }
 
 impl BufferReader for FieldDefinition {
     /// used in the decoding process
-    fn read(&self, buffer: &WhiteflagBuffer) -> String {
+    fn read(&self, buffer: &WhiteflagBuffer) -> Result<String, CodecError> {
         buffer.extract_message_value(self, self.positions.bit_start)
     }
 }

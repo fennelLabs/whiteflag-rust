@@ -1,8 +1,10 @@
+use wf_codec::CodecError;
+
 use crate::{definitions, Field, FieldDefinition};
 
 pub trait FieldDefinitionParser {
     /// uses FieldDefinition to extract the associated string value from data
-    fn parse(&mut self, definition: &FieldDefinition) -> String;
+    fn parse(&mut self, definition: &FieldDefinition) -> Result<String, CodecError>;
     /// meant to calculate remaining values (if any) for request field definitions
     fn remaining(&self) -> usize;
 }
@@ -16,14 +18,10 @@ pub trait FieldDefinitionParserBase {
 
 impl<T: FieldDefinitionParser> FieldDefinitionParserBase for T {
     fn parse_fields(&mut self, field_defs: Vec<FieldDefinition>) -> Vec<Field> {
-        /* if self.data.len() < field_defs.len() {
-            panic!("not enough field definitions to process given values\nvalues: {:#?}\ndefinitions: {:#?}", self.data, field_defs);
-        } */
-
         field_defs
             .into_iter()
             .map(|f| {
-                let value = self.parse(&f);
+                let value = self.parse(&f).unwrap();
                 Field::new(f, value)
             })
             .collect()

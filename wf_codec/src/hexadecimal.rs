@@ -1,4 +1,5 @@
 use wf_common::constants::QUADBIT;
+use crate::error::HexDecodeError;
 
 /// encodes a hexadecimal string into a binary buffer
 ///
@@ -15,16 +16,16 @@ pub fn encode_from_bdx<T: AsRef<str>>(hex: T) -> Vec<u8> {
     hex::decode(data).unwrap()
 }
 
-fn from_hex_digit(data: u8) -> char {
+fn from_hex_digit(data: u8) -> Result<char, HexDecodeError> {
     match data {
-        0..=9 => (data + b'0') as char,
-        10 => 'a',
-        11 => 'b',
-        12 => 'c',
-        13 => 'd',
-        14 => 'e',
-        15 => 'f',
-        16.. => panic!("invalid data"),
+        0..=9 => Ok((data + b'0') as char),
+        10 => Ok('a'),
+        11 => Ok('b'),
+        12 => Ok('c'),
+        13 => Ok('d'),
+        14 => Ok('e'),
+        15 => Ok('f'),
+        16.. => Err(HexDecodeError::InvalidHexDigit(data as char)),
     }
 }
 
@@ -35,7 +36,7 @@ fn from_hex_digit(data: u8) -> char {
 /// if the bit_length is not a multiple of 8, then the last byte is only split once, and `b & 0xF` is ignored
 ///
 /// java: WfMessageCodec.decodeBDX
-pub fn decode_to_bdx(buffer: &[u8], bit_length: usize) -> String {
+pub fn decode_to_bdx(buffer: &[u8], bit_length: usize) -> Result<String, HexDecodeError> {
     (0..(bit_length / QUADBIT))
         .map(|i| {
             // traverse buffer by 2

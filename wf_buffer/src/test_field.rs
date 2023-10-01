@@ -31,7 +31,7 @@ fn test_add_field_utf() {
 fn test_extract_field_utf() {
     let buffer: WhiteflagBuffer = vec![0x95, 0x74, 0x78, 0x74].into();
     let def = FieldDefinition::new(FIELDNAME, UTF8, 0, 0);
-    let field = buffer.extract_message_value(&def, 8);
+    let field = buffer.extract_message_value(&def, 8).unwrap();
 
     assert_eq!(
         "txt", field,
@@ -110,7 +110,7 @@ fn test_extract_field_dec() {
     let buffer: WhiteflagBuffer = vec![0x95, 0x91, 0xFF, 0xE7].into();
     let def = FieldDefinition::new(FIELDNAME, DEC, 0, 2);
 
-    let field = buffer.extract_message_value(&def, 10);
+    let field = buffer.extract_message_value(&def, 10).unwrap();
 
     assert_eq!(
         "47", field,
@@ -146,7 +146,7 @@ fn test_extract_field_hex() {
     let buffer: WhiteflagBuffer = vec![0x95, 0xDD, 0xFF, 0xE7].into();
 
     let def: FieldDefinition = FieldDefinition::new(FIELDNAME, HEX, 0, 2);
-    let field = buffer.extract_message_value(&def, 9);
+    let field = buffer.extract_message_value(&def, 9).unwrap();
 
     assert_eq!(
         "bb", field,

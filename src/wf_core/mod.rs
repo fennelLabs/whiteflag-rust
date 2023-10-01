@@ -15,6 +15,7 @@ mod wf_message_builder;
 
 use message::Message;
 use wf_field::FieldValue;
+use crate::error::WhiteflagError;
 
 /// encode an array of values, ordered according to the WF specification, into a hexadecimal string
 pub fn encode<T: FieldValue>(fields: &[T]) -> String {
@@ -24,6 +25,9 @@ pub fn encode<T: FieldValue>(fields: &[T]) -> String {
 }
 
 /// decode a hexadecimal encoded whiteflag message
-pub fn decode<T: AsRef<str>>(message: T) -> Message {
-    Message::decode_from_hexadecimal(message)
+pub fn decode<T: AsRef<str>>(message: T) -> Result<Message, WhiteflagError> {
+    match Message::decode_from_hexadecimal(message) {
+        Ok(message) => Ok(message),
+        Err(error) => Err(error),
+    }
 }

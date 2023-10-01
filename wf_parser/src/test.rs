@@ -59,14 +59,14 @@ fn extract_code_for_a_message() {
 
     let field = buffer.extract_message_value(&def, 33);
 
-    assert_eq!("A", field, "extracted message code should be A");
+    assert_eq!("A", field.unwrap(), "extracted message code should be A");
 }
 
 #[test]
 fn extract_code_for_a_message_2() {
     let buffer = WhiteflagBuffer::decode_from_hexadecimal(AUTH_MESSAGE).unwrap();
     let code = message_code().read(&buffer);
-    assert_eq!("A", code, "extracted message code should be A");
+    assert_eq!("A", code.unwrap(), "extracted message code should be A");
 }
 
 #[test]
@@ -74,9 +74,9 @@ fn extract_code_for_t_message() {
     let buffer = WhiteflagBuffer::decode_from_hexadecimal(TEST_MESSAGE).unwrap();
     let code = message_code().read(&buffer);
 
-    assert_eq!("T", code, "extracted message code should be T");
+    assert_eq!("T", code.unwrap(), "extracted message code should be T");
 
     let test_code = psuedo_message_code().read(&buffer);
 
-    assert_eq!("M", test_code, "extracted message code should be T");
+    assert_eq!("M", test_code.unwrap(), "extracted message code should be T");
 }

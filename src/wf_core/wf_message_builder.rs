@@ -1,5 +1,6 @@
 use std::ops::Div;
 use wf_buffer::WhiteflagBuffer;
+use wf_codec::CodecError;
 use wf_field::{FieldDefinition, FieldDefinitionParser, FieldValue};
 use wf_parser::Parser;
 use wf_validation::Validation;
@@ -10,13 +11,13 @@ pub struct SerializedMessageParser<'a> {
 }
 
 impl FieldDefinitionParser for SerializedMessageParser<'_> {
-    fn parse(&mut self, definition: &FieldDefinition) -> String {
+    fn parse(&mut self, definition: &FieldDefinition) -> Result<String, CodecError> {
         if let Some(end) = definition.positions.bytes.end {
             self.last_byte = end;
-            self.message[definition.positions.bytes.start..end].to_owned()
+            Ok(self.message[definition.positions.bytes.start..end].to_owned())
         } else {
             self.last_byte = self.message.len();
-            self.message[definition.positions.bytes.start..].to_owned()
+            Ok(self.message[definition.positions.bytes.start..].to_owned())
         }
     }
 
@@ -31,7 +32,7 @@ pub struct FieldValuesParser<'a, T: FieldValue> {
 }
 
 impl<T: FieldValue> FieldDefinitionParser for FieldValuesParser<'_, T> {
-    fn parse(&mut self, definition: &FieldDefinition) -> String {
+    fn parse(&mut self, definition: &FieldDefinition) -> Result<String, CodecError> {
         let value = self.data[self.index].as_ref();
 
         if let Err(e) = definition.validate(value) {
@@ -44,7 +45,7 @@ impl<T: FieldValue> FieldDefinitionParser for FieldValuesParser<'_, T> {
 
         self.index += 1;
 
-        value.into()
+        Ok(value.into())
     }
 
     fn remaining(&self) -> usize {
@@ -58,7 +59,7 @@ pub struct EncodedMessageParser {
 }
 
 impl FieldDefinitionParser for EncodedMessageParser {
-    fn parse(&mut self, definition: &FieldDefinition) -> String {
+    fn parse(&mut self, definition: &FieldDefinition) -> Result<String, CodecError> {
         let value = self
             .buffer
             .extract_message_value(definition, self.bit_cursor);
@@ -71,12 +72,12 @@ impl FieldDefinitionParser for EncodedMessageParser {
     }
 }
 
-pub fn builder_from_field_values<T: FieldValue>(data: &[T]) -> Parser {
+pub fn builder_from_field_values<T: FieldValue>(data: &[T]) -> Result<Parser, wf_field::Error> {
     let parser = FieldValuesParser { data, index: 0 };
     Parser::parse(parser)
 }
 
-pub fn builder_from_serialized(message: &str) -> Parser {
+pub fn builder_from_serialized(message: &str) -> Result<Parser, wf_field::Error> {
     let parser = SerializedMessageParser {
         message,
         last_byte: 0,
@@ -84,7 +85,7 @@ pub fn builder_from_serialized(message: &str) -> Parser {
     Parser::parse(parser)
 }
 
-pub fn builder_from_encoded(message: WhiteflagBuffer) -> Parser {
+pub fn builder_from_encoded(message: WhiteflagBuffer) -> Result<Parser, wf_field::Error> {
     let parser = EncodedMessageParser {
         buffer: message,
         bit_cursor: 0,

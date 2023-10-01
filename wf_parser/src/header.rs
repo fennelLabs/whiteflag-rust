@@ -8,16 +8,16 @@ pub struct Header {
 }
 
 impl Header {
-    pub fn new(fields: Vec<Field>) -> Self {
+    pub fn new(fields: Vec<Field>) -> Result<Self, wf_field::Error> {
         let code: MessageCodeType = MessageCodeType::get_message_code(
             fields[MessageHeaderOrder::MessageCode.as_usize()].get(),
-        );
+        )?;
 
-        Self {
+        Ok(Self {
             fields,
             code,
             psuedo_code: None,
-        }
+        })
     }
 
     /// if the pseudo code is present, that means self.code = 'T'
@@ -34,8 +34,14 @@ impl Header {
         // if this is a test message, then we need to parse the pseudo code
         if self.code == MessageCodeType::Test {
             let def = definitions::test::PSEUDO_MESSAGE_CODE;
-            let pseudo_code = parser.parse(&def);
-            self.psuedo_code = Some(MessageCodeType::get_message_code(&pseudo_code));
+            let pseudo_code = match parser.parse(&def) {
+                Ok(code) => code,
+                Err(_) => return None,
+            };
+            self.psuedo_code = match MessageCodeType::get_message_code(&pseudo_code) {
+                Ok(code) => Some(code),
+                Err(_) => None,
+            };
             Some(Field::new(def, pseudo_code))
         } else {
             None

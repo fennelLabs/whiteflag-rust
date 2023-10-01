@@ -1,3 +1,5 @@
+use wf_codec::CodecError;
+
 use super::field_definition::FieldDefinition;
 
 #[derive(Clone, Debug)]
@@ -47,20 +49,14 @@ impl Field {
         hex::encode(self.encode())
     }
 
-    pub fn decode(&mut self, data: &[u8]) -> String {
-        let s = match self
+    pub fn decode(&mut self, data: &[u8]) -> Result<String, CodecError> {
+        let s = self
             .definition
             .bytes
             .encoding
-            .decode(data, self.bit_length())
-        {
-            Ok(r) => r,
-            Err(e) => {
-                panic!("error: {}\n\t{:#?}", e, &self);
-            }
-        };
+            .decode(data, self.bit_length())?;
         self.value = s.clone();
-        s
+        Ok(s)
     }
 
     /// Gets the byte length of the unencoded field value

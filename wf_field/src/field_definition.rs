@@ -2,7 +2,7 @@ use crate::{
     byte_configuration::ByteConfiguration, codec_positions::CodecPositions,
     definitions::WhiteflagFields, Field,
 };
-use wf_codec::encoding::Encoding;
+use wf_codec::{encoding::Encoding, CodecError};
 use wf_validation::{Validation, ValidationError};
 
 #[derive(Clone, Debug)]
@@ -75,18 +75,18 @@ impl FieldDefinition {
         Ok(Field::new(self, data.into()))
     }
 
-    pub fn decode(&self, data: &[u8]) -> String {
+    pub fn decode(&self, data: &[u8]) -> Result<String, CodecError> {
         match self.positions.bytes.decode(data) {
-            Ok(r) => r,
+            Ok(r) => Ok(r),
             Err(e) => {
                 panic!("error: {}\n\t{:#?}", e, &self);
             }
         }
     }
 
-    pub fn decode_to_field(self, data: &[u8]) -> Field {
-        let value = self.decode(data);
-        Field::new(self, value)
+    pub fn decode_to_field(self, data: &[u8]) -> Result<Field, CodecError> {
+        let value = self.decode(data)?;
+        Ok(Field::new(self, value))
     }
 
     pub fn encode(&self, data: String) -> Vec<u8> {
