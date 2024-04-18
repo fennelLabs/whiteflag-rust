@@ -34,10 +34,8 @@ pub struct FieldValuesParser<'a, T: FieldValue> {
 impl<T: FieldValue> FieldDefinitionParser for FieldValuesParser<'_, T> {
     fn parse(&mut self, definition: &FieldDefinition) -> Result<String, CodecError> {
         let value = self.data[self.index].as_ref();
-        println!("{:#?}", value);
 
         if let Err(e) = definition.validate(value) {
-            // Print VALUE as a debug string
             println!("current value: {}", value);
             panic!(
                 "{} error while converting array of strings into fields\n{0:?}",
