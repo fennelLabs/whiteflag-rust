@@ -8,6 +8,10 @@ pub enum CodecError {
     Hexadecimal(),
     #[error("field definition vector should not be empty")]
     EmptyFieldDefinition(),
+    #[error("validation error while converting array of strings into fields: {error:?}")]
+    Validation {
+        error: String,
+    },
 }
 
 #[derive(thiserror::Error, Debug, PartialEq, Eq)]
