@@ -36,7 +36,9 @@ impl<T: FieldValue> FieldDefinitionParser for FieldValuesParser<'_, T> {
         let value = self.data[self.index].as_ref();
 
         if let Err(e) = definition.validate(value) {
-            return Err(CodecError::Validation { error: e.to_string() });
+            return Err(CodecError::Validation {
+                error: e.to_string(),
+            });
         };
 
         self.index += 1;
