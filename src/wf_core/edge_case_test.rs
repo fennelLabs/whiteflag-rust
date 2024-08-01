@@ -66,7 +66,7 @@ fn test_q_message() {
 
 fn test(serialized: &'static str, values: &'static [&'static str]) {
     let message: Message = values.into();
-    let encoded_message = super::encode(values);
+    let encoded_message = super::encode(values).unwrap();
     let decoded_message = super::decode(&encoded_message).unwrap();
 
     assert_eq!(

@@ -24,7 +24,7 @@ fn encode_sign_signal_message() {
 
     assert_eq!(
         encoding_result,
-        encode(&field_values),
+        encode(&field_values).unwrap(),
         "Encoding should be correct"
     );
 }
@@ -74,7 +74,7 @@ fn encode_auth_message() {
 
     assert_eq!(
         encoding_result,
-        encode(&auth_message),
+        encode(&auth_message).unwrap(),
         "Encoding should be correct"
     );
 }

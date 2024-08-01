@@ -18,10 +18,10 @@ use message::Message;
 use wf_field::FieldValue;
 
 /// encode an array of values, ordered according to the WF specification, into a hexadecimal string
-pub fn encode<T: FieldValue>(fields: &[T]) -> String {
-    let basic_message: Message = fields.into();
+pub fn encode<T: FieldValue>(fields: &[T]) -> Result<String, WhiteflagError> {
+    let basic_message: Message = Message::compile(fields)?;
     let message_encoded = basic_message.encode();
-    hex::encode(message_encoded)
+    Ok(hex::encode(message_encoded))
 }
 
 /// decode a hexadecimal encoded whiteflag message
