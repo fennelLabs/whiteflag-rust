@@ -11,23 +11,23 @@ pub trait FieldDefinitionParser {
 
 pub trait FieldDefinitionParserBase {
     /// parse multiple FieldDefinitions and extract its assoicated values and converts it into Fields
-    fn parse_fields(&mut self, field_defs: Vec<FieldDefinition>) -> Vec<Field>;
+    fn parse_fields(&mut self, field_defs: Vec<FieldDefinition>) -> Result<Vec<Field>, CodecError>;
     /// parses header definitions into an array of Fields
-    fn parse_header(&mut self) -> Vec<Field>;
+    fn parse_header(&mut self) -> Result<Vec<Field>, CodecError>;
 }
 
 impl<T: FieldDefinitionParser> FieldDefinitionParserBase for T {
-    fn parse_fields(&mut self, field_defs: Vec<FieldDefinition>) -> Vec<Field> {
-        field_defs
-            .into_iter()
-            .map(|f| {
-                let value = self.parse(&f).unwrap();
-                Field::new(f, value)
-            })
-            .collect()
+    fn parse_fields(&mut self, field_defs: Vec<FieldDefinition>) -> Result<Vec<Field>, CodecError> {
+        let mut fields: Vec<Field> = Vec::new();
+        for f in field_defs.into_iter() {
+            let value: String = self.parse(&f)?;
+            let field = Field::new(f, value);
+            fields.push(field);
+        }
+        Ok(fields)
     }
 
-    fn parse_header(&mut self) -> Vec<Field> {
+    fn parse_header(&mut self) -> Result<Vec<Field>, CodecError> {
         self.parse_fields(definitions::header::DEFINITIONS.to_vec())
     }
 }
