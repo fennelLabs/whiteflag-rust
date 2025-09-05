@@ -1,13 +1,26 @@
 #[cfg(test)]
 mod test;
 
+#[cfg(test)]
+mod integration_tests;
+
+// JWT/JWS support modules
+pub mod jws;
+pub mod dual_signer;
+pub mod whiteflag_jwt;
+
+// Re-export key types for convenience
+pub use jws::{JwtHeader, WhiteflagAuthPayload, WhiteflagJwsToken, JwsError};
+pub use dual_signer::{WhiteflagSigner, HybridAuth, SignerError};
+pub use whiteflag_jwt::{WhiteflagJwtAuth, TokenClaims, WhiteflagJwtError};
+
 use wf_crypto::{hkdf, CryptoResult};
 
 /// Whiteflag specifies two methods for authentication
 /// (4.3.4.2 https://standard.whiteflagprotocol.org/v1/)
 /// - (1) internet resource
 /// - (2) pre shared token
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum AuthenticationMethod {
     InternetResource,
     PresharedToken,
