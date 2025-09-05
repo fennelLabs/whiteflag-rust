@@ -1,3 +1,6 @@
 **/target
 .DS_Store
 **/.vscodeINVESTIGATION/
+
+# Implementation documentation files (keep local)
+IMPLEMENTATION_*.md
