@@ -48,13 +48,13 @@ impl WhiteflagSigner {
         // Create sr25519 keypair from seed using mini_secret_key
         use schnorrkel::MiniSecretKey;
         let mini_secret = MiniSecretKey::from_bytes(seed).map_err(|e| {
-            SignerError::KeyGeneration(format!("sr25519 mini secret from seed: {}", e))
+            SignerError::KeyGeneration(format!("sr25519 mini secret from seed: {e}"))
         })?;
         let sr25519_keypair = mini_secret.expand_to_keypair(schnorrkel::ExpansionMode::Ed25519);
 
         // Create ECDSA key from seed (using seed as entropy)
         let ecdsa_key = EcdsaSigningKey::from_bytes(seed.into())
-            .map_err(|e| SignerError::KeyGeneration(format!("ECDSA from seed: {}", e)))?;
+            .map_err(|e| SignerError::KeyGeneration(format!("ECDSA from seed: {e}")))?;
 
         Ok(Self::new(sr25519_keypair, ecdsa_key))
     }
@@ -82,7 +82,7 @@ impl WhiteflagSigner {
         let signature = self
             .ecdsa_key
             .try_sign(&hash)
-            .map_err(|e| SignerError::SigningError(format!("ECDSA signing failed: {}", e)))?;
+            .map_err(|e| SignerError::SigningError(format!("ECDSA signing failed: {e}")))?;
         Ok(signature)
     }
 
@@ -118,7 +118,7 @@ impl WhiteflagSigner {
         // Create signing input
         let header_b64 = Base64UrlUnpadded::encode_string(&header_json);
         let payload_b64 = Base64UrlUnpadded::encode_string(&payload_json);
-        let signing_input = format!("{}.{}", header_b64, payload_b64);
+        let signing_input = format!("{header_b64}.{payload_b64}");
 
         // Sign with ECDSA for JWT compliance
         let ecdsa_signature = self.sign_ecdsa(signing_input.as_bytes())?;
@@ -220,11 +220,11 @@ pub enum SignerError {
 impl fmt::Display for SignerError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            SignerError::KeyGeneration(msg) => write!(f, "Key generation error: {}", msg),
-            SignerError::SigningError(msg) => write!(f, "Signing error: {}", msg),
-            SignerError::SerializationError(msg) => write!(f, "Serialization error: {}", msg),
-            SignerError::TokenCreation(msg) => write!(f, "Token creation error: {}", msg),
-            SignerError::VerificationError(msg) => write!(f, "Verification error: {}", msg),
+            SignerError::KeyGeneration(msg) => write!(f, "Key generation error: {msg}"),
+            SignerError::SigningError(msg) => write!(f, "Signing error: {msg}"),
+            SignerError::SerializationError(msg) => write!(f, "Serialization error: {msg}"),
+            SignerError::TokenCreation(msg) => write!(f, "Token creation error: {msg}"),
+            SignerError::VerificationError(msg) => write!(f, "Verification error: {msg}"),
         }
     }
 }

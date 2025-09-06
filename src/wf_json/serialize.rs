@@ -55,7 +55,7 @@ fn name_map(name: &str) -> Result<&'static str, String> {
         "ObjectOrientation" => "objectOrientation",
         /* request */
         "ObjectTypeQuant" => "objectTypeQuant",
-        _ => return Err(format!("missing support for field name: {}", name)),
+        _ => return Err(format!("missing support for field name: {name}")),
     };
 
     Ok(json_name)

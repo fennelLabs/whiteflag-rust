@@ -156,9 +156,9 @@ impl FromStr for MessageCodeType {
     }
 }
 
-impl ToString for MessageCodeType {
-    fn to_string(&self) -> String {
-        match &self {
+impl std::fmt::Display for MessageCodeType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let code = match self {
             MessageCodeType::Any => "_",
             MessageCodeType::Authentication => "A",
             MessageCodeType::Cryptographic => "K",
@@ -172,7 +172,7 @@ impl ToString for MessageCodeType {
             MessageCodeType::Infrastructure => "I",
             MessageCodeType::Mission => "M",
             MessageCodeType::Request => "Q",
-        }
-        .to_string()
+        };
+        write!(f, "{code}")
     }
 }

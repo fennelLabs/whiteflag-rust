@@ -26,8 +26,5 @@ pub fn encode<T: FieldValue>(fields: &[T]) -> Result<String, WhiteflagError> {
 
 /// decode a hexadecimal encoded whiteflag message
 pub fn decode<T: AsRef<str>>(message: T) -> Result<Message, WhiteflagError> {
-    match Message::decode_from_hexadecimal(message) {
-        Ok(message) => Ok(message),
-        Err(error) => Err(error),
-    }
+    Message::decode_from_hexadecimal(message)
 }

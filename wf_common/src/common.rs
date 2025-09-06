@@ -202,7 +202,7 @@ pub fn concatinate_bits(
 
     /* Prepare byte arrays */
     let byte_array_2_shift = shift_right(byte_array_2, shift as isize);
-    let mut new_byte_array = vec![0; byte_length as usize];
+    let mut new_byte_array = vec![0; byte_length];
 
     /* Concatenation */
     let mut byte_cursor = 0;

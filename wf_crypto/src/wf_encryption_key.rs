@@ -52,7 +52,7 @@ impl WhiteflagEncryptionKey {
         AESCipher::new_from_shared_secret(&self.fixed_raw_secret())
     }
 
-    pub fn aes_256_ctr_cipher<'a>(&'a self, iv: &'a [u8]) -> AES256CTR {
+    pub fn aes_256_ctr_cipher<'a>(&'a self, iv: &'a [u8]) -> AES256CTR<'a> {
         AES256CTR::new(&self.secret_key, Some(iv))
     }
 }

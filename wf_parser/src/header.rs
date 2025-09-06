@@ -38,10 +38,7 @@ impl Header {
                 Ok(code) => code,
                 Err(_) => return None,
             };
-            self.psuedo_code = match MessageCodeType::get_message_code(&pseudo_code) {
-                Ok(code) => Some(code),
-                Err(_) => None,
-            };
+            self.psuedo_code = MessageCodeType::get_message_code(&pseudo_code).ok();
             Some(Field::new(def, pseudo_code))
         } else {
             None

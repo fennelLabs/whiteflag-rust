@@ -99,7 +99,7 @@ impl WhiteflagJwtAuth {
         // For now, we'll do basic parsing - full verification would require
         // the issuer's public key
         let payload_bytes = Base64UrlUnpadded::decode_vec(&jws.payload)
-            .map_err(|e| WhiteflagJwtError::InvalidToken(format!("Base64 decode error: {}", e)))?;
+            .map_err(|e| WhiteflagJwtError::InvalidToken(format!("Base64 decode error: {e}")))?;
 
         let claims: TokenClaims = serde_json::from_slice(&payload_bytes)?;
 
@@ -249,12 +249,12 @@ pub enum WhiteflagJwtError {
 impl std::fmt::Display for WhiteflagJwtError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            WhiteflagJwtError::SignerError(e) => write!(f, "Signer error: {}", e),
-            WhiteflagJwtError::JwsError(e) => write!(f, "JWS error: {}", e),
-            WhiteflagJwtError::SerializationError(e) => write!(f, "Serialization error: {}", e),
-            WhiteflagJwtError::InvalidToken(msg) => write!(f, "Invalid token: {}", msg),
+            WhiteflagJwtError::SignerError(e) => write!(f, "Signer error: {e}"),
+            WhiteflagJwtError::JwsError(e) => write!(f, "JWS error: {e}"),
+            WhiteflagJwtError::SerializationError(e) => write!(f, "Serialization error: {e}"),
+            WhiteflagJwtError::InvalidToken(msg) => write!(f, "Invalid token: {msg}"),
             WhiteflagJwtError::TokenExpired => write!(f, "Token has expired"),
-            WhiteflagJwtError::InvalidClaims(msg) => write!(f, "Invalid claims: {}", msg),
+            WhiteflagJwtError::InvalidClaims(msg) => write!(f, "Invalid claims: {msg}"),
         }
     }
 }

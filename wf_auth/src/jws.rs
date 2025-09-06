@@ -94,7 +94,7 @@ impl WhiteflagJwsToken {
     }
 
     /// Verify the signature using provided public key
-    pub fn verify_signature(&self, public_key: &[u8]) -> Result<bool, JwsError> {
+    pub fn verify_signature(&self, _public_key: &[u8]) -> Result<bool, JwsError> {
         // This is a placeholder - actual verification depends on the signature algorithm
         // For ECDSA P-256, we would use the p256 crate
         // For sr25519, we would use schnorrkel
@@ -127,10 +127,10 @@ pub enum JwsError {
 impl fmt::Display for JwsError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            JwsError::InvalidFormat(msg) => write!(f, "Invalid JWS format: {}", msg),
-            JwsError::SerializationError(err) => write!(f, "Serialization error: {}", err),
-            JwsError::SignatureError(msg) => write!(f, "Signature error: {}", msg),
-            JwsError::ValidationError(msg) => write!(f, "Validation error: {}", msg),
+            JwsError::InvalidFormat(msg) => write!(f, "Invalid JWS format: {msg}"),
+            JwsError::SerializationError(err) => write!(f, "Serialization error: {err}"),
+            JwsError::SignatureError(msg) => write!(f, "Signature error: {msg}"),
+            JwsError::ValidationError(msg) => write!(f, "Validation error: {msg}"),
         }
     }
 }

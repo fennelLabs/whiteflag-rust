@@ -40,7 +40,7 @@ impl Header {
             encryption_indicator: "0".to_string(),
             duress_indicator: "0".to_string(),
             message_code: code,
-            reference_indicator: reference_indicator,
+            reference_indicator,
             referenced_message: EMPTY_MESSAGE.to_string(),
         }
     }
@@ -68,6 +68,7 @@ impl Header {
     }
 }
 
+#[allow(dead_code)]
 pub trait MessageHeader {
     type Target: ?Sized;
 
