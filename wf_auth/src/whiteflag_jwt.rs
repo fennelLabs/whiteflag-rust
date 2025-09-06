@@ -157,7 +157,7 @@ impl WhiteflagJwtAuth {
     fn create_key_id(&self) -> Result<String, WhiteflagJwtError> {
         let sr25519_pk = self.signer.sr25519_public_key();
         let public_key_bytes = sr25519_pk.to_bytes();
-        let hash = Sha256::digest(&public_key_bytes);
+        let hash = Sha256::digest(public_key_bytes);
         Ok(Base64UrlUnpadded::encode_string(&hash[..8]))
     }
 }
