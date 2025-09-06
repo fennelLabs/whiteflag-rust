@@ -5,14 +5,14 @@ mod test;
 mod integration_tests;
 
 // JWT/JWS support modules
-pub mod jws;
 pub mod dual_signer;
+pub mod jws;
 pub mod whiteflag_jwt;
 
 // Re-export key types for convenience
-pub use jws::{JwtHeader, WhiteflagAuthPayload, WhiteflagJwsToken, JwsError};
-pub use dual_signer::{WhiteflagSigner, HybridAuth, SignerError};
-pub use whiteflag_jwt::{WhiteflagJwtAuth, TokenClaims, WhiteflagJwtError};
+pub use dual_signer::{HybridAuth, SignerError, WhiteflagSigner};
+pub use jws::{JwsError, JwtHeader, WhiteflagAuthPayload, WhiteflagJwsToken};
+pub use whiteflag_jwt::{TokenClaims, WhiteflagJwtAuth, WhiteflagJwtError};
 
 use wf_crypto::{hkdf, CryptoResult};
 

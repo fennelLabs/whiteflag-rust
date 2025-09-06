@@ -52,41 +52,47 @@ pub struct WhiteflagJwsToken {
 
 impl WhiteflagJwsToken {
     /// Create a new JWS token from components
-    pub fn new(header: &JwtHeader, payload: &WhiteflagAuthPayload, signature: &[u8]) -> Result<Self, JwsError> {
+    pub fn new(
+        header: &JwtHeader,
+        payload: &WhiteflagAuthPayload,
+        signature: &[u8],
+    ) -> Result<Self, JwsError> {
         let header_json = serde_json::to_vec(header)?;
         let payload_json = serde_json::to_vec(payload)?;
-        
+
         Ok(Self {
             header: Base64UrlUnpadded::encode_string(&header_json),
             payload: Base64UrlUnpadded::encode_string(&payload_json),
             signature: Base64UrlUnpadded::encode_string(signature),
         })
     }
-    
+
     /// Get the signing input (header.payload)
     pub fn signing_input(&self) -> String {
         format!("{}.{}", self.header, self.payload)
     }
-    
+
     /// Get the complete JWS compact serialization
     pub fn compact(&self) -> String {
         format!("{}.{}.{}", self.header, self.payload, self.signature)
     }
-    
+
     /// Parse a JWS token from compact serialization
     pub fn from_compact(token: &str) -> Result<Self, JwsError> {
         let parts: Vec<&str> = token.split('.').collect();
         if parts.len() != 3 {
-            return Err(JwsError::InvalidFormat("JWS must have exactly 3 parts".to_string()));
+            return Err(JwsError::InvalidFormat(
+                "JWS must have exactly 3 parts".to_string(),
+            ));
         }
-        
+
         Ok(Self {
             header: parts[0].to_string(),
             payload: parts[1].to_string(),
             signature: parts[2].to_string(),
         })
     }
-    
+
     /// Verify the signature using provided public key
     pub fn verify_signature(&self, public_key: &[u8]) -> Result<bool, JwsError> {
         // This is a placeholder - actual verification depends on the signature algorithm
@@ -94,7 +100,7 @@ impl WhiteflagJwsToken {
         // For sr25519, we would use schnorrkel
         Ok(true) // Simplified for now
     }
-    
+
     /// Create a hash of the token for sr25519 compatibility
     pub fn token_hash(&self) -> [u8; 32] {
         let mut hasher = Sha256::new();
@@ -141,14 +147,14 @@ impl From<serde_json::Error> for JwsError {
 mod tests {
     use super::*;
     use chrono::Utc;
-    
+
     #[test]
     fn test_jwt_header_default() {
         let header = JwtHeader::default();
         assert_eq!(header.alg, "ES256");
         assert_eq!(header.typ, "JWT");
     }
-    
+
     #[test]
     fn test_jws_token_creation() {
         let header = JwtHeader::default();
@@ -161,13 +167,13 @@ mod tests {
             whiteflag_claims: serde_json::json!({"method": 1}),
         };
         let signature = b"dummy_signature";
-        
+
         let token = WhiteflagJwsToken::new(&header, &payload, signature).unwrap();
         assert!(!token.header.is_empty());
         assert!(!token.payload.is_empty());
         assert!(!token.signature.is_empty());
     }
-    
+
     #[test]
     fn test_jws_compact_format() {
         let header = JwtHeader::default();
@@ -180,13 +186,13 @@ mod tests {
             whiteflag_claims: serde_json::json!({}),
         };
         let signature = b"sig";
-        
+
         let token = WhiteflagJwsToken::new(&header, &payload, signature).unwrap();
         let compact = token.compact();
-        
+
         // Should have 3 parts separated by dots
         assert_eq!(compact.matches('.').count(), 2);
-        
+
         // Should be able to parse it back
         let parsed = WhiteflagJwsToken::from_compact(&compact).unwrap();
         assert_eq!(parsed.header, token.header);
