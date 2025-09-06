@@ -120,9 +120,9 @@ impl WhiteflagSigner {
         let payload_b64 = Base64UrlUnpadded::encode_string(&payload_json);
         let signing_input = format!("{header_b64}.{payload_b64}");
 
-        // Sign with ECDSA for JWT compliance
-        let ecdsa_signature = self.sign_ecdsa(signing_input.as_bytes())?;
-        let signature_bytes = ecdsa_signature.to_bytes();
+        // Sign with sr25519 for Polkadot/Substrate compatibility
+        let sr25519_signature = self.sign_sr25519(signing_input.as_bytes());
+        let signature_bytes = sr25519_signature.to_bytes();
 
         // Create the JWS token
         WhiteflagJwsToken::new(&header, &payload, &signature_bytes)

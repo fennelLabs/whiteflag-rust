@@ -135,22 +135,16 @@ impl WhiteflagJwtAuth {
 
     /// Create a verification key set (JWK Set) for this signer
     pub fn create_jwks(&self) -> Result<serde_json::Value, WhiteflagJwtError> {
-        let ecdsa_pk = self.signer.ecdsa_public_key();
-        let point = ecdsa_pk.to_encoded_point(false);
+        let sr25519_pk = self.signer.sr25519_public_key();
+        let public_key_bytes = sr25519_pk.to_bytes();
 
-        // Extract coordinates from the uncompressed point
-        let point_bytes = point.as_bytes();
-        // Skip the first byte (0x04) which indicates uncompressed format
-        let x_bytes = &point_bytes[1..33];
-        let y_bytes = &point_bytes[33..65];
-
+        // Create a custom JWK for sr25519 (not standard JWK format)
         let jwk = json!({
-            "kty": "EC",
-            "crv": "P-256",
-            "x": Base64UrlUnpadded::encode_string(x_bytes),
-            "y": Base64UrlUnpadded::encode_string(y_bytes),
+            "kty": "OKP", // Octet Key Pair (closest standard type)
+            "crv": "Ed25519", // Using Ed25519 as closest standard curve
+            "x": Base64UrlUnpadded::encode_string(&public_key_bytes),
             "use": "sig",
-            "alg": "ES256",
+            "alg": "sr25519", // Custom algorithm identifier
             "kid": self.create_key_id()?,
         });
 
@@ -161,9 +155,9 @@ impl WhiteflagJwtAuth {
 
     /// Create a unique key identifier
     fn create_key_id(&self) -> Result<String, WhiteflagJwtError> {
-        let ecdsa_pk = self.signer.ecdsa_public_key();
-        let point = ecdsa_pk.to_encoded_point(false);
-        let hash = Sha256::digest(point.as_bytes());
+        let sr25519_pk = self.signer.sr25519_public_key();
+        let public_key_bytes = sr25519_pk.to_bytes();
+        let hash = Sha256::digest(&public_key_bytes);
         Ok(Base64UrlUnpadded::encode_string(&hash[..8]))
     }
 }
@@ -332,9 +326,9 @@ mod tests {
         assert_eq!(keys.len(), 1);
 
         let key = &keys[0];
-        assert_eq!(key.get("kty").unwrap().as_str().unwrap(), "EC");
-        assert_eq!(key.get("crv").unwrap().as_str().unwrap(), "P-256");
-        assert_eq!(key.get("alg").unwrap().as_str().unwrap(), "ES256");
+        assert_eq!(key.get("kty").unwrap().as_str().unwrap(), "OKP");
+        assert_eq!(key.get("crv").unwrap().as_str().unwrap(), "Ed25519");
+        assert_eq!(key.get("alg").unwrap().as_str().unwrap(), "sr25519");
     }
 
     #[test]

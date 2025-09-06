@@ -273,7 +273,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Use a mock blockchain address for testing
     let blockchain_address = "0x742d35Cc6634C0532925a3b8D2Cc1A51e37DcFF1";
-    let originator_pubkey = hex::encode(signer.ecdsa_public_key().to_encoded_point(false));
+    let originator_pubkey = hex::encode(signer.sr25519_public_key().to_bytes());
 
     let auth_payload = create_whiteflag_auth_payload(blockchain_address, &originator_pubkey);
 
@@ -285,12 +285,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Sign the authentication payload
     let payload_string = serde_json::to_string(&auth_payload)?;
-    let signature = signer.sign_ecdsa(payload_string.as_bytes())?;
+    let signature = signer.sign_sr25519(payload_string.as_bytes());
 
     // Create signature data in Whiteflag format
     let signature_data = json!({
         "signature": hex::encode(signature.to_bytes()),
-        "algorithm": "ES256",
+        "algorithm": "sr25519",
         "publicKey": originator_pubkey,
         "payload": auth_payload
     });
@@ -364,11 +364,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("===========================");
     println!("✅ JWT token generation: WORKING");
     println!("✅ JWKS generation: WORKING");
-    println!("✅ ECDSA signature creation: WORKING");
+    println!("✅ sr25519 signature creation: WORKING");
     println!("✅ Whiteflag message format: COMPATIBLE");
     println!("🔗 API connectivity: ESTABLISHED");
     println!("\n💡 Next steps:");
-    println!("1. Configure the Whiteflag API to recognize ES256 signatures");
+    println!("1. Configure the Whiteflag API to recognize sr25519 signatures");
     println!("2. Set up blockchain connectivity in the API");
     println!("3. Publish your JWKS at the internet resource URL");
     println!("4. Test end-to-end authentication flow");
@@ -401,7 +401,7 @@ async fn demonstrate_jwt_format() -> Result<(), Box<dyn std::error::Error>> {
     println!("📋 JWT Token for Whiteflag API:");
     println!("Length: {} characters", jwt.len());
     println!("Format: RFC 7515 JWS Compact Serialization");
-    println!("Algorithm: ES256 (ECDSA using P-256 and SHA-256)");
+    println!("Algorithm: sr25519 (Schnorr signatures on Ristretto25519)");
     println!("Token: {}\n", jwt);
 
     // Show JWT parts

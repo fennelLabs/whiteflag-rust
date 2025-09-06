@@ -6,7 +6,7 @@ use std::fmt;
 /// JWT Header for Whiteflag authentication
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JwtHeader {
-    /// Algorithm identifier (always "ES256" for Whiteflag compatibility)
+    /// Algorithm identifier (always "sr25519" for Polkadot/Substrate compatibility)
     pub alg: String,
     /// Token type (always "JWT")
     pub typ: String,
@@ -15,7 +15,7 @@ pub struct JwtHeader {
 impl Default for JwtHeader {
     fn default() -> Self {
         Self {
-            alg: "ES256".to_string(),
+            alg: "sr25519".to_string(),
             typ: "JWT".to_string(),
         }
     }
@@ -151,7 +151,7 @@ mod tests {
     #[test]
     fn test_jwt_header_default() {
         let header = JwtHeader::default();
-        assert_eq!(header.alg, "ES256");
+        assert_eq!(header.alg, "sr25519");
         assert_eq!(header.typ, "JWT");
     }
 

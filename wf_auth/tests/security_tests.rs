@@ -285,7 +285,7 @@ mod security_tests {
 
     #[test]
     fn test_algorithm_consistency() {
-        // Verify that we consistently use ES256
+        // Verify that we consistently use sr25519
         let signer = WhiteflagSigner::generate().unwrap();
         let jwt_auth = WhiteflagJwtAuth::new(
             signer,
@@ -304,7 +304,7 @@ mod security_tests {
             serde_json::from_slice(&general_purpose::URL_SAFE_NO_PAD.decode(parts[0]).unwrap())
                 .unwrap();
 
-        assert_eq!(header.get("alg").unwrap(), "ES256");
+        assert_eq!(header.get("alg").unwrap(), "sr25519");
         assert_eq!(header.get("typ").unwrap(), "JWT");
     }
 

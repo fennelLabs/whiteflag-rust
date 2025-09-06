@@ -131,13 +131,13 @@ mod integration_tests {
         assert_eq!(keys.len(), 1);
 
         let key = &keys[0];
-        assert_eq!(key.get("kty").unwrap().as_str().unwrap(), "EC");
-        assert_eq!(key.get("crv").unwrap().as_str().unwrap(), "P-256");
-        assert_eq!(key.get("alg").unwrap().as_str().unwrap(), "ES256");
+        assert_eq!(key.get("kty").unwrap().as_str().unwrap(), "OKP");
+        assert_eq!(key.get("crv").unwrap().as_str().unwrap(), "Ed25519");
+        assert_eq!(key.get("alg").unwrap().as_str().unwrap(), "sr25519");
         assert_eq!(key.get("use").unwrap().as_str().unwrap(), "sig");
         assert!(key.get("kid").is_some());
         assert!(key.get("x").is_some());
-        assert!(key.get("y").is_some());
+        // Note: sr25519 keys don't have separate x,y coordinates like ECDSA
 
         println!("✅ JWKS generation test passed");
         println!("JWKS: {}", serde_json::to_string_pretty(&jwks).unwrap());
@@ -170,7 +170,7 @@ mod integration_tests {
         // Decode and verify header
         let header_bytes = Base64UrlUnpadded::decode_vec(parts[0]).unwrap();
         let header: JwtHeader = serde_json::from_slice(&header_bytes).unwrap();
-        assert_eq!(header.alg, "ES256");
+        assert_eq!(header.alg, "sr25519");
         assert_eq!(header.typ, "JWT");
 
         // Decode and verify payload

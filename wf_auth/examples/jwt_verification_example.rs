@@ -145,7 +145,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("jwt.verify(token, getKey, {{");
     println!("  audience: 'whiteflag-mainnet',");
     println!("  issuer: 'fennel-validator-001',");
-    println!("  algorithms: ['ES256']");
+    println!("  algorithms: ['sr25519']");
     println!("}}, (err, decoded) => {{");
     println!("  if (err) {{");
     println!("    console.error('Verification failed:', err);");
@@ -158,14 +158,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("\n🎯 Integration Summary:");
     println!("=======================");
     println!("✅ JWT format: RFC 7515 compliant");
-    println!("✅ Algorithm: ES256 (ECDSA P-256 + SHA-256)");
+    println!("✅ Algorithm: sr25519 (Schnorr signatures on Ristretto25519)");
     println!("✅ Standard library compatible");
     println!("✅ JWKS format available");
     println!("✅ Whiteflag Method 1 compatible");
     println!("✅ Node.js jsonwebtoken library compatible");
 
     println!("\n💡 For Whiteflag API integration:");
-    println!("1. Update the API to accept ES256 algorithm");
+    println!("1. Update the API to accept sr25519 algorithm");
     println!("2. Configure JWKS endpoint verification");
     println!("3. Add support for Fennel's custom claims");
     println!("4. Test with the above JWT token format");
