@@ -33,6 +33,17 @@ pub struct FieldValuesParser<'a, T: FieldValue> {
 
 impl<T: FieldValue> FieldDefinitionParser for FieldValuesParser<'_, T> {
     fn parse(&mut self, definition: &FieldDefinition) -> Result<String, CodecError> {
+        // Bounds checking to prevent index out of bounds panic
+        if self.index >= self.data.len() {
+            return Err(CodecError::Validation {
+                error: format!(
+                    "Not enough field values provided. Expected at least {} values, but only {} were provided.",
+                    self.index + 1,
+                    self.data.len()
+                ),
+            });
+        }
+
         let value = self.data[self.index].as_ref();
 
         if let Err(e) = definition.validate(value) {
@@ -89,4 +100,47 @@ pub fn builder_from_encoded(message: WhiteflagBuffer) -> Result<Parser, wf_field
         bit_cursor: 0,
     };
     Parser::parse(parser)
+}
+
+#[cfg(test)]
+mod wf_message_builder_tests {
+    use super::*;
+
+    #[test]
+    fn test_bounds_checking_with_insufficient_data() {
+        // Test case that would previously cause index out of bounds panic
+        let insufficient_data = vec!["WF"]; // Only 1 element, but parser needs at least 7 for header
+        
+        let result = builder_from_field_values(&insufficient_data);
+        
+        // Should return an error instead of panicking
+        assert!(result.is_err());
+        
+        // Check that the error message contains our bounds checking message
+        if let Err(e) = result {
+            let error_string = format!("{}", e);
+            assert!(error_string.contains("Not enough field values provided"));
+        }
+    }
+
+    #[test]
+    fn test_bounds_checking_with_sufficient_data() {
+        // Test with sufficient data - should work normally
+        let sufficient_data = vec![
+            "WF",           // Prefix
+            "1",            // Version  
+            "0",            // EncryptionIndicator
+            "0",            // DuressIndicator
+            "A",            // MessageCode
+            "0",            // ReferenceIndicator
+            "0000000000000000000000000000000000000000000000000000000000000000", // ReferencedMessage
+            "1",            // VerificationMethod
+            "https://test.com" // VerificationData
+        ];
+        
+        let result = builder_from_field_values(&sufficient_data);
+        
+        // Should succeed with sufficient data
+        assert!(result.is_ok());
+    }
 }
