@@ -19,7 +19,7 @@ pub fn remove_hexadecimal_prefix(data: &str) -> &str {
 /// java equivalent: WfBinaryBuffer.byteLength
 pub fn byte_length(bit_length: usize) -> usize {
     let i_byte = BYTE;
-    (bit_length / i_byte) + usize::from(!bit_length.is_multiple_of(i_byte))
+    (bit_length / i_byte) + usize::from(bit_length % i_byte != 0)
 }
 
 /// Shortens the byte array to fit the length of the used bits
