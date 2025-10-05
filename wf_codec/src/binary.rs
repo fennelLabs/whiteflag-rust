@@ -7,12 +7,7 @@ use wf_common::constants::BYTE;
 pub fn encode_from_binary<T: AsRef<str>>(binary_str: T) -> Vec<u8> {
     let binary = binary_str.as_ref();
     let bit_length: usize = binary.len();
-    let byte_length: usize = (bit_length / BYTE)
-        + (if bit_length % BYTE == 0 {
-            0
-        } else {
-            1
-        });
+    let byte_length: usize = (bit_length / BYTE) + (if bit_length % BYTE == 0 { 0 } else { 1 });
 
     let mut buffer = vec![0; byte_length];
 
