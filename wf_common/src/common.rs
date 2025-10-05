@@ -17,6 +17,7 @@ pub fn remove_hexadecimal_prefix(data: &str) -> &str {
 
 /// Calculates the number of bytes required to hold the given number of bits
 /// java equivalent: WfBinaryBuffer.byteLength
+#[allow(unknown_lints, clippy::manual_is_multiple_of)]
 pub fn byte_length(bit_length: usize) -> usize {
     let i_byte = BYTE;
     (bit_length / i_byte) + usize::from(bit_length % i_byte != 0)
