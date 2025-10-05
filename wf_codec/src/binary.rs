@@ -3,11 +3,12 @@ use wf_common::constants::BYTE;
 /// encodes a binary string into a binary buffer
 ///
 /// java: WfMessageCodec.encodeBIN
+#[allow(unknown_lints, clippy::manual_is_multiple_of)]
 pub fn encode_from_binary<T: AsRef<str>>(binary_str: T) -> Vec<u8> {
     let binary = binary_str.as_ref();
     let bit_length: usize = binary.len();
     let byte_length: usize = (bit_length / BYTE)
-        + (if bit_length.is_multiple_of(BYTE) {
+        + (if bit_length % BYTE == 0 {
             0
         } else {
             1
