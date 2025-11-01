@@ -118,7 +118,7 @@ mod wf_message_builder_tests {
 
         // Check that the error message contains our bounds checking message
         if let Err(e) = result {
-            let error_string = format!("{}", e);
+            let error_string = format!("{e}");
             assert!(error_string.contains("Not enough field values provided"));
         }
     }

@@ -87,7 +87,7 @@ impl WfAccount for WhiteflagAccount {
     }
 
     fn get_ecdh_public_key(&mut self) -> Option<&[u8]> {
-        self.ecdh_public_key.as_ref().map(|v| v.as_slice())
+        self.ecdh_public_key.as_deref()
     }
 
     fn set_ecdh_public_key(&mut self, ecdh_public_key: Vec<u8>) -> WhiteflagAccountResult<()> {
@@ -140,8 +140,7 @@ impl WhiteflagAccount {
         // Create A(0) message JSON manually
         // ReferenceIndicator = "0" for initial authentication per spec 5.1.1
         format!(
-            r#"{{"prefix":"WF","version":"1","encryptionIndicator":"0","duressIndicator":"0","messageCode":"A","referenceIndicator":"0","referencedMessage":"0000000000000000000000000000000000000000000000000000000000000000","verificationMethod":"{}","verificationData":"{}"}}"#,
-            method, data
+            r#"{{"prefix":"WF","version":"1","encryptionIndicator":"0","duressIndicator":"0","messageCode":"A","referenceIndicator":"0","referencedMessage":"0000000000000000000000000000000000000000000000000000000000000000","verificationMethod":"{method}","verificationData":"{data}"}}"#
         )
     }
 

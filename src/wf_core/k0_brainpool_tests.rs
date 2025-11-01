@@ -64,7 +64,7 @@ fn test_k0_message_with_brainpool_public_key() {
     );
 
     println!("✅ K0 message successfully created with brainpoolP256r1 public key:");
-    println!("   Public key (hex): {}", public_key_hex);
+    println!("   Public key (hex): {public_key_hex}");
     println!("   Message length: {} characters", serialized.len());
     println!("   Serialized: {}...", &serialized[..80]);
 }
@@ -142,6 +142,6 @@ fn test_k0_message_deterministic_key() {
     let _message = Message::compile(&field_values).expect("Failed to compile K0 message");
 
     println!("✅ Deterministic brainpool key generation works:");
-    println!("   Public key: {}", pk1);
+    println!("   Public key: {pk1}");
     println!("   K0 message compiles successfully");
 }

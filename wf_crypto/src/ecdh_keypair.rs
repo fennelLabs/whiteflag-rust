@@ -83,7 +83,7 @@ impl WhiteflagECDHKeyPair {
 
     fn negotiate_internal(&self, peer_public_bytes: &[u8]) -> Result<Vec<u8>, String> {
         let peer_encoded = EncodedPoint::<BrainpoolP256r1>::from_bytes(peer_public_bytes)
-            .map_err(|e| format!("Invalid SEC1 encoding: {:?}", e))?;
+            .map_err(|e| format!("Invalid SEC1 encoding: {e:?}"))?;
 
         let peer_affine =
             Option::<BrainpoolAffine>::from(BrainpoolAffine::from_encoded_point(&peer_encoded))
@@ -111,7 +111,7 @@ impl WhiteflagECDHKeyPair {
         let hkdf = Hkdf::<Sha256>::new(Some(salt), &shared_secret);
         let mut output_key_material = [0u8; 32];
         hkdf.expand(info, &mut output_key_material)
-            .map_err(|e| format!("HKDF expansion failed: {:?}", e))?;
+            .map_err(|e| format!("HKDF expansion failed: {e:?}"))?;
 
         Ok(output_key_material)
     }
