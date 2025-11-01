@@ -8,8 +8,22 @@ edition = "2021"
 [dependencies]
 thiserror = "1.0.31"
 hex = "0.4.3"
+
+# Brainpool P-256 for Whiteflag compliance (RFC 5639)
+bp256 = { version = "0.14.0-rc.0", default-features = false, features = ["alloc", "arithmetic"] }
+elliptic-curve = { version = "0.14.0-rc.16", default-features = false, features = ["sec1", "arithmetic"] }
+
+# Legacy X25519 (kept for reference, will be removed after migration)
 x25519-dalek = { version = "2.0.1", features=["static_secrets"] }
-aes_tools = { git = "https://github.com/fennelLabs/fennel-lib", branch = "master" }
-dh_tools = { git = "https://github.com/fennelLabs/fennel-lib", branch = "master" }
+
+# AES and key derivation
+aes_tools = { git = "https://github.com/fennelLabs/fennel-lib", branch = "whiteflagupdatefennellib2025" }
+dh_tools = { git = "https://github.com/fennelLabs/fennel-lib", branch = "whiteflagupdatefennellib2025" }
 hkdf = "0.12.3"
 sha2 = "0.10.2"
+
+# Random number generation
+rand_core = { version = "0.9", features = ["std", "os_rng"] }
+
+# Zeroization of secrets
+zeroize = { version = "1.8", features = ["zeroize_derive"] }

@@ -7,6 +7,9 @@ mod message_feature_parity_tests;
 #[cfg(test)]
 mod edge_case_test;
 
+#[cfg(test)]
+mod k0_brainpool_tests;
+
 mod crypted_buffer;
 pub mod error;
 pub mod message;
