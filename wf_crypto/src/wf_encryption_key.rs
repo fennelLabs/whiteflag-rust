@@ -18,7 +18,7 @@ pub struct WhiteflagEncryptionKey {
 
 impl WhiteflagEncryptionKey {
     /// Constructs a new Whiteflag encryption key through ECDH key negotiation
-    /// 
+    ///
     /// # Arguments
     /// * `public_key_bytes` - Peer's public key in SEC1 format (33 bytes compressed or 65 bytes uncompressed)
     /// * `ecdh_key_pair` - Our ECDH key pair for negotiation

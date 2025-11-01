@@ -103,17 +103,17 @@ impl WfAccount for WhiteflagAccount {
 /// Additional methods for Whiteflag A(0) initial authentication
 impl WhiteflagAccount {
     /// Generates an A(0) initial authentication message JSON for this account
-    /// 
-    /// Per Whiteflag spec 5.1.1: "Each account should be identified by sending 
+    ///
+    /// Per Whiteflag spec 5.1.1: "Each account should be identified by sending
     /// an A(0) initial authentication message, before sending any other message."
-    /// 
+    ///
     /// This creates a JSON string representing the A(0) authentication message.
     /// The message will use the account's auth_url (Method 1) or auth_token (Method 2)
     /// if configured, otherwise it will use a default placeholder URL.
-    /// 
+    ///
     /// # Returns
     /// - JSON string with verification data from the account
-    /// 
+    ///
     /// # Example
     /// ```
     /// let mut account = WhiteflagAccount::new(true);
@@ -136,7 +136,7 @@ impl WhiteflagAccount {
             // No authentication data set - use default URL
             ("1", "https://organisation.int/whiteflag".to_string())
         };
-        
+
         // Create A(0) message JSON manually
         // ReferenceIndicator = "0" for initial authentication per spec 5.1.1
         format!(
@@ -144,9 +144,9 @@ impl WhiteflagAccount {
             method, data
         )
     }
-    
+
     /// Checks if this account has authentication data configured
-    /// 
+    ///
     /// # Returns
     /// - `true` if auth_url or auth_token is set
     /// - `false` if neither is configured

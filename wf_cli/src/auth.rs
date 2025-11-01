@@ -1,7 +1,7 @@
 use std::{
+    env,
     fs::{self, File},
     path::Path,
-    env,
 };
 
 use fennel_whiteflag::WhiteflagMessage;
@@ -44,16 +44,17 @@ impl UserAuthenticationState {
         }
 
         acquire_auth_lock();
-        
+
         // Generate A(0) initial authentication message per Whiteflag spec 5.1.1
-        // "Each account should be identified by sending an A(0) initial authentication 
+        // "Each account should be identified by sending an A(0) initial authentication
         // message, before sending any other message."
-        
+
         // Check for authentication URL from environment variable or config
-        let verification_method = env::var("WHITEFLAG_VERIFICATION_METHOD").unwrap_or_else(|_| "1".to_string());
+        let verification_method =
+            env::var("WHITEFLAG_VERIFICATION_METHOD").unwrap_or_else(|_| "1".to_string());
         let verification_data = env::var("WHITEFLAG_AUTH_URL")
             .unwrap_or_else(|_| "https://organisation.int/whiteflag".to_string());
-        
+
         // Generate A(0) message with ReferenceIndicator="0" (initial authentication)
         format!(
             r#"{{"prefix":"WF","version":"1","encryptionIndicator":"0","duressIndicator":"0","messageCode":"A","referenceIndicator":"0","referencedMessage":"0000000000000000000000000000000000000000000000000000000000000000","verificationMethod":"{}","verificationData":"{}"}}"#,
