@@ -47,7 +47,12 @@ impl ByteConfiguration {
     }
 
     pub fn decode(&self, data: &[u8]) -> CodecResult<String> {
-        self.encoding.decode(data, self.bit_length())
+        self.decode_with_length(data, self.bit_length())
+    }
+
+    /// Decode with an explicit bit length (used for variable-length fields)
+    pub fn decode_with_length(&self, data: &[u8], bit_length: usize) -> CodecResult<String> {
+        self.encoding.decode(data, bit_length)
     }
 }
 
