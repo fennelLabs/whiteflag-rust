@@ -84,6 +84,16 @@ impl FieldDefinition {
         }
     }
 
+    /// Decode with an explicit bit length (used for variable-length fields)
+    pub fn decode_with_length(&self, data: &[u8], bit_length: usize) -> Result<String, CodecError> {
+        match self.positions.bytes.decode_with_length(data, bit_length) {
+            Ok(r) => Ok(r),
+            Err(e) => {
+                panic!("error: {}\n\t{:#?}", e, &self);
+            }
+        }
+    }
+
     pub fn decode_to_field(self, data: &[u8]) -> Result<Field, CodecError> {
         let value = self.decode(data)?;
         Ok(Field::new(self, value))

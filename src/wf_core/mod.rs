@@ -7,6 +7,9 @@ mod message_feature_parity_tests;
 #[cfg(test)]
 mod edge_case_test;
 
+#[cfg(test)]
+mod k0_brainpool_tests;
+
 mod crypted_buffer;
 pub mod error;
 pub mod message;
@@ -26,8 +29,5 @@ pub fn encode<T: FieldValue>(fields: &[T]) -> Result<String, WhiteflagError> {
 
 /// decode a hexadecimal encoded whiteflag message
 pub fn decode<T: AsRef<str>>(message: T) -> Result<Message, WhiteflagError> {
-    match Message::decode_from_hexadecimal(message) {
-        Ok(message) => Ok(message),
-        Err(error) => Err(error),
-    }
+    Message::decode_from_hexadecimal(message)
 }

@@ -60,7 +60,7 @@ fn decode_sign_signal_message() {
 fn encode_auth_message() {
     let encoding_result: String = "5746313020800000000000000000000000000000000000000000000000000000000000000000b43a3a38399d1797b7b933b0b734b9b0ba34b7b71734b73a17bbb434ba32b33630b380".to_string();
 
-    let auth_message = vec![
+    let auth_message = [
         "WF",
         "1",
         "0",
@@ -82,7 +82,7 @@ fn encode_auth_message() {
 #[test]
 fn decode_auth_message() {
     /* Setup */
-    let field_values = vec![
+    let field_values = [
         "WF",
         "1",
         "0",

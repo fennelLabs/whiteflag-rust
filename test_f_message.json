@@ -1,0 +1,11 @@
+{
+  "prefix": "WF",
+  "version": "1",
+  "encryptionIndicator": "0",
+  "duressIndicator": "0",
+  "messageCode": "T",
+  "referenceIndicator": "0",
+  "referencedMessage": "0000000000000000000000000000000000000000000000000000000000000000",
+  "pseudoMessageCode": "F",
+  "text": "Test annotation"
+}

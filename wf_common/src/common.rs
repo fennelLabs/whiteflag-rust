@@ -17,9 +17,10 @@ pub fn remove_hexadecimal_prefix(data: &str) -> &str {
 
 /// Calculates the number of bytes required to hold the given number of bits
 /// java equivalent: WfBinaryBuffer.byteLength
+#[allow(unknown_lints, clippy::manual_is_multiple_of)]
 pub fn byte_length(bit_length: usize) -> usize {
     let i_byte = BYTE;
-    (bit_length / i_byte) + usize::from((bit_length % i_byte) > 0)
+    (bit_length / i_byte) + usize::from(bit_length % i_byte != 0)
 }
 
 /// Shortens the byte array to fit the length of the used bits
@@ -202,7 +203,7 @@ pub fn concatinate_bits(
 
     /* Prepare byte arrays */
     let byte_array_2_shift = shift_right(byte_array_2, shift as isize);
-    let mut new_byte_array = vec![0; byte_length as usize];
+    let mut new_byte_array = vec![0; byte_length];
 
     /* Concatenation */
     let mut byte_cursor = 0;

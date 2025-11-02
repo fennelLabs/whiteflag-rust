@@ -1,7 +1,6 @@
 use super::error::WhiteflagAccountResult;
 use wf_auth::WhiteflagAuthToken;
 use wf_crypto::{ecdh_keypair::WhiteflagECDHKeyPair, wf_encryption_key::WhiteflagEncryptionKey};
-use x25519_dalek::PublicKey;
 
 /// Ports the interface found in https://github.com/fennelLabs/whiteflag-java/blob/master/src/main/java/org/whiteflagprotocol/java/WfAccount.java
 pub trait WfAccount {
@@ -37,8 +36,8 @@ pub trait WfAccount {
         ecdh_keypair: WhiteflagECDHKeyPair,
     ) -> WhiteflagAccountResult<()>;
 
-    /// Gets the other's ECDH public key used to negatioate a key with this participant's account
+    /// Gets the other's ECDH public key (SEC1 compressed, 33 bytes) used to negotiate a key with this participant's account
     /// Whiteflag Specification 5.2.4 Message Encryption
-    fn get_ecdh_public_key(&mut self) -> Option<&PublicKey>;
-    fn set_ecdh_public_key(&mut self, ecdh_public_key: PublicKey) -> WhiteflagAccountResult<()>;
+    fn get_ecdh_public_key(&mut self) -> Option<&[u8]>;
+    fn set_ecdh_public_key(&mut self, ecdh_public_key: Vec<u8>) -> WhiteflagAccountResult<()>;
 }

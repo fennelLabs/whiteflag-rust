@@ -1,7 +1,6 @@
 use super::ecdh_keypair::WhiteflagECDHKeyPair;
 use super::encryption_method::WhiteflagEncryptionMethod;
 use aes_tools::{AESCipher, AES256CTR};
-use x25519_dalek::PublicKey;
 
 /// This class represents a Whiteflag encryption key. Instances of this
 /// class represent the raw key, either pre-shared or negotiated, from which
@@ -19,9 +18,13 @@ pub struct WhiteflagEncryptionKey {
 
 impl WhiteflagEncryptionKey {
     /// Constructs a new Whiteflag encryption key through ECDH key negotiation
-    pub fn from_ecdh_key(public_key: &PublicKey, ecdh_key_pair: &WhiteflagECDHKeyPair) -> Self {
+    ///
+    /// # Arguments
+    /// * `public_key_bytes` - Peer's public key in SEC1 format (33 bytes compressed or 65 bytes uncompressed)
+    /// * `ecdh_key_pair` - Our ECDH key pair for negotiation
+    pub fn from_ecdh_key(public_key_bytes: &[u8], ecdh_key_pair: &WhiteflagECDHKeyPair) -> Self {
         WhiteflagEncryptionKey {
-            secret_key: ecdh_key_pair.negotiate(public_key),
+            secret_key: ecdh_key_pair.negotiate(public_key_bytes),
             method: WhiteflagEncryptionMethod::from_number(1).unwrap(),
         }
     }
@@ -52,7 +55,7 @@ impl WhiteflagEncryptionKey {
         AESCipher::new_from_shared_secret(&self.fixed_raw_secret())
     }
 
-    pub fn aes_256_ctr_cipher<'a>(&'a self, iv: &'a [u8]) -> AES256CTR {
+    pub fn aes_256_ctr_cipher<'a>(&'a self, iv: &'a [u8]) -> AES256CTR<'a> {
         AES256CTR::new(&self.secret_key, Some(iv))
     }
 }

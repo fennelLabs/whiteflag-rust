@@ -64,7 +64,7 @@ fn auth_message_deserialization() {
 
 #[test]
 fn auth_message_decoding() {
-    let field_values = vec![
+    let field_values = [
         "WF",
         "1",
         "0",

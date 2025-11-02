@@ -54,19 +54,19 @@ fn name_map(name: &str) -> Result<usize, String> {
         "messageCode" => 4,
         "referenceIndicator" => 5,
         "referencedMessage" => 6,
+        /* test - MUST come before other body fields for Test messages */
+        "pseudoMessageCode" => 7,
         /* authentication */
-        "verificationMethod" => 7,
-        "verificationData" => 8,
+        "verificationMethod" => 8,
+        "verificationData" => 9,
         /* crypto */
-        "cryptoDataType" => 9,
-        "cryptoData" => 10,
+        "cryptoDataType" => 10,
+        "cryptoData" => 11,
         /* free text */
-        "text" => 11,
+        "text" => 12,
         /* resource */
-        "resourceMethod" => 12,
-        "resourceData" => 13,
-        /* test */
-        "pseudoMessageCode" => 14,
+        "resourceMethod" => 13,
+        "resourceData" => 14,
         /* sign signal */
         "subjectCode" => 15,
         "dateTime" => 16,
